@@ -1,0 +1,961 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<abapGit version="v1.0.0" serializer="LCL_OBJECT_MSAG" serializer_version="v1.0.0">
+ <asx:abap xmlns:asx="http://www.sap.com/abapxml" version="1.0">
+  <asx:values>
+   <T100A>
+    <ARBGB>/GDA/SDM_ART</ARBGB>
+    <MASTERLANG>E</MASTERLANG>
+    <STEXT>SDM: Article Master</STEXT>
+   </T100A>
+   <T100>
+    <T100>
+     <SPRSL>E</SPRSL>
+     <ARBGB>/GDA/SDM_ART</ARBGB>
+     <MSGNR>000</MSGNR>
+     <TEXT>SDM: MARA TEST</TEXT>
+    </T100>
+    <T100>
+     <SPRSL>E</SPRSL>
+     <ARBGB>/GDA/SDM_ART</ARBGB>
+     <MSGNR>001</MSGNR>
+     <TEXT>SDM: EINA  TEST</TEXT>
+    </T100>
+    <T100>
+     <SPRSL>E</SPRSL>
+     <ARBGB>/GDA/SDM_ART</ARBGB>
+     <MSGNR>002</MSGNR>
+     <TEXT>SDM: EORD TEST</TEXT>
+    </T100>
+    <T100>
+     <SPRSL>E</SPRSL>
+     <ARBGB>/GDA/SDM_ART</ARBGB>
+     <MSGNR>003</MSGNR>
+     <TEXT>SDM: MPOP TEST</TEXT>
+    </T100>
+    <T100>
+     <SPRSL>E</SPRSL>
+     <ARBGB>/GDA/SDM_ART</ARBGB>
+     <MSGNR>004</MSGNR>
+     <TEXT>SDM: MVKE TEST</TEXT>
+    </T100>
+    <T100>
+     <SPRSL>E</SPRSL>
+     <ARBGB>/GDA/SDM_ART</ARBGB>
+     <MSGNR>005</MSGNR>
+     <TEXT>SDM: MWLI TEST</TEXT>
+    </T100>
+    <T100>
+     <SPRSL>E</SPRSL>
+     <ARBGB>/GDA/SDM_ART</ARBGB>
+     <MSGNR>006</MSGNR>
+     <TEXT>SDM: MARD TEST</TEXT>
+    </T100>
+    <T100>
+     <SPRSL>E</SPRSL>
+     <ARBGB>/GDA/SDM_ART</ARBGB>
+     <MSGNR>007</MSGNR>
+     <TEXT>SDM: MARC TEST</TEXT>
+    </T100>
+    <T100>
+     <SPRSL>E</SPRSL>
+     <ARBGB>/GDA/SDM_ART</ARBGB>
+     <MSGNR>008</MSGNR>
+     <TEXT>SDM: MAKT TEST</TEXT>
+    </T100>
+    <T100>
+     <SPRSL>E</SPRSL>
+     <ARBGB>/GDA/SDM_ART</ARBGB>
+     <MSGNR>009</MSGNR>
+     <TEXT>SDM: MAW1 TEST</TEXT>
+    </T100>
+    <T100>
+     <SPRSL>E</SPRSL>
+     <ARBGB>/GDA/SDM_ART</ARBGB>
+     <MSGNR>010</MSGNR>
+     <TEXT>SDM: PRICING TEST</TEXT>
+    </T100>
+    <T100>
+     <SPRSL>E</SPRSL>
+     <ARBGB>/GDA/SDM_ART</ARBGB>
+     <MSGNR>011</MSGNR>
+     <TEXT>SDM: MAST TEST</TEXT>
+    </T100>
+    <T100>
+     <SPRSL>E</SPRSL>
+     <ARBGB>/GDA/SDM_ART</ARBGB>
+     <MSGNR>012</MSGNR>
+     <TEXT>SDM: EINE TEST</TEXT>
+    </T100>
+    <T100>
+     <SPRSL>E</SPRSL>
+     <ARBGB>/GDA/SDM_ART</ARBGB>
+     <MSGNR>013</MSGNR>
+     <TEXT>SDM: KONH TEST</TEXT>
+    </T100>
+    <T100>
+     <SPRSL>E</SPRSL>
+     <ARBGB>/GDA/SDM_ART</ARBGB>
+     <MSGNR>014</MSGNR>
+     <TEXT>SDM: MALG TEST</TEXT>
+    </T100>
+    <T100>
+     <SPRSL>E</SPRSL>
+     <ARBGB>/GDA/SDM_ART</ARBGB>
+     <MSGNR>015</MSGNR>
+     <TEXT>SDM: MAMT TEST</TEXT>
+    </T100>
+    <T100>
+     <SPRSL>E</SPRSL>
+     <ARBGB>/GDA/SDM_ART</ARBGB>
+     <MSGNR>016</MSGNR>
+     <TEXT>SDM: MBEW TEST</TEXT>
+    </T100>
+    <T100>
+     <SPRSL>E</SPRSL>
+     <ARBGB>/GDA/SDM_ART</ARBGB>
+     <MSGNR>017</MSGNR>
+     <TEXT>SDM: MLGN TEST</TEXT>
+    </T100>
+    <T100>
+     <SPRSL>E</SPRSL>
+     <ARBGB>/GDA/SDM_ART</ARBGB>
+     <MSGNR>018</MSGNR>
+     <TEXT>SDM: MARM TEST</TEXT>
+    </T100>
+    <T100>
+     <SPRSL>E</SPRSL>
+     <ARBGB>/GDA/SDM_ART</ARBGB>
+     <MSGNR>019</MSGNR>
+     <TEXT>SDM: MEAN TEST</TEXT>
+    </T100>
+    <T100>
+     <SPRSL>E</SPRSL>
+     <ARBGB>/GDA/SDM_ART</ARBGB>
+     <MSGNR>020</MSGNR>
+     <TEXT>SDM: MLAN TEST</TEXT>
+    </T100>
+    <T100>
+     <SPRSL>E</SPRSL>
+     <ARBGB>/GDA/SDM_ART</ARBGB>
+     <MSGNR>021</MSGNR>
+     <TEXT>SDM: MLEA TEST</TEXT>
+    </T100>
+    <T100>
+     <SPRSL>E</SPRSL>
+     <ARBGB>/GDA/SDM_ART</ARBGB>
+     <MSGNR>022</MSGNR>
+     <TEXT>SDM: MLGT TEST</TEXT>
+    </T100>
+    <T100>
+     <SPRSL>E</SPRSL>
+     <ARBGB>/GDA/SDM_ART</ARBGB>
+     <MSGNR>023</MSGNR>
+     <TEXT>SDM: MYMS TEST</TEXT>
+    </T100>
+    <T100>
+     <SPRSL>E</SPRSL>
+     <ARBGB>/GDA/SDM_ART</ARBGB>
+     <MSGNR>024</MSGNR>
+     <TEXT>SDM: MEINH TEST</TEXT>
+    </T100>
+    <T100>
+     <SPRSL>E</SPRSL>
+     <ARBGB>/GDA/SDM_ART</ARBGB>
+     <MSGNR>025</MSGNR>
+     <TEXT>SDM: MPGD TEST</TEXT>
+    </T100>
+    <T100>
+     <SPRSL>E</SPRSL>
+     <ARBGB>/GDA/SDM_ART</ARBGB>
+     <MSGNR>026</MSGNR>
+     <TEXT>SDM: RMMW1 TEST</TEXT>
+    </T100>
+    <T100>
+     <SPRSL>E</SPRSL>
+     <ARBGB>/GDA/SDM_ART</ARBGB>
+     <MSGNR>027</MSGNR>
+     <TEXT>SDM: SRCLIST TEST</TEXT>
+    </T100>
+    <T100>
+     <SPRSL>E</SPRSL>
+     <ARBGB>/GDA/SDM_ART</ARBGB>
+     <MSGNR>028</MSGNR>
+     <TEXT>SDM: TARIFFS TEST</TEXT>
+    </T100>
+    <T100>
+     <SPRSL>E</SPRSL>
+     <ARBGB>/GDA/SDM_ART</ARBGB>
+     <MSGNR>029</MSGNR>
+     <TEXT>SDM: WLK1 TEST</TEXT>
+    </T100>
+    <T100>
+     <SPRSL>E</SPRSL>
+     <ARBGB>/GDA/SDM_ART</ARBGB>
+     <MSGNR>030</MSGNR>
+     <TEXT>SDM: WLK2 TEST</TEXT>
+    </T100>
+    <T100>
+     <SPRSL>E</SPRSL>
+     <ARBGB>/GDA/SDM_ART</ARBGB>
+     <MSGNR>031</MSGNR>
+     <TEXT>SDM: MG03STEUER TEST</TEXT>
+    </T100>
+    <T100>
+     <SPRSL>E</SPRSL>
+     <ARBGB>/GDA/SDM_ART</ARBGB>
+     <MSGNR>050</MSGNR>
+     <TEXT>SDM: No PIR records exists</TEXT>
+    </T100>
+    <T100>
+     <SPRSL>E</SPRSL>
+     <ARBGB>/GDA/SDM_ART</ARBGB>
+     <MSGNR>051</MSGNR>
+     <TEXT>SDM: EINA mark for deletion</TEXT>
+    </T100>
+    <T100>
+     <SPRSL>E</SPRSL>
+     <ARBGB>/GDA/SDM_ART</ARBGB>
+     <MSGNR>052</MSGNR>
+     <TEXT>SDM: EINE mark for deletion</TEXT>
+    </T100>
+    <T100>
+     <SPRSL>E</SPRSL>
+     <ARBGB>/GDA/SDM_ART</ARBGB>
+     <MSGNR>053</MSGNR>
+     <TEXT>SDM: ZCSA PIR Consignment type</TEXT>
+    </T100>
+    <T100>
+     <SPRSL>E</SPRSL>
+     <ARBGB>/GDA/SDM_ART</ARBGB>
+     <MSGNR>054</MSGNR>
+     <TEXT>SDM: ZCSA Material Number Used by Supplier must be blank</TEXT>
+    </T100>
+    <T100>
+     <SPRSL>E</SPRSL>
+     <ARBGB>/GDA/SDM_ART</ARBGB>
+     <MSGNR>055</MSGNR>
+     <TEXT>SDM: Material Number Used by Supplier may not be blank</TEXT>
+    </T100>
+    <T100>
+     <SPRSL>E</SPRSL>
+     <ARBGB>/GDA/SDM_ART</ARBGB>
+     <MSGNR>100</MSGNR>
+     <TEXT>SDM: No source list record exist for article &amp;</TEXT>
+    </T100>
+    <T100>
+     <SPRSL>E</SPRSL>
+     <ARBGB>/GDA/SDM_ART</ARBGB>
+     <MSGNR>101</MSGNR>
+     <TEXT>SDM: Existing source list record for article &amp; is not assigned to DC/ST</TEXT>
+    </T100>
+    <T100>
+     <SPRSL>E</SPRSL>
+     <ARBGB>/GDA/SDM_ART</ARBGB>
+     <MSGNR>102</MSGNR>
+     <TEXT>SDM: Existing source list record for article &amp; is only assigned to ST</TEXT>
+    </T100>
+    <T100>
+     <SPRSL>E</SPRSL>
+     <ARBGB>/GDA/SDM_ART</ARBGB>
+     <MSGNR>103</MSGNR>
+     <TEXT>SDM: Existing source list record for article &amp; is no longer valid</TEXT>
+    </T100>
+    <T100>
+     <SPRSL>E</SPRSL>
+     <ARBGB>/GDA/SDM_ART</ARBGB>
+     <MSGNR>104</MSGNR>
+     <TEXT>SDM: X-plant status may not be blank</TEXT>
+    </T100>
+    <T100>
+     <SPRSL>E</SPRSL>
+     <ARBGB>/GDA/SDM_ART</ARBGB>
+     <MSGNR>105</MSGNR>
+     <TEXT>SDM: X-plant status valid from date may not be blank</TEXT>
+    </T100>
+    <T100>
+     <SPRSL>E</SPRSL>
+     <ARBGB>/GDA/SDM_ART</ARBGB>
+     <MSGNR>106</MSGNR>
+     <TEXT>SDM: Rounding Profile may not be blank for MRP type &apos;ND&apos; - Store</TEXT>
+    </T100>
+    <T100>
+     <SPRSL>E</SPRSL>
+     <ARBGB>/GDA/SDM_ART</ARBGB>
+     <MSGNR>107</MSGNR>
+     <TEXT>SDM: Rounding Profile may not be blank for MRP type &apos;ND&apos; - DC</TEXT>
+    </T100>
+    <T100>
+     <SPRSL>E</SPRSL>
+     <ARBGB>/GDA/SDM_ART</ARBGB>
+     <MSGNR>108</MSGNR>
+     <TEXT>SDM: MRP controller may not be blank - Store</TEXT>
+    </T100>
+    <T100>
+     <SPRSL>E</SPRSL>
+     <ARBGB>/GDA/SDM_ART</ARBGB>
+     <MSGNR>109</MSGNR>
+     <TEXT>SDM: MRP controller may not be blank -  DC</TEXT>
+    </T100>
+    <T100>
+     <SPRSL>E</SPRSL>
+     <ARBGB>/GDA/SDM_ART</ARBGB>
+     <MSGNR>110</MSGNR>
+     <TEXT>SDM: Rem. Shelf Life must be 1 if Tot. shelf life is not blank</TEXT>
+    </T100>
+    <T100>
+     <SPRSL>E</SPRSL>
+     <ARBGB>/GDA/SDM_ART</ARBGB>
+     <MSGNR>111</MSGNR>
+     <TEXT>SDM: Disc. in kind must be 1 for material type FOOD</TEXT>
+    </T100>
+    <T100>
+     <SPRSL>E</SPRSL>
+     <ARBGB>/GDA/SDM_ART</ARBGB>
+     <MSGNR>112</MSGNR>
+     <TEXT>SDM: Supply source must be 1 for material type FOOD</TEXT>
+    </T100>
+    <T100>
+     <SPRSL>E</SPRSL>
+     <ARBGB>/GDA/SDM_ART</ARBGB>
+     <MSGNR>113</MSGNR>
+     <TEXT>SDM: Var. Order Unit must be 1</TEXT>
+    </T100>
+    <T100>
+     <SPRSL>E</SPRSL>
+     <ARBGB>/GDA/SDM_ART</ARBGB>
+     <MSGNR>114</MSGNR>
+     <TEXT>SDM: MRP Type must be &apos;ND&apos; for material type FOOD - DC</TEXT>
+    </T100>
+    <T100>
+     <SPRSL>E</SPRSL>
+     <ARBGB>/GDA/SDM_ART</ARBGB>
+     <MSGNR>115</MSGNR>
+     <TEXT>SDM: Distribution profile must be &apos;001&apos; - DC</TEXT>
+    </T100>
+    <T100>
+     <SPRSL>E</SPRSL>
+     <ARBGB>/GDA/SDM_ART</ARBGB>
+     <MSGNR>116</MSGNR>
+     <TEXT>SDM: Automatic purchase order must be flagged - DC</TEXT>
+    </T100>
+    <T100>
+     <SPRSL>E</SPRSL>
+     <ARBGB>/GDA/SDM_ART</ARBGB>
+     <MSGNR>117</MSGNR>
+     <TEXT>SDM: Availabilty Check must be &apos;02&apos; - DC</TEXT>
+    </T100>
+    <T100>
+     <SPRSL>E</SPRSL>
+     <ARBGB>/GDA/SDM_ART</ARBGB>
+     <MSGNR>118</MSGNR>
+     <TEXT>SDM: Negative Stock Indicator must be flagged - DC</TEXT>
+    </T100>
+    <T100>
+     <SPRSL>E</SPRSL>
+     <ARBGB>/GDA/SDM_ART</ARBGB>
+     <MSGNR>119</MSGNR>
+     <TEXT>SDM: Supply source must be 1 for material type FOOD - STORE</TEXT>
+    </T100>
+    <T100>
+     <SPRSL>E</SPRSL>
+     <ARBGB>/GDA/SDM_ART</ARBGB>
+     <MSGNR>120</MSGNR>
+     <TEXT>SDM: Account Assignment Group may not be blank - Sales Org &amp;1 Distr.Ch &amp;2</TEXT>
+    </T100>
+    <T100>
+     <SPRSL>E</SPRSL>
+     <ARBGB>/GDA/SDM_ART</ARBGB>
+     <MSGNR>121</MSGNR>
+     <TEXT>SDM: DC Storage Locaction must be default 0001</TEXT>
+    </T100>
+    <T100>
+     <SPRSL>E</SPRSL>
+     <ARBGB>/GDA/SDM_ART</ARBGB>
+     <MSGNR>122</MSGNR>
+     <TEXT>SDM: Account group may not be blank - Sales Org &amp;1 Distr.Ch &amp;2</TEXT>
+    </T100>
+    <T100>
+     <SPRSL>E</SPRSL>
+     <ARBGB>/GDA/SDM_ART</ARBGB>
+     <MSGNR>123</MSGNR>
+     <TEXT>SDM: Listing for store must be 01</TEXT>
+    </T100>
+    <T100>
+     <SPRSL>E</SPRSL>
+     <ARBGB>/GDA/SDM_ART</ARBGB>
+     <MSGNR>124</MSGNR>
+     <TEXT>SDM: Listing for store must be 01 (MVKE) - Sales Org &amp;1 Distr.Ch &amp;2</TEXT>
+    </T100>
+    <T100>
+     <SPRSL>E</SPRSL>
+     <ARBGB>/GDA/SDM_ART</ARBGB>
+     <MSGNR>125</MSGNR>
+     <TEXT>SDM: No Repeat Key must be selected - Sales Org &amp;1 Distr.Ch &amp;2</TEXT>
+    </T100>
+    <T100>
+     <SPRSL>E</SPRSL>
+     <ARBGB>/GDA/SDM_ART</ARBGB>
+     <MSGNR>126</MSGNR>
+     <TEXT>SDM: Tax Category must be 1 for country ZA</TEXT>
+    </T100>
+    <T100>
+     <SPRSL>E</SPRSL>
+     <ARBGB>/GDA/SDM_ART</ARBGB>
+     <MSGNR>127</MSGNR>
+     <TEXT>SDM: InfoRec Purch Org Data - &apos;No Cash Discount&apos; flag may NOT be set</TEXT>
+    </T100>
+    <T100>
+     <SPRSL>E</SPRSL>
+     <ARBGB>/GDA/SDM_ART</ARBGB>
+     <MSGNR>128</MSGNR>
+     <TEXT>SDM: Article number &amp;1 is not equal to &amp;2</TEXT>
+    </T100>
+    <T100>
+     <SPRSL>E</SPRSL>
+     <ARBGB>/GDA/SDM_ART</ARBGB>
+     <MSGNR>129</MSGNR>
+     <TEXT>SDM: Gross Weight may not be blank for AUoM &amp;</TEXT>
+    </T100>
+    <T100>
+     <SPRSL>E</SPRSL>
+     <ARBGB>/GDA/SDM_ART</ARBGB>
+     <MSGNR>130</MSGNR>
+     <TEXT>SDM: Length may not be blank for AUoM &amp;</TEXT>
+    </T100>
+    <T100>
+     <SPRSL>E</SPRSL>
+     <ARBGB>/GDA/SDM_ART</ARBGB>
+     <MSGNR>131</MSGNR>
+     <TEXT>SDM: Width may not be blank for AUoM &amp;</TEXT>
+    </T100>
+    <T100>
+     <SPRSL>E</SPRSL>
+     <ARBGB>/GDA/SDM_ART</ARBGB>
+     <MSGNR>132</MSGNR>
+     <TEXT>SDM: Height weight may not be blank for AUoM &amp;</TEXT>
+    </T100>
+    <T100>
+     <SPRSL>E</SPRSL>
+     <ARBGB>/GDA/SDM_ART</ARBGB>
+     <MSGNR>133</MSGNR>
+     <TEXT>SDM: Net weight may not be blank for AUoM &amp;</TEXT>
+    </T100>
+    <T100>
+     <SPRSL>E</SPRSL>
+     <ARBGB>/GDA/SDM_ART</ARBGB>
+     <MSGNR>134</MSGNR>
+     <TEXT>SDM: For generic articles, supplier material number must be populated</TEXT>
+    </T100>
+    <T100>
+     <SPRSL>E</SPRSL>
+     <ARBGB>/GDA/SDM_ART</ARBGB>
+     <MSGNR>135</MSGNR>
+     <TEXT>SDM: InfoRec General Data - Country of Origin must be ZA</TEXT>
+    </T100>
+    <T100>
+     <SPRSL>E</SPRSL>
+     <ARBGB>/GDA/SDM_ART</ARBGB>
+     <MSGNR>136</MSGNR>
+     <TEXT>SDM: InfoRec Purch Org Data - Shippg Instr may not be blank</TEXT>
+    </T100>
+    <T100>
+     <SPRSL>E</SPRSL>
+     <ARBGB>/GDA/SDM_ART</ARBGB>
+     <MSGNR>137</MSGNR>
+     <TEXT>SDM: Planned Delivery Time in Days may not be blank</TEXT>
+    </T100>
+    <T100>
+     <SPRSL>E</SPRSL>
+     <ARBGB>/GDA/SDM_ART</ARBGB>
+     <MSGNR>150</MSGNR>
+     <TEXT>SDM: Article type FOOD not applicable for sales price</TEXT>
+    </T100>
+    <T100>
+     <SPRSL>E</SPRSL>
+     <ARBGB>/GDA/SDM_ART</ARBGB>
+     <MSGNR>151</MSGNR>
+     <TEXT>SDM: Existing pricing condition for article &amp; is no longer valid</TEXT>
+    </T100>
+    <T100>
+     <SPRSL>E</SPRSL>
+     <ARBGB>/GDA/SDM_ART</ARBGB>
+     <MSGNR>152</MSGNR>
+     <TEXT>SDM: No pricing condition exist for article &amp;</TEXT>
+    </T100>
+    <T100>
+     <SPRSL>E</SPRSL>
+     <ARBGB>/GDA/SDM_ART</ARBGB>
+     <MSGNR>153</MSGNR>
+     <TEXT>SDM: Pricing condition for article &amp; exist with status &apos;I&apos;</TEXT>
+    </T100>
+    <T100>
+     <SPRSL>E</SPRSL>
+     <ARBGB>/GDA/SDM_ART</ARBGB>
+     <MSGNR>200</MSGNR>
+     <TEXT>SDM: No tariff classification maintained for article &amp;1 country &amp;2</TEXT>
+    </T100>
+    <T100>
+     <SPRSL>E</SPRSL>
+     <ARBGB>/GDA/SDM_ART</ARBGB>
+     <MSGNR>201</MSGNR>
+     <TEXT>SDM: No tariff classification maintained for article &amp;1 country &amp;2</TEXT>
+    </T100>
+    <T100>
+     <SPRSL>E</SPRSL>
+     <ARBGB>/GDA/SDM_ART</ARBGB>
+     <MSGNR>500</MSGNR>
+     <TEXT>RMMW1 TEST</TEXT>
+    </T100>
+    <T100>
+     <SPRSL>E</SPRSL>
+     <ARBGB>/GDA/SDM_ART</ARBGB>
+     <MSGNR>501</MSGNR>
+     <TEXT>MAMT TEST</TEXT>
+    </T100>
+    <T100>
+     <SPRSL>E</SPRSL>
+     <ARBGB>/GDA/SDM_ART</ARBGB>
+     <MSGNR>502</MSGNR>
+     <TEXT>MARC RMMW1 STORE TEST</TEXT>
+    </T100>
+    <T100>
+     <SPRSL>E</SPRSL>
+     <ARBGB>/GDA/SDM_ART</ARBGB>
+     <MSGNR>503</MSGNR>
+     <TEXT>MARC RMMW1 DISTRIBUTION TEST</TEXT>
+    </T100>
+    <T100>
+     <SPRSL>E</SPRSL>
+     <ARBGB>/GDA/SDM_ART</ARBGB>
+     <MSGNR>504</MSGNR>
+     <TEXT>MARC TEST</TEXT>
+    </T100>
+    <T100>
+     <SPRSL>E</SPRSL>
+     <ARBGB>/GDA/SDM_ART</ARBGB>
+     <MSGNR>505</MSGNR>
+     <TEXT>MVKE TEST</TEXT>
+    </T100>
+    <T100>
+     <SPRSL>E</SPRSL>
+     <ARBGB>/GDA/SDM_ART</ARBGB>
+     <MSGNR>506</MSGNR>
+     <TEXT>MVKE RMMW1 TEST</TEXT>
+    </T100>
+    <T100>
+     <SPRSL>E</SPRSL>
+     <ARBGB>/GDA/SDM_ART</ARBGB>
+     <MSGNR>507</MSGNR>
+     <TEXT>MARD TEST</TEXT>
+    </T100>
+    <T100>
+     <SPRSL>E</SPRSL>
+     <ARBGB>/GDA/SDM_ART</ARBGB>
+     <MSGNR>508</MSGNR>
+     <TEXT>MAW1 TEST</TEXT>
+    </T100>
+    <T100>
+     <SPRSL>E</SPRSL>
+     <ARBGB>/GDA/SDM_ART</ARBGB>
+     <MSGNR>509</MSGNR>
+     <TEXT>MBEW TEST</TEXT>
+    </T100>
+    <T100>
+     <SPRSL>E</SPRSL>
+     <ARBGB>/GDA/SDM_ART</ARBGB>
+     <MSGNR>510</MSGNR>
+     <TEXT>WLK2 TEST</TEXT>
+    </T100>
+    <T100>
+     <SPRSL>E</SPRSL>
+     <ARBGB>/GDA/SDM_ART</ARBGB>
+     <MSGNR>511</MSGNR>
+     <TEXT>WLK2 RMMW1 TEST</TEXT>
+    </T100>
+    <T100>
+     <SPRSL>E</SPRSL>
+     <ARBGB>/GDA/SDM_ART</ARBGB>
+     <MSGNR>512</MSGNR>
+     <TEXT>MAT_STEUER TEST</TEXT>
+    </T100>
+    <T100>
+     <SPRSL>E</SPRSL>
+     <ARBGB>/GDA/SDM_ART</ARBGB>
+     <MSGNR>513</MSGNR>
+     <TEXT>EINA TEST</TEXT>
+    </T100>
+    <T100>
+     <SPRSL>E</SPRSL>
+     <ARBGB>/GDA/SDM_ART</ARBGB>
+     <MSGNR>514</MSGNR>
+     <TEXT>EINE TEST</TEXT>
+    </T100>
+    <T100>
+     <SPRSL>E</SPRSL>
+     <ARBGB>/GDA/SDM_ART</ARBGB>
+     <MSGNR>515</MSGNR>
+     <TEXT>EINA EINE TEST</TEXT>
+    </T100>
+    <T100>
+     <SPRSL>E</SPRSL>
+     <ARBGB>/GDA/SDM_ART</ARBGB>
+     <MSGNR>516</MSGNR>
+     <TEXT>EINE RMMW1 TEST</TEXT>
+    </T100>
+    <T100>
+     <SPRSL>E</SPRSL>
+     <ARBGB>/GDA/SDM_ART</ARBGB>
+     <MSGNR>517</MSGNR>
+     <TEXT>EINA RMMW1 TEST</TEXT>
+    </T100>
+    <T100>
+     <SPRSL>E</SPRSL>
+     <ARBGB>/GDA/SDM_ART</ARBGB>
+     <MSGNR>518</MSGNR>
+     <TEXT>MFHM TEST</TEXT>
+    </T100>
+    <T100>
+     <SPRSL>E</SPRSL>
+     <ARBGB>/GDA/SDM_ART</ARBGB>
+     <MSGNR>519</MSGNR>
+     <TEXT>MLEA TEST</TEXT>
+    </T100>
+    <T100>
+     <SPRSL>E</SPRSL>
+     <ARBGB>/GDA/SDM_ART</ARBGB>
+     <MSGNR>520</MSGNR>
+     <TEXT>MLGN TEST</TEXT>
+    </T100>
+    <T100>
+     <SPRSL>E</SPRSL>
+     <ARBGB>/GDA/SDM_ART</ARBGB>
+     <MSGNR>521</MSGNR>
+     <TEXT>MLGT TEST</TEXT>
+    </T100>
+    <T100>
+     <SPRSL>E</SPRSL>
+     <ARBGB>/GDA/SDM_ART</ARBGB>
+     <MSGNR>522</MSGNR>
+     <TEXT>MPGD TEST</TEXT>
+    </T100>
+    <T100>
+     <SPRSL>E</SPRSL>
+     <ARBGB>/GDA/SDM_ART</ARBGB>
+     <MSGNR>523</MSGNR>
+     <TEXT>MWLI TEST</TEXT>
+    </T100>
+    <T100>
+     <SPRSL>E</SPRSL>
+     <ARBGB>/GDA/SDM_ART</ARBGB>
+     <MSGNR>524</MSGNR>
+     <TEXT>MPOP TEST</TEXT>
+    </T100>
+    <T100>
+     <SPRSL>E</SPRSL>
+     <ARBGB>/GDA/SDM_ART</ARBGB>
+     <MSGNR>525</MSGNR>
+     <TEXT>MYMS TEST</TEXT>
+    </T100>
+    <T100>
+     <SPRSL>E</SPRSL>
+     <ARBGB>/GDA/SDM_ART</ARBGB>
+     <MSGNR>526</MSGNR>
+     <TEXT>MARA TEST</TEXT>
+    </T100>
+    <T100>
+     <SPRSL>E</SPRSL>
+     <ARBGB>/GDA/SDM_ART</ARBGB>
+     <MSGNR>527</MSGNR>
+     <TEXT>MARM TEST</TEXT>
+    </T100>
+    <T100>
+     <SPRSL>E</SPRSL>
+     <ARBGB>/GDA/SDM_ART</ARBGB>
+     <MSGNR>528</MSGNR>
+     <TEXT>MAKT TEST</TEXT>
+    </T100>
+    <T100>
+     <SPRSL>E</SPRSL>
+     <ARBGB>/GDA/SDM_ART</ARBGB>
+     <MSGNR>529</MSGNR>
+     <TEXT>MALG TEST</TEXT>
+    </T100>
+    <T100>
+     <SPRSL>E</SPRSL>
+     <ARBGB>/GDA/SDM_ART</ARBGB>
+     <MSGNR>530</MSGNR>
+     <TEXT>MARITC TEST</TEXT>
+    </T100>
+    <T100>
+     <SPRSL>E</SPRSL>
+     <ARBGB>/GDA/SDM_ART</ARBGB>
+     <MSGNR>531</MSGNR>
+     <TEXT>MAST TEST</TEXT>
+    </T100>
+    <T100>
+     <SPRSL>E</SPRSL>
+     <ARBGB>/GDA/SDM_ART</ARBGB>
+     <MSGNR>532</MSGNR>
+     <TEXT>WLK1 TEST</TEXT>
+    </T100>
+    <T100>
+     <SPRSL>E</SPRSL>
+     <ARBGB>/GDA/SDM_ART</ARBGB>
+     <MSGNR>533</MSGNR>
+     <TEXT>MARC TEST</TEXT>
+    </T100>
+    <T100>
+     <SPRSL>E</SPRSL>
+     <ARBGB>/GDA/SDM_ART</ARBGB>
+     <MSGNR>534</MSGNR>
+     <TEXT>MARC TEST</TEXT>
+    </T100>
+    <T100>
+     <SPRSL>E</SPRSL>
+     <ARBGB>/GDA/SDM_ART</ARBGB>
+     <MSGNR>535</MSGNR>
+     <TEXT>EORD TEST</TEXT>
+    </T100>
+    <T100>
+     <SPRSL>E</SPRSL>
+     <ARBGB>/GDA/SDM_ART</ARBGB>
+     <MSGNR>536</MSGNR>
+     <TEXT>KONH TEST</TEXT>
+    </T100>
+    <T100>
+     <SPRSL>E</SPRSL>
+     <ARBGB>/GDA/SDM_ART</ARBGB>
+     <MSGNR>537</MSGNR>
+     <TEXT>MEAN TEST</TEXT>
+    </T100>
+    <T100>
+     <SPRSL>E</SPRSL>
+     <ARBGB>/GDA/SDM_ART</ARBGB>
+     <MSGNR>538</MSGNR>
+     <TEXT>MEINH TEST</TEXT>
+    </T100>
+    <T100>
+     <SPRSL>E</SPRSL>
+     <ARBGB>/GDA/SDM_ART</ARBGB>
+     <MSGNR>539</MSGNR>
+     <TEXT>MLAN TEST</TEXT>
+    </T100>
+    <T100>
+     <SPRSL>E</SPRSL>
+     <ARBGB>/GDA/SDM_ART</ARBGB>
+     <MSGNR>540</MSGNR>
+     <TEXT>EINA TEST</TEXT>
+    </T100>
+    <T100>
+     <SPRSL>E</SPRSL>
+     <ARBGB>/GDA/SDM_ART</ARBGB>
+     <MSGNR>541</MSGNR>
+     <TEXT>EINA MARA TEST</TEXT>
+    </T100>
+    <T100>
+     <SPRSL>E</SPRSL>
+     <ARBGB>/GDA/SDM_ART</ARBGB>
+     <MSGNR>542</MSGNR>
+     <TEXT>EINE TEST</TEXT>
+    </T100>
+    <T100>
+     <SPRSL>E</SPRSL>
+     <ARBGB>/GDA/SDM_ART</ARBGB>
+     <MSGNR>550</MSGNR>
+     <TEXT>PRICING TEST</TEXT>
+    </T100>
+    <T100>
+     <SPRSL>E</SPRSL>
+     <ARBGB>/GDA/SDM_ART</ARBGB>
+     <MSGNR>551</MSGNR>
+     <TEXT>MARA TEST</TEXT>
+    </T100>
+    <T100>
+     <SPRSL>E</SPRSL>
+     <ARBGB>/GDA/SDM_ART</ARBGB>
+     <MSGNR>560</MSGNR>
+     <TEXT>EORD TEST</TEXT>
+    </T100>
+    <T100>
+     <SPRSL>E</SPRSL>
+     <ARBGB>/GDA/SDM_ART</ARBGB>
+     <MSGNR>561</MSGNR>
+     <TEXT>RMMW1 TEST</TEXT>
+    </T100>
+    <T100>
+     <SPRSL>E</SPRSL>
+     <ARBGB>/GDA/SDM_ART</ARBGB>
+     <MSGNR>562</MSGNR>
+     <TEXT>MARC TEST</TEXT>
+    </T100>
+    <T100>
+     <SPRSL>E</SPRSL>
+     <ARBGB>/GDA/SDM_ART</ARBGB>
+     <MSGNR>563</MSGNR>
+     <TEXT>SRC LIST TEST</TEXT>
+    </T100>
+    <T100>
+     <SPRSL>E</SPRSL>
+     <ARBGB>/GDA/SDM_ART</ARBGB>
+     <MSGNR>564</MSGNR>
+     <TEXT>MARA TEST</TEXT>
+    </T100>
+    <T100>
+     <SPRSL>E</SPRSL>
+     <ARBGB>/GDA/SDM_ART</ARBGB>
+     <MSGNR>570</MSGNR>
+     <TEXT>TARIFFS TEST</TEXT>
+    </T100>
+    <T100>
+     <SPRSL>E</SPRSL>
+     <ARBGB>/GDA/SDM_ART</ARBGB>
+     <MSGNR>571</MSGNR>
+     <TEXT>TARIFFS TEST</TEXT>
+    </T100>
+    <T100>
+     <SPRSL>E</SPRSL>
+     <ARBGB>/GDA/SDM_ART</ARBGB>
+     <MSGNR>580</MSGNR>
+     <TEXT>SDM Article (Basic Data): ABC Indicator must be A or B</TEXT>
+    </T100>
+    <T100>
+     <SPRSL>E</SPRSL>
+     <ARBGB>/GDA/SDM_ART</ARBGB>
+     <MSGNR>581</MSGNR>
+     <TEXT>SDM Article (Basic Data): Prod.hierarchy must be 10</TEXT>
+    </T100>
+    <T100>
+     <SPRSL>E</SPRSL>
+     <ARBGB>/GDA/SDM_ART</ARBGB>
+     <MSGNR>582</MSGNR>
+     <TEXT>SDM Article (Listing): Assortment grade must be 1</TEXT>
+    </T100>
+    <T100>
+     <SPRSL>E</SPRSL>
+     <ARBGB>/GDA/SDM_ART</ARBGB>
+     <MSGNR>583</MSGNR>
+     <TEXT>SDM Article (Purchasing): Return Agmt must be 01</TEXT>
+    </T100>
+    <T100>
+     <SPRSL>E</SPRSL>
+     <ARBGB>/GDA/SDM_ART</ARBGB>
+     <MSGNR>584</MSGNR>
+     <TEXT>SDM Article (Purchasing): PurchasingGroup must be 002</TEXT>
+    </T100>
+    <T100>
+     <SPRSL>E</SPRSL>
+     <ARBGB>/GDA/SDM_ART</ARBGB>
+     <MSGNR>585</MSGNR>
+     <TEXT>SDM Article (Sales): Item cat.group must be 0001</TEXT>
+    </T100>
+    <T100>
+     <SPRSL>E</SPRSL>
+     <ARBGB>/GDA/SDM_ART</ARBGB>
+     <MSGNR>586</MSGNR>
+    </T100>
+    <T100>
+     <SPRSL>E</SPRSL>
+     <ARBGB>/GDA/SDM_ART</ARBGB>
+     <MSGNR>587</MSGNR>
+     <TEXT>SDM Article (Logistics DC): MRP type must be ND</TEXT>
+    </T100>
+    <T100>
+     <SPRSL>E</SPRSL>
+     <ARBGB>/GDA/SDM_ART</ARBGB>
+     <MSGNR>588</MSGNR>
+     <TEXT>SDM Article (Logistics DC): Forecast model must be S</TEXT>
+    </T100>
+    <T100>
+     <SPRSL>E</SPRSL>
+     <ARBGB>/GDA/SDM_ART</ARBGB>
+     <MSGNR>589</MSGNR>
+     <TEXT>SDM Article (Logistics DC): Storage bin must be BIN</TEXT>
+    </T100>
+    <T100>
+     <SPRSL>E</SPRSL>
+     <ARBGB>/GDA/SDM_ART</ARBGB>
+     <MSGNR>600</MSGNR>
+     <TEXT>MARA TEST</TEXT>
+    </T100>
+    <T100>
+     <SPRSL>E</SPRSL>
+     <ARBGB>/GDA/SDM_ART</ARBGB>
+     <MSGNR>650</MSGNR>
+     <TEXT>SDM: No PIR records exists</TEXT>
+    </T100>
+    <T100>
+     <SPRSL>E</SPRSL>
+     <ARBGB>/GDA/SDM_ART</ARBGB>
+     <MSGNR>651</MSGNR>
+     <TEXT>SDM: EINA mark for deletion</TEXT>
+    </T100>
+    <T100>
+     <SPRSL>E</SPRSL>
+     <ARBGB>/GDA/SDM_ART</ARBGB>
+     <MSGNR>652</MSGNR>
+     <TEXT>SDM: EINE mark for deletion</TEXT>
+    </T100>
+    <T100>
+     <SPRSL>E</SPRSL>
+     <ARBGB>/GDA/SDM_ART</ARBGB>
+     <MSGNR>653</MSGNR>
+     <TEXT>SDM: ZCSA PIR Consignment type</TEXT>
+    </T100>
+    <T100>
+     <SPRSL>E</SPRSL>
+     <ARBGB>/GDA/SDM_ART</ARBGB>
+     <MSGNR>654</MSGNR>
+     <TEXT>SDM: ZCSA Material Number Used by Supplier must be blank</TEXT>
+    </T100>
+    <T100>
+     <SPRSL>E</SPRSL>
+     <ARBGB>/GDA/SDM_ART</ARBGB>
+     <MSGNR>655</MSGNR>
+     <TEXT>SDM: Material Number Used by Supplier may not be blank</TEXT>
+    </T100>
+    <T100>
+     <SPRSL>E</SPRSL>
+     <ARBGB>/GDA/SDM_ART</ARBGB>
+     <MSGNR>700</MSGNR>
+     <TEXT>SDM: No source list record exist for article &amp;</TEXT>
+    </T100>
+    <T100>
+     <SPRSL>E</SPRSL>
+     <ARBGB>/GDA/SDM_ART</ARBGB>
+     <MSGNR>701</MSGNR>
+     <TEXT>SDM: Existing source list record for article &amp; is not assigned to DC/ST</TEXT>
+    </T100>
+    <T100>
+     <SPRSL>E</SPRSL>
+     <ARBGB>/GDA/SDM_ART</ARBGB>
+     <MSGNR>702</MSGNR>
+     <TEXT>SDM: Existing source list record for article &amp; is only assigned to ST</TEXT>
+    </T100>
+    <T100>
+     <SPRSL>E</SPRSL>
+     <ARBGB>/GDA/SDM_ART</ARBGB>
+     <MSGNR>703</MSGNR>
+     <TEXT>SDM: Existing source list record for article &amp; is no longer valid</TEXT>
+    </T100>
+    <T100>
+     <SPRSL>E</SPRSL>
+     <ARBGB>/GDA/SDM_ART</ARBGB>
+     <MSGNR>750</MSGNR>
+     <TEXT>SDM: Article type ZEXP not applicable for sales price</TEXT>
+    </T100>
+    <T100>
+     <SPRSL>E</SPRSL>
+     <ARBGB>/GDA/SDM_ART</ARBGB>
+     <MSGNR>751</MSGNR>
+     <TEXT>SDM: Existing pricing condition for article &amp; is no longer valid</TEXT>
+    </T100>
+    <T100>
+     <SPRSL>E</SPRSL>
+     <ARBGB>/GDA/SDM_ART</ARBGB>
+     <MSGNR>752</MSGNR>
+     <TEXT>SDM: No pricing condition exists for article &amp;</TEXT>
+    </T100>
+   </T100>
+  </asx:values>
+ </asx:abap>
+</abapGit>

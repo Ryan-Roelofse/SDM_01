@@ -1,0 +1,50 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<abapGit version="v1.0.0" serializer="LCL_OBJECT_CLAS" serializer_version="v1.0.0">
+ <asx:abap xmlns:asx="http://www.sap.com/abapxml" version="1.0">
+  <asx:values>
+   <VSEOCLASS>
+    <CLSNAME>/GDA/SDM_CL_ARTICLE</CLSNAME>
+    <LANGU>E</LANGU>
+    <DESCRIPT>SDM:Article Master</DESCRIPT>
+    <STATE>1</STATE>
+    <CLSCCINCL>X</CLSCCINCL>
+    <FIXPT>X</FIXPT>
+    <UNICODE>X</UNICODE>
+   </VSEOCLASS>
+   <TPOOL>
+    <item>
+     <ID>I</ID>
+     <KEY>100</KEY>
+     <ENTRY>Config</ENTRY>
+     <LENGTH>6</LENGTH>
+    </item>
+   </TPOOL>
+   <DESCRIPTIONS>
+    <SEOCOMPOTX>
+     <CLSNAME>/GDA/SDM_CL_ARTICLE</CLSNAME>
+     <CMPNAME>MC_BOR</CMPNAME>
+     <LANGU>E</LANGU>
+     <DESCRIPT>Object type</DESCRIPT>
+    </SEOCOMPOTX>
+    <SEOCOMPOTX>
+     <CLSNAME>/GDA/SDM_CL_ARTICLE</CLSNAME>
+     <CMPNAME>MC_OBJECT</CMPNAME>
+     <LANGU>E</LANGU>
+     <DESCRIPT>SDM:Object Type</DESCRIPT>
+    </SEOCOMPOTX>
+    <SEOCOMPOTX>
+     <CLSNAME>/GDA/SDM_CL_ARTICLE</CLSNAME>
+     <CMPNAME>MC_OBJECT_ID</CMPNAME>
+     <LANGU>E</LANGU>
+     <DESCRIPT>SDM:Object Type ID</DESCRIPT>
+    </SEOCOMPOTX>
+    <SEOCOMPOTX>
+     <CLSNAME>/GDA/SDM_CL_ARTICLE</CLSNAME>
+     <CMPNAME>MC_PRIMARY</CMPNAME>
+     <LANGU>E</LANGU>
+     <DESCRIPT>Name of Dictionary Type</DESCRIPT>
+    </SEOCOMPOTX>
+   </DESCRIPTIONS>
+  </asx:values>
+ </asx:abap>
+</abapGit>
