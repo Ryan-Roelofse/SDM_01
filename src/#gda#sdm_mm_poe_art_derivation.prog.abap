@@ -21,7 +21,7 @@ data:
  ls_mwli         type mwli.
 
 field-symbols:
-  <field>       type any,
+*  <field>       type any,
   <table>       type any,
   <mlea>        like line of tmlea,
   <meinh>       like line of wmeinh,
