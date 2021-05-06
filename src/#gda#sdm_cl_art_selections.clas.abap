@@ -134,6 +134,7 @@ public section.
   data MT_MYMS_SPEC type /GDA/SDM_T_MYMS_01 .
   data MT_MWLI_SPEC type /GDA/SDM_T_MWLI_01 .
   data MT_MAMT_SPEC type /GDA/SDM_T_MAMT_01 .
+  data MT_TARIFF_SPEC type /GDA/SDM_T_TARIFFS_01 .
   data MT_MALG_SPEC type /GDA/SDM_T_MALG_01 .
 
   methods CONSTRUCTOR .
@@ -150,6 +151,7 @@ public section.
 protected section.
 private section.
 
+  data MT_PRICING_SPEC type /GDA/SDM_T_PRICING_01 .
   data MS_SELSCREEN type TY_SELSCREEN .
   data:
     mt_makt       type hashed table of /gda/sdm_s_makt_01
@@ -185,6 +187,8 @@ private section.
   data MT_MYMS type /GDA/SDM_T_MYMS_01 .
   data MT_MWLI type /GDA/SDM_T_MWLI_01 .
   data MT_MAMT type /GDA/SDM_T_MAMT_01 .
+  data MT_TARIFF type /GDA/SDM_T_TARIFFS_01 .
+  data MT_PRICING type /GDA/SDM_T_PRICING_01 .
   data MT_MALG type /GDA/SDM_T_MALG_01 .
   data MT_STPO type TTY_STPO .
   data MV_EINA_FIRST type C .
@@ -260,6 +264,15 @@ private section.
     raising
       /GDA/CX_SDM_EXCEPTION_HANDL .
   methods BUILD_MAST
+    raising
+      /GDA/CX_SDM_EXCEPTION_HANDL .
+  methods BUILD_MWLI
+    raising
+      /GDA/CX_SDM_EXCEPTION_HANDL .
+  methods BUILD_TARIFFS
+    raising
+      /GDA/CX_SDM_EXCEPTION_HANDL .
+  methods BUILD_PRICING
     raising
       /GDA/CX_SDM_EXCEPTION_HANDL .
 ENDCLASS.
@@ -965,17 +978,26 @@ CLASS /GDA/SDM_CL_ART_SELECTIONS IMPLEMENTATION.
 
     try.
 */ Select Data
-*Get STPO
-        select  idnrk stlty stlnr from stpo
-           into table lt_stpo
-           for all entries in me->mt_mara
-           where idnrk = me->mt_mara-matnr.
+**Get STPO
+*        select  idnrk stlty stlnr from stpo
+*           into table lt_stpo
+*           for all entries in me->mt_mara
+*           where idnrk = me->mt_mara-matnr.
+**Get MAST
+*        select * from mast
+*                 into table me->mt_mast
+*                 for all entries in lt_stpo
+**                 where ( matnr  =  mt_mara-matnr or
+**                         stlnr  =  mt_mara-matnr )
+*                 where ( matnr  =  lt_stpo-idnrk or
+*                         stlnr  =  lt_stpo-stlnr )
+*                 and werks    in me->ms_selscreen-werks.
+
 *Get MAST
         select * from mast
                  into table me->mt_mast
-                 for all entries in lt_stpo
-                 where ( matnr  =  lt_stpo-idnrk or
-                         stlnr  =  lt_stpo-stlnr )
+                 for all entries in me->mt_mara
+                 where matnr  =  me->mt_mara-matnr
                  and werks    in me->ms_selscreen-werks.
 
       catch cx_sy_open_sql_error into lx_open_sql_error.
@@ -1120,42 +1142,86 @@ CLASS /GDA/SDM_CL_ART_SELECTIONS IMPLEMENTATION.
   endmethod.
 
 
-  method BUILD_MLAN.
+  METHOD build_mlan.
+    TYPES BEGIN OF struc_tax.
+    TYPES: matnr     TYPE mara-matnr.
+    TYPES: mg03steuer TYPE mg03steuer.
+    TYPES END OF struc_tax.
 
+    DATA: gt_mg03         TYPE STANDARD TABLE OF struc_tax,
+          gs_mg03         TYPE struc_tax,
+          gs_mg03steuer   TYPE mg03steuer,
+          gs_mg03_sdm     TYPE /gda/sdm_mlan,
+          gt_steuer       LIKE TABLE OF gs_mg03steuer.
+    DATA:
+     lx_open_sql_error TYPE REF TO cx_sy_open_sql_error.
 
-    data:
-     lx_open_sql_error type ref to cx_sy_open_sql_error.
+    FIELD-SYMBOLS:
+       <ls_mlan> LIKE LINE OF me->mt_mlan.
 
-    field-symbols:
-       <ls_mlan> like line of me->mt_mlan.
-
-    if me->ms_selscreen-mlan = abap_false.
-      return.
-    endif.
+    IF me->ms_selscreen-mlan = abap_false.
+      RETURN.
+    ENDIF.
 
     me->build_field_selection( iv_struct_name = '/GDA/SDM_S_MLAN_01' ).
 
-    try.
-*/ MLAN
-        select (me->mt_field_list)
-           from mlan
-           into table me->mt_mlan
-           for all entries in me->mt_mara
-         where matnr = me->mt_mara-matnr.
+*    try.
+**/ MLAN
+*        select (me->mt_field_list)
+*           from mlan
+*           into table me->mt_mlan
+*           for all entries in me->mt_mara
+*         where matnr = me->mt_mara-matnr.
+*
+*      catch cx_sy_open_sql_error into lx_open_sql_error.
+*        me->mv_message = lx_open_sql_error->get_text( ).
+*        me->mv_message = |Error /GDA/SDM_S_MLAN_01:| && me->mv_message.
+*        raise exception type /gda/cx_sdm_exception_handl
+*          exporting
+*            mv_text = mv_message.
+*    endtry.
 
-      catch cx_sy_open_sql_error into lx_open_sql_error.
-        me->mv_message = lx_open_sql_error->get_text( ).
-        me->mv_message = |Error /GDA/SDM_S_MLAN_01:| && me->mv_message.
-        raise exception type /gda/cx_sdm_exception_handl
-          exporting
-            mv_text = mv_message.
-    endtry.
+* TAX
+    LOOP AT me->mt_mara ASSIGNING FIELD-SYMBOL(<mara_struc>).
+      CALL FUNCTION 'STEUERTAB_READ'
+        EXPORTING
+*         KZRFB           = ' '
+          matnr           = <mara_struc>-matnr
+        TABLES
+          steuertab       = gt_steuer
+        EXCEPTIONS
+          wrong_call      = 1
+          steuertab_empty = 2
+          OTHERS          = 3.
+      IF sy-subrc = 0.
+        LOOP AT gt_steuer ASSIGNING FIELD-SYMBOL(<steuer>).
+          gs_mg03-matnr      = <mara_struc>-matnr.
+          gs_mg03-mg03steuer = <steuer>.
+          APPEND gs_mg03 TO gt_mg03.
+          CLEAR:
+            gs_mg03.
+        ENDLOOP.
+      ENDIF.
+    ENDLOOP.
 
-    loop at me->mt_mlan assigning <ls_mlan>.
+    LOOP AT gt_mg03 ASSIGNING FIELD-SYMBOL(<mg03>)." where matnr = x_mara-matnr.
+      MOVE-CORRESPONDING <mg03>-mg03steuer TO gs_mg03_sdm.
+      gs_mg03_sdm-matnr = <mg03>-matnr.
+      APPEND gs_mg03_sdm TO me->mt_mlan.
+
+*        MOVE-CORRESPONDING <mg03>-mg03steuer TO gs_mg03_sdm_brf.
+*        APPEND gs_mg03_sdm_brf TO gt_mg03_sdm_brf.
+
+      CLEAR:
+        gs_mg03_sdm.
+*          gs_mg03_sdm_brf.
+    ENDLOOP.
+
+    LOOP AT me->mt_mlan ASSIGNING <ls_mlan>.
       <ls_mlan>-sdm_tabkey = /gda/cl_sdm_data_model_main=>build_string_from_key( i_tabname  = 'MLAN'
                                                                            i_contents = <ls_mlan> ).
-    endloop.
-  endmethod.
+    ENDLOOP.
+  ENDMETHOD.
 
 
   method BUILD_MLGN.
@@ -1286,6 +1352,45 @@ CLASS /GDA/SDM_CL_ART_SELECTIONS IMPLEMENTATION.
   endmethod.
 
 
+  method BUILD_MWLI.
+
+    data:
+     lx_open_sql_error type ref to cx_sy_open_sql_error.
+
+    field-symbols:
+      <ls_mwli> like line of me->mt_mwli.
+
+    if me->ms_selscreen-mwli = abap_false.
+      return.
+    endif.
+
+    me->build_field_selection( iv_struct_name = '/GDA/SDM_S_MWLI_01' ).
+
+    try.
+*/ Select Data
+        select (me->mt_field_list)
+          from maw1
+          into table me->mt_mwli
+         for all entries in me->mt_mara
+        where matnr = me->mt_mara-matnr.
+
+      catch cx_sy_open_sql_error into lx_open_sql_error.
+        me->mv_message = lx_open_sql_error->get_text( ).
+        me->mv_message = |Error /GDA/SDM_S_MWLI_01:| && me->mv_message.
+        raise exception type /gda/cx_sdm_exception_handl
+          exporting
+            mv_text = mv_message.
+    endtry.
+
+
+    loop at me->mt_mwli assigning <ls_mwli>.
+      <ls_mwli>-sdm_tabkey = /gda/cl_sdm_data_model_main=>build_string_from_key( i_tabname  = 'MWLI'
+                                                                           i_contents = <ls_mwli> ).
+    endloop.
+
+  endmethod.
+
+
   method BUILD_MYMS.
 
     data:
@@ -1325,6 +1430,29 @@ CLASS /GDA/SDM_CL_ART_SELECTIONS IMPLEMENTATION.
   endmethod.
 
 
+  METHOD build_pricing.
+
+    DATA:
+     lx_open_sql_error TYPE REF TO cx_sy_open_sql_error,
+      ls_pricing     type /gda/sdm_st_pricing_01.
+
+    TRY.
+* Tariff
+        LOOP AT me->mt_mara ASSIGNING FIELD-SYMBOL(<lfs_mara>).
+
+          CALL FUNCTION '/GDA/SDM_PP_BRF_PRICING1'
+            EXPORTING
+              x_matnr  = <lfs_mara>-matnr
+            IMPORTING
+              y_result = ls_pricing.
+
+          ls_pricing-matnr = <lfs_mara>-matnr.
+          APPEND ls_pricing TO me->mt_pricing.
+        ENDLOOP.
+    ENDTRY.
+  ENDMETHOD.
+
+
   method BUILD_SPEC.
 
 
@@ -1338,6 +1466,8 @@ CLASS /GDA/SDM_CL_ART_SELECTIONS IMPLEMENTATION.
       ls_mean_sdm        type /gda/sdm_s_mean_01,
       ls_marm_sdm        type /gda/sdm_s_marm_01,
       ls_maw1_sdm        type /gda/sdm_s_maw1_01,
+      ls_mwli_sdm        type /gda/sdm_s_mwli_01,
+      ls_tariffs_sdm     type /gda/sdm_s_tariffs_01,
 
       ls_wlk1_sdm        type /gda/sdm_s_wlk1_01,
       ls_wlk2_sdm        type /gda/sdm_s_wlk2_01,
@@ -1354,12 +1484,14 @@ CLASS /GDA/SDM_CL_ART_SELECTIONS IMPLEMENTATION.
 
     field-symbols:
       <ls_marc> type /gda/sdm_s_marc_01,
+      <ls_mast> type /gda/sdm_s_mast_01,
       <ls_mard> type /gda/sdm_s_mard_01,
       <ls_mvke> type /gda/sdm_s_mvke_01,
       <ls_mbew> type /gda/sdm_s_mbew_01,
       <ls_mlgn> type /gda/sdm_s_mlgn_01,
       <ls_mlgt> type /gda/sdm_s_mlgt_01,
       <ls_maw1> type /gda/sdm_s_maw1_01,
+      <ls_mwli> type /gda/sdm_s_mwli_01,
       <ls_wlk1> type /gda/sdm_s_wlk1_01,
       <ls_wlk2> type /gda/sdm_s_wlk2_01,
       <ls_myms> type /gda/sdm_s_myms_01,
@@ -1372,6 +1504,7 @@ CLASS /GDA/SDM_CL_ART_SELECTIONS IMPLEMENTATION.
       <ls_eord> type /gda/sdm_s_eord_01,
       <ls_eina> type /gda/sdm_s_eina_01,
       <ls_eine> type /gda/sdm_s_eine_01,
+      <ls_tariffs> type /gda/sdm_s_tariffs_01,
       <steuertab> like line of lt_steuertab,
       <steummtab> like line of lt_steummtab.
 
@@ -1398,6 +1531,21 @@ CLASS /GDA/SDM_CL_ART_SELECTIONS IMPLEMENTATION.
             exit.
           else.
             insert <ls_marc> into table me->mt_marc_spec.
+          endif.
+        endloop.
+      endif.
+    endif.
+
+*/ MAST
+    if me->ms_selscreen-mast = abap_true.
+      read table mt_mast transporting no fields
+        with key matnr = MV_OBJECT binary search.
+      if sy-subrc = 0.
+        loop at me->mt_mast assigning <ls_mast> from sy-tabix.
+          if <ls_mast>-matnr <> MV_OBJECT.
+            exit.
+          else.
+            insert <ls_mast> into table me->mt_mast_spec.
           endif.
         endloop.
       endif.
@@ -1488,6 +1636,36 @@ CLASS /GDA/SDM_CL_ART_SELECTIONS IMPLEMENTATION.
             exit.
           else.
             insert <ls_maw1> into table me->mt_maw1_spec.
+          endif.
+        endloop.
+      endif.
+    endif.
+
+*/ TARIFFS
+
+      read table mt_tariff transporting no fields
+        with key matnr = MV_OBJECT binary search.
+      if sy-subrc = 0.
+        loop at mt_tariff assigning <ls_tariffs> from sy-tabix.
+          if <ls_tariffs>-matnr <> MV_OBJECT.
+            exit.
+          else.
+            insert <ls_tariffs> into table me->mt_tariff_spec.
+          endif.
+        endloop.
+      endif.
+
+
+*/ MWLI
+    if me->ms_selscreen-mwli = abap_true.
+      read table mt_mwli transporting no fields
+        with key matnr = MV_OBJECT binary search.
+      if sy-subrc = 0.
+        loop at mt_mwli assigning <ls_mwli> from sy-tabix.
+          if <ls_mwli>-matnr <> MV_OBJECT.
+            exit.
+          else.
+            insert <ls_mwli> into table me->mt_mwli_spec.
           endif.
         endloop.
       endif.
@@ -1873,6 +2051,66 @@ CLASS /GDA/SDM_CL_ART_SELECTIONS IMPLEMENTATION.
   endmethod.
 
 
+  METHOD build_tariffs.
+
+    DATA:
+     lx_open_sql_error TYPE REF TO cx_sy_open_sql_error,
+      ls_mvke         TYPE /gda/sdm_s_mvke_01,
+      lt_tariff_sdm   TYPE /gda/sdm_t_tariffs_01,
+      lt_mvke_sdm     TYPE /gda/sdm_t_mvke_01.
+
+    TRY.
+*/ Select Data
+*        select (me->mt_field_list)
+*          from maw1
+*          into table me->mt_mwli
+*         for all entries in me->mt_mara
+*        where matnr = me->mt_mara-matnr.
+
+* Tariff
+        LOOP AT me->mt_mara ASSIGNING FIELD-SYMBOL(<lfs_mara>).
+
+          LOOP AT me->mt_mvke ASSIGNING FIELD-SYMBOL(<lfs_mvke>) WHERE matnr = <lfs_mara>-matnr.
+*            APPEND INITIAL LINE TO lt_mvke_sdm ASSIGNING FIELD-SYMBOL(<lfs_mvke_tmp>).
+            MOVE-CORRESPONDING <lfs_mvke> TO ls_mvke.
+
+            APPEND ls_mvke TO lt_mvke_sdm.
+          ENDLOOP.
+
+          CALL FUNCTION '/GDA/SDM_PP_BRF_TARIFF1'
+            EXPORTING
+              x_matnr  = <lfs_mara>-matnr
+              xt_mvke  = lt_mvke_sdm
+            IMPORTING
+              y_result = lt_tariff_sdm.
+
+          APPEND LINES OF lt_tariff_sdm TO me->mt_tariff.
+
+          CLEAR lt_mvke_sdm[].
+
+        ENDLOOP.
+
+*        IF NOT me->mt_mvke IS INITIAL.
+*          CALL FUNCTION '/GDA/SDM_PP_BRF_TARIFF1'
+*            EXPORTING
+*              x_matnr  = x_mara-matnr
+*              xt_mvke  = lt_mvke_sdm
+*            IMPORTING
+*              y_result = lt_tariff_sdm.
+*        ENDIF.
+
+*      CATCH cx_sy_open_sql_error INTO lx_open_sql_error.
+*        me->mv_message = lx_open_sql_error->get_text( ).
+*        me->mv_message = |Error /GDA/SDM_S_MWLI_01:| && me->mv_message.
+*        RAISE EXCEPTION TYPE /gda/cx_sdm_exception_handl
+*          EXPORTING
+*            mv_text = mv_message.
+    ENDTRY.
+
+
+  ENDMETHOD.
+
+
   method BUILD_WLK1.
 
     data:
@@ -2010,6 +2248,10 @@ CLASS /GDA/SDM_CL_ART_SELECTIONS IMPLEMENTATION.
     me->build_mlgn( ).
     me->build_mlgt( ).
     me->build_maw1( ).
+    me->build_mast( ).
+    me->build_mapr( ).
+    me->build_mwli( ).
+    me->build_tariffs( ).
 
     me->build_myms( ).
     me->build_mamt( ).
@@ -2020,7 +2262,7 @@ CLASS /GDA/SDM_CL_ART_SELECTIONS IMPLEMENTATION.
 *    me->build_mapr( ).
     me->build_marm( ).
     me->build_mean( ).
-*    me->build_mlan( ).
+    me->build_mlan( ).
     me->build_eord( ).
     me->build_eina( ).
     me->build_eine( ).
@@ -2045,7 +2287,8 @@ CLASS /GDA/SDM_CL_ART_SELECTIONS IMPLEMENTATION.
           me->mt_maw1_spec, me->mt_wlk1_spec,
           me->mt_wlk2_spec, me->mt_mast_spec,
           me->mt_myms_spec, me->mt_mwli_spec,
-          me->mt_mamt_spec, me->mt_malg_spec.
+          me->mt_mamt_spec, me->mt_malg_spec,
+          me->mt_tariff_spec.
 
 
   endmethod.

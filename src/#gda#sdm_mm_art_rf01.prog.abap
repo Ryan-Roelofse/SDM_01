@@ -3082,22 +3082,30 @@ form sdm_main_article.
 
     gs_mara_sdm     = go_selection->ms_mara_spec.
     gt_marc_sdm[]   = go_selection->mt_marc_spec[].
+    gt_mast_sdm[]   = go_selection->mt_mast_spec[].
     gt_mard_sdm[]   = go_selection->mt_mard_spec[].
+    gt_maw1_sdm[]   = go_selection->mt_maw1_spec[].
+    gt_mwli_sdm[]   = go_selection->mt_mwli_spec[].
     gt_mbew_sdm[]   = go_selection->mt_mbew_spec[].
     gt_meinh_sdm[]  = go_selection->mt_meinh_spec[].
 *    gt_mfhm_sdm[]   = go_selection->mt_mfhm_spec[].
     gt_mlgn_sdm[]   = go_selection->mt_mlgn_spec[].
     gt_mlgt_sdm[]   = go_selection->mt_mlgt_spec[].
     gt_mvke_sdm[]   = go_selection->mt_mvke_spec[].
+    gt_wlk1_sdm[]   = go_selection->mt_wlk1_spec[].
+    gt_wlk2_sdm[]   = go_selection->mt_wlk2_spec[].
     gt_mean_sdm[]   = go_selection->mt_mean_spec[].
     gt_mpop_sdm[]   = go_selection->mt_mpop_spec[].
     gt_marm_sdm[]   = go_selection->mt_marm_spec[].
-*    gt_mlan_sdm[]   = go_selection->mt_mlan_spec[].
+    gt_mlan_sdm[]   = go_selection->mt_mlan_spec[].
+    gt_malg_sdm[]   = go_selection->mt_malg_spec[].
+    gt_mamt_sdm[]   = go_selection->mt_mamt_spec[].
 *    gt_steuer_sdm[] = go_selection->mt_steuertab_spec[].
 *    gt_steumm_sdm[] = go_selection->mt_steummtab_spec[].
     gt_eord_sdm[]   = go_selection->mt_eord_spec[].
     gt_eina_sdm[]   = go_selection->mt_eina_spec[].
     gt_eine_sdm[]   = go_selection->mt_eine_spec[].
+    gt_tariff_sdm   = go_selection->mt_tariff_spec[].
     gs_syst_sdm     = syst.
     append go_selection->ms_makt_spec to gt_makt_sdm[].
 
@@ -3141,7 +3149,8 @@ form sdm_main_article.
     clear:
      gs_sdm_objects.
     refresh:
-     gt_mara_sdm,gt_marc_sdm,gt_mard_sdm,gt_mbew_sdm,gt_mlgn_sdm,gt_makt_sdm,gt_eord_sdm.
+     gt_mara_sdm,gt_marc_sdm,gt_mard_sdm,gt_mbew_sdm,gt_mlgn_sdm,gt_makt_sdm,gt_eord_sdm,
+     gt_mlan_sdm,gt_malg_sdm,gt_mamt_sdm,gt_maw1_sdm,gt_wlk1_sdm,gt_wlk2_sdm,gt_mwli_sdm.
   endloop.
 
   perform progress_bar using text-019.

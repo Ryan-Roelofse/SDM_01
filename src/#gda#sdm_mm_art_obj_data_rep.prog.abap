@@ -36,8 +36,10 @@ data:
   gt_mg03_sdm_brf type /gda/sdm_t_mat_steuer_01,"mat_steuer,
   gt_src_list_sdm type /gda/sdm_t_srclist_01,
   gt_marm_sdm     type /gda/sdm_t_marm_01,
+  gt_mg03steumm_sdm type /gda/sdm_t_mg03steumm_01,
   gt_mpop_sdm     type /gda/sdm_t_mpop_01,
   gt_mpgd_sdm     type /gda/sdm_t_mpgd_01,
+  gt_mlan_sdm     type /gda/sdm_t_mlan_01,
 * Available for use in SDM config start***************************>>>
   gs_mara_sdm     type /gda/sdm_s_mara_01,
   gs_marc_sdm     type /gda/sdm_s_marc_01,
@@ -47,6 +49,7 @@ data:
   gs_eina_sdm     type /gda/sdm_s_eina_01,
   gs_eine_sdm     type /gda/sdm_s_eine_01,
   gs_eord_sdm     type /gda/sdm_s_eord_01,
+  gs_mlan_sdm     type /gda/sdm_s_mlan_01,
 
   gs_mg03_sdm     type /gda/sdm_mlan,
   gs_mg03_sdm_brf type /gda/sdm_s_mg03steuer_01,

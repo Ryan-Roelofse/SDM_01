@@ -874,6 +874,30 @@
     <T100>
      <SPRSL>E</SPRSL>
      <ARBGB>/GDA/SDM_ART</ARBGB>
+     <MSGNR>590</MSGNR>
+     <TEXT>SDM Article (Basic Data 2): Purchasing value key must be 1</TEXT>
+    </T100>
+    <T100>
+     <SPRSL>E</SPRSL>
+     <ARBGB>/GDA/SDM_ART</ARBGB>
+     <MSGNR>591</MSGNR>
+     <TEXT>SDM Article (Source List): Valid from must be 06.05.2021</TEXT>
+    </T100>
+    <T100>
+     <SPRSL>E</SPRSL>
+     <ARBGB>/GDA/SDM_ART</ARBGB>
+     <MSGNR>592</MSGNR>
+     <TEXT>SDM Article (PIR): Certif. Cat. must be 1</TEXT>
+    </T100>
+    <T100>
+     <SPRSL>E</SPRSL>
+     <ARBGB>/GDA/SDM_ART</ARBGB>
+     <MSGNR>593</MSGNR>
+     <TEXT>SDM Article (Store Logistics): Reorder Point must be 1</TEXT>
+    </T100>
+    <T100>
+     <SPRSL>E</SPRSL>
+     <ARBGB>/GDA/SDM_ART</ARBGB>
      <MSGNR>600</MSGNR>
      <TEXT>MARA TEST</TEXT>
     </T100>
