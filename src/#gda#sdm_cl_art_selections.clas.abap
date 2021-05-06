@@ -176,7 +176,7 @@ private section.
                     with unique key matnr werks zeord .
   data:
     mt_mlan       type sorted table of /gda/sdm_s_mlan_01
-                    with unique key matnr aland .
+                    with unique key matnr aland lfdnr tatyp.
   data MT_EINA type /GDA/SDM_T_EINA_01 .
   data MT_EINE type /GDA/SDM_T_EINE_01 .
   data MT_MG03STEUMM type /GDA/SDM_T_MG03STEUMM_01 .
