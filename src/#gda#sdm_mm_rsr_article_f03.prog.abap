@@ -28,7 +28,7 @@ FORM sdm_logic .
 *  PERFORM build_structure USING gc_default
 *                                gc_object
 *                                space.
-  PERFORM build_structure using gc_default
+  PERFORM build_structure USING gc_default
                                 gc_object
                                 p_struc.
 
@@ -73,6 +73,17 @@ FORM sdm_logic .
     gt_mean_sdm[]   = go_selection->mt_mean_spec[].
     gt_mpop_sdm[]   = go_selection->mt_mpop_spec[].
     gt_marm_sdm[]   = go_selection->mt_marm_spec[].
+
+    gt_maw1_sdm[]   = go_selection->mt_maw1_spec[].
+    gt_eord_sdm[]   = go_selection->mt_eord_spec[].
+    gt_eina_sdm[]   = go_selection->mt_eina_spec[].
+    gt_mwli_sdm[]   = go_selection->mt_mwli_spec[].
+    gt_wlk1_sdm[]   = go_selection->mt_wlk1_spec[].
+    gt_wlk2_sdm[]   = go_selection->mt_wlk2_spec[].
+    gt_mlan_sdm[]   = go_selection->mt_mlan_spec[].
+    gt_mamt_sdm[]   = go_selection->mt_mamt_spec[].
+    gt_malg_sdm[]   = go_selection->mt_malg_spec[].
+    gt_tariff_sdm   = go_selection->mt_tariff_spec[].
 *    gt_mlan_sdm[]   = go_selection->mt_mlan_spec[].
 *    gt_steuer_sdm[] = go_selection->mt_steuertab_spec[].
 *    gt_steumm_sdm[] = go_selection->mt_steummtab_spec[].
@@ -195,6 +206,18 @@ FORM sdm_logic .
 *    gs_sdm_objects-mlan[]   = gt_mlan_sdm[].
     gs_sdm_objects-eine[]   = gt_eine_sdm[].
     gs_sdm_objects-eina[]   = gt_eina_sdm[].
+
+    gs_sdm_objects-maw1   = gt_maw1_sdm[].
+    gs_sdm_objects-eord   = gt_eord_sdm[].
+    gs_sdm_objects-eina   = gt_eina_sdm[].
+    gs_sdm_objects-mwli   = gt_mwli_sdm[].
+    gs_sdm_objects-wlk1   = gt_wlk1_sdm[].
+    gs_sdm_objects-wlk2   = gt_wlk2_sdm[].
+    gs_sdm_objects-/gda/sdm_mlan   = gt_mlan_sdm[].
+*    gs_sdm_objects-mamt   = gt_mamt_sdm[].
+*    gs_sdm_objects-malg   = gt_malg_sdm[].
+    gs_sdm_objects-/gda/sdm_tariff   = gt_tariff_sdm[].
+
 *    gs_sdm_objects-/gda/mg03steuer[] = gt_steuer_sdm[].
 *    gs_sdm_objects-/gda/mg03steumm[]  = gt_steumm_sdm[].
     gs_syst_sdm              = syst.
@@ -219,7 +242,19 @@ FORM sdm_logic .
      gt_mvke_sdm,
      gt_mean_sdm,
      gt_mpop_sdm,
-     gt_marm_sdm.
+     gt_marm_sdm,
+
+    gt_maw1_sdm,
+    gt_eord_sdm,
+    gt_eina_sdm,
+    gt_eine_sdm,
+    gt_mwli_sdm,
+    gt_wlk1_sdm,
+    gt_wlk2_sdm,
+    gt_mlan_sdm,
+    gt_mamt_sdm,
+    gt_malg_sdm,
+    gt_tariff_sdm.
 *     gt_mlan_sdm,
 *     gt_steuer_sdm,
 *     gt_steumm_sdm.
@@ -1836,41 +1871,41 @@ ENDFORM.
 *  -->  p1        text
 *  <--  p2        text
 *----------------------------------------------------------------------*
-form set_up_relations .
-  data:
-    lt_relations       type standard table of struc_rel.
+FORM set_up_relations .
+  DATA:
+    lt_relations       TYPE STANDARD TABLE OF struc_rel.
 *    lt_relations_extra type standard table of struc_rel,
 *    lv_matnr           type mara-matnr.
 
-  field-symbols:
-    <matnr>          type any,
-    <linkage>        type any,
+  FIELD-SYMBOLS:
+    <matnr>          TYPE any,
+    <linkage>        TYPE any,
 *    <matnr_new>      type any,
-    <attyp>          type any,
-    <relations>      like line of gt_relations.
+    <attyp>          TYPE any,
+    <relations>      LIKE LINE OF gt_relations.
 *    <relations_copy> like line of lt_relations.
 
-  loop at <dyn_table> assigning <dyn_wa>.
-    assign component 'KEY_MATNR' of structure <dyn_wa> to <matnr>.
-    check sy-subrc = 0.
-    assign component 'KEY_ATTYP' of structure <dyn_wa> to <attyp>.
-    check sy-subrc = 0.
-    assign component 'LINKAGE' of structure <dyn_wa> to <linkage>.
+  LOOP AT <dyn_table> ASSIGNING <dyn_wa>.
+    ASSIGN COMPONENT 'KEY_MATNR' OF STRUCTURE <dyn_wa> TO <matnr>.
+    CHECK sy-subrc = 0.
+    ASSIGN COMPONENT 'KEY_ATTYP' OF STRUCTURE <dyn_wa> TO <attyp>.
+    CHECK sy-subrc = 0.
+    ASSIGN COMPONENT 'LINKAGE' OF STRUCTURE <dyn_wa> TO <linkage>.
 
-    check sy-subrc = 0.
-    read table gt_relations assigning <relations> with key matnr_rel = <matnr>.
-    if sy-subrc = 0.
+    CHECK sy-subrc = 0.
+    READ TABLE gt_relations ASSIGNING <relations> WITH KEY matnr_rel = <matnr>.
+    IF sy-subrc = 0.
       <linkage> = <relations>-matnr.
-    else.
-      if <attyp> = '11' or <attyp> =  '01' or <attyp> = '10'  or <attyp> = '12'.
+    ELSE.
+      IF <attyp> = '11' OR <attyp> =  '01' OR <attyp> = '10'  OR <attyp> = '12'.
         <linkage> = <matnr>.
-      endif.
-    endif.
-    check <relations> is assigned.
-    delete gt_relations where matnr     = <relations>-matnr
-                          and matnr_rel = <relations>-matnr_rel.
-  endloop.
-endform.
+      ENDIF.
+    ENDIF.
+    CHECK <relations> IS ASSIGNED.
+    DELETE gt_relations WHERE matnr     = <relations>-matnr
+                          AND matnr_rel = <relations>-matnr_rel.
+  ENDLOOP.
+ENDFORM.
 *&---------------------------------------------------------------------*
 *&      Form  AT_SELECTION_SCREEN_ART_RSR
 *&---------------------------------------------------------------------*
@@ -1879,38 +1914,38 @@ endform.
 *  -->  p1        text
 *  <--  p2        text
 *----------------------------------------------------------------------*
-form screen_output_art_rsr.
-  data:
+FORM screen_output_art_rsr.
+  DATA:
     lv_active.
 
 
-  case ok_code.
-    when 'STRUC'.
-      if p_struc = abap_true.
+  CASE ok_code.
+    WHEN 'STRUC'.
+      IF p_struc = abap_true.
         lv_active = 1.
-      else.
+      ELSE.
         lv_active = 0.
-      endif.
-      loop at screen.
-        if screen-group1 = 'SC1'.
+      ENDIF.
+      LOOP AT SCREEN.
+        IF screen-group1 = 'SC1'.
           screen-active = lv_active.
-          modify screen.
-        endif.
-      endloop.
-    when others.
-      if p_struc = abap_true.
+          MODIFY SCREEN.
+        ENDIF.
+      ENDLOOP.
+    WHEN OTHERS.
+      IF p_struc = abap_true.
         lv_active = 1.
-      else.
+      ELSE.
         lv_active = 0.
-      endif.
-      loop at screen.
-        if screen-group1 = 'SC1'.
+      ENDIF.
+      LOOP AT SCREEN.
+        IF screen-group1 = 'SC1'.
           screen-active = lv_active.
-          modify screen.
-        endif.
-      endloop.
-  endcase.
-endform.
+          MODIFY SCREEN.
+        ENDIF.
+      ENDLOOP.
+  ENDCASE.
+ENDFORM.
 *&---------------------------------------------------------------------*
 *&      Form  INIT_ART_RSR
 *&---------------------------------------------------------------------*
@@ -1919,44 +1954,44 @@ endform.
 *  -->  p1        text
 *  <--  p2        text
 *----------------------------------------------------------------------*
-form init_art_rsr .
+FORM init_art_rsr .
   s_attyps-sign   = 'I'.
   s_attyps-option = 'EQ'.
   s_attyps-low    = '00'.
-  append  s_attyps.
+  APPEND  s_attyps.
 
   s_attyps-sign   = 'I'.
   s_attyps-option = 'EQ'.
   s_attyps-low    = '01'.
-  append  s_attyps.
+  APPEND  s_attyps.
 
   s_attyps-sign   = 'I'.
   s_attyps-option = 'EQ'.
   s_attyps-low    = '02'.
-  append  s_attyps.
+  APPEND  s_attyps.
 
   s_attyps-sign   = 'I'.
   s_attyps-option = 'EQ'.
   s_attyps-low    = '10'.
-  append  s_attyps.
+  APPEND  s_attyps.
 
   s_attyps-sign   = 'I'.
   s_attyps-option = 'EQ'.
   s_attyps-low    = '11'.
-  append  s_attyps.
+  APPEND  s_attyps.
 
   s_attyps-sign   = 'I'.
   s_attyps-option = 'EQ'.
   s_attyps-low    = '12'.
-  append  s_attyps.
+  APPEND  s_attyps.
 
   s_attyps-sign   = 'I'.
   s_attyps-option = 'EQ'.
   s_attyps-low    = '21'.
-  append  s_attyps.
+  APPEND  s_attyps.
 
   s_attyps-sign   = 'I'.
   s_attyps-option = 'EQ'.
   s_attyps-low    = '22'.
-  append  s_attyps.
-endform.
+  APPEND  s_attyps.
+ENDFORM.
