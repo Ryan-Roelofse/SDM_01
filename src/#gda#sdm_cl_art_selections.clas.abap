@@ -15,6 +15,13 @@ public section.
   types:
     tty_stpo type standard table of ty_stpo .
   types:
+    begin of struc_rel.
+types: matnr     type mara-matnr.
+types: matnr_rel type mara-matnr.
+types end of struc_rel .
+  types:
+    tty_mara_relations type standard table of struc_rel .
+  types:
     begin of ty_selscreen,
                    matnr             type range of mara-matnr,
                    ersda             type range of mara-ersda,
@@ -136,6 +143,7 @@ public section.
   data MT_MAMT_SPEC type /GDA/SDM_T_MAMT_01 .
   data MT_TARIFF_SPEC type /GDA/SDM_T_TARIFFS_01 .
   data MT_MALG_SPEC type /GDA/SDM_T_MALG_01 .
+  data MT_MARA_RELATIONS type TTY_MARA_RELATIONS .
 
   methods CONSTRUCTOR .
   methods SET_SELSCREEN
@@ -176,7 +184,7 @@ private section.
                     with unique key matnr werks zeord .
   data:
     mt_mlan       type sorted table of /gda/sdm_s_mlan_01
-                    with unique key matnr aland lfdnr tatyp.
+                    with unique key matnr aland lfdnr tatyp .
   data MT_EINA type /GDA/SDM_T_EINA_01 .
   data MT_EINE type /GDA/SDM_T_EINE_01 .
   data MT_MG03STEUMM type /GDA/SDM_T_MG03STEUMM_01 .
@@ -807,6 +815,7 @@ CLASS /GDA/SDM_CL_ART_SELECTIONS IMPLEMENTATION.
       DELETE ADJACENT DUPLICATES FROM me->mt_mara.
 
       lt_relations[] = gt_relations[].
+      me->mt_mara_relations = gt_relations[].
 
       LOOP AT gt_relations ASSIGNING <relations1>.
         LOOP AT lt_relations ASSIGNING <relations2> WHERE matnr <> <relations1>-matnr
@@ -817,10 +826,12 @@ CLASS /GDA/SDM_CL_ART_SELECTIONS IMPLEMENTATION.
 * this entry should be added back
         ENDLOOP.
       ENDLOOP.
-      SORT lt_mara.
-      DELETE ADJACENT DUPLICATES FROM lt_mara.
+
       APPEND LINES OF lt_mara TO me->mt_mara.
     ENDIF.
+
+    SORT me->mt_mara.
+    DELETE ADJACENT DUPLICATES FROM me->mt_mara.
 
     LOOP AT me->mt_mara ASSIGNING <ls_mara>.
       <ls_mara>-sdm_tabkey = /gda/cl_sdm_data_model_main=>build_string_from_key( i_tabname  = 'MARA'
@@ -1422,10 +1433,10 @@ CLASS /GDA/SDM_CL_ART_SELECTIONS IMPLEMENTATION.
     endtry.
 
 
-*    loop at me->mt_myms assigning <ls_myms>.
-*      <ls_myms>-sdm_tabkey = /gda/cl_sdm_data_model_main=>build_string_from_key( i_tabname  = 'MYMS'
-*                                                                           i_contents = <ls_myms> ).
-*    endloop.
+    loop at me->mt_myms assigning <ls_myms>.
+      <ls_myms>-sdm_tabkey = /gda/cl_sdm_data_model_main=>build_string_from_key( i_tabname  = 'MYMS'
+                                                                           i_contents = <ls_myms> ).
+    endloop.
 
   endmethod.
 

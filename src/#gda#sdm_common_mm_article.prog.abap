@@ -113,6 +113,7 @@ form selection_screen.
   gs_selscreen-eord = p_eord.
   gs_selscreen-eina = p_eina.
   gs_selscreen-eine = p_eine.
+*  gs_selscreen-mpop = p_mpop.
   gs_selscreen-struc = p_struc.
 
   gs_selscreen-max_rows = p_max.

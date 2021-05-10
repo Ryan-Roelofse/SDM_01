@@ -3100,6 +3100,7 @@ form sdm_main_article.
     gt_mlan_sdm[]   = go_selection->mt_mlan_spec[].
     gt_malg_sdm[]   = go_selection->mt_malg_spec[].
     gt_mamt_sdm[]   = go_selection->mt_mamt_spec[].
+    gt_myms_sdm[]   = go_selection->mt_myms_spec[].
 *    gt_steuer_sdm[] = go_selection->mt_steuertab_spec[].
 *    gt_steumm_sdm[] = go_selection->mt_steummtab_spec[].
     gt_eord_sdm[]   = go_selection->mt_eord_spec[].

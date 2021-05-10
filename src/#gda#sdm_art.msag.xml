@@ -898,6 +898,24 @@
     <T100>
      <SPRSL>E</SPRSL>
      <ARBGB>/GDA/SDM_ART</ARBGB>
+     <MSGNR>594</MSGNR>
+     <TEXT>SDM Article (Tariffs): Comm. code cannot be blank</TEXT>
+    </T100>
+    <T100>
+     <SPRSL>E</SPRSL>
+     <ARBGB>/GDA/SDM_ART</ARBGB>
+     <MSGNR>595</MSGNR>
+     <TEXT>SDM Article (POS): No repeat key must be 1</TEXT>
+    </T100>
+    <T100>
+     <SPRSL>E</SPRSL>
+     <ARBGB>/GDA/SDM_ART</ARBGB>
+     <MSGNR>596</MSGNR>
+     <TEXT>SDM Article (Product Costing: DC): Origin group must be BIKE</TEXT>
+    </T100>
+    <T100>
+     <SPRSL>E</SPRSL>
+     <ARBGB>/GDA/SDM_ART</ARBGB>
      <MSGNR>600</MSGNR>
      <TEXT>MARA TEST</TEXT>
     </T100>

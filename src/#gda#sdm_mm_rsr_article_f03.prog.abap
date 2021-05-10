@@ -83,7 +83,9 @@ FORM sdm_logic .
     gt_mlan_sdm[]   = go_selection->mt_mlan_spec[].
     gt_mamt_sdm[]   = go_selection->mt_mamt_spec[].
     gt_malg_sdm[]   = go_selection->mt_malg_spec[].
+    gt_myms_sdm[]   = go_selection->mt_myms_spec[].
     gt_tariff_sdm   = go_selection->mt_tariff_spec[].
+
 *    gt_mlan_sdm[]   = go_selection->mt_mlan_spec[].
 *    gt_steuer_sdm[] = go_selection->mt_steuertab_spec[].
 *    gt_steumm_sdm[] = go_selection->mt_steummtab_spec[].
@@ -201,7 +203,7 @@ FORM sdm_logic .
 *    gs_sdm_objects-mlgt[]   = gt_mlgt_sdm[].
     gs_sdm_objects-mvke[]   = gt_mvke_sdm[].
     gs_sdm_objects-mean[]   = gt_mean_sdm[].
-*    gs_sdm_objects-mpop[]   = gt_mpop_sdm[].
+    gs_sdm_objects-mpop[]   = gt_mpop_sdm[].
 *    gs_sdm_objects-marm[]   = gt_marm_sdm[].
 *    gs_sdm_objects-mlan[]   = gt_mlan_sdm[].
     gs_sdm_objects-eine[]   = gt_eine_sdm[].
@@ -213,6 +215,7 @@ FORM sdm_logic .
     gs_sdm_objects-mwli   = gt_mwli_sdm[].
     gs_sdm_objects-wlk1   = gt_wlk1_sdm[].
     gs_sdm_objects-wlk2   = gt_wlk2_sdm[].
+    gs_sdm_objects-myms   = gt_myms_sdm[].
     gs_sdm_objects-/gda/sdm_mlan   = gt_mlan_sdm[].
 *    gs_sdm_objects-mamt   = gt_mamt_sdm[].
 *    gs_sdm_objects-malg   = gt_malg_sdm[].
@@ -1884,6 +1887,8 @@ FORM set_up_relations .
     <attyp>          TYPE any,
     <relations>      LIKE LINE OF gt_relations.
 *    <relations_copy> like line of lt_relations.
+
+  gt_relations[]   = go_selection->mt_mara_relations.
 
   LOOP AT <dyn_table> ASSIGNING <dyn_wa>.
     ASSIGN COMPONENT 'KEY_MATNR' OF STRUCTURE <dyn_wa> TO <matnr>.

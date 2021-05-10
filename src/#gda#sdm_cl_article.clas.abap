@@ -719,7 +719,8 @@ CLASS /GDA/SDM_CL_ARTICLE IMPLEMENTATION.
 
 
   method get_object_keys.
-    r_key_fields = value #( ( 'KEY_MATNR' ) ( 'KEY_MAKTX' ) ( 'KEY_ATTYP' ) ( 'KEY_MATKL' ) ( 'KEY_MTART' ) ).
+*    r_key_fields = value #( ( 'KEY_MATNR' ) ( 'KEY_MAKTX' ) ( 'KEY_ATTYP' ) ( 'KEY_MATKL' ) ( 'KEY_MTART' ) ).
+    r_key_fields = value #( ( 'KEY_MATNR' ) ).
   endmethod.
 
 

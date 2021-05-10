@@ -16,7 +16,7 @@ INCLUDE /gda/sdm_mm_article_data3."zmat_data_test."/gda/sdm_mm_mat_data.
 INCLUDE /gda/sdm_mm_art_obj_data_rep."zmat_obj_data_test. "/gda/sdm_mm_mat_obj_data.
 INCLUDE /gda/sdm_mm_art_screens3."/gda/sdm_mm_art_screens."zmat_screens_test."/gda/sdm_mm_mat_screens. " check
 INCLUDE /gda/sdm_rsr_lcl_class. "/gda/sdm_mm_mat_lcl_class.
-INCLUDE /GDA/SDM_MM_RSR_ARTICLE_F03."/gda/sdm_mm_rsr_mat_f03."zrsr_mat_f01_test. "/gda/sdm_mm_rsr_mat_f01.."
+INCLUDE /gda/sdm_mm_rsr_article_f03."/gda/sdm_mm_rsr_mat_f03."zrsr_mat_f01_test. "/gda/sdm_mm_rsr_mat_f01.."
 INCLUDE /gda/sdm_common_core.
 INCLUDE /gda/sdm_common_core_rsr.
 INCLUDE /gda/sdm_mod_core.
@@ -63,6 +63,10 @@ START-OF-SELECTION.
   ENDTRY.
 
   PERFORM sdm_logic.
+
+  IF p_struc = abap_true.
+    PERFORM set_up_relations.
+  ENDIF.
 
 END-OF-SELECTION.
   CHECK gv_execute_report = abap_true.
