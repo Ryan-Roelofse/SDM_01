@@ -84,6 +84,7 @@ FORM sdm_logic .
     gt_mamt_sdm[]   = go_selection->mt_mamt_spec[].
     gt_malg_sdm[]   = go_selection->mt_malg_spec[].
     gt_myms_sdm[]   = go_selection->mt_myms_spec[].
+    gt_konh_sdm[]   = go_selection->mt_konh_spec[].
     gt_tariff_sdm   = go_selection->mt_tariff_spec[].
 
 *    gt_mlan_sdm[]   = go_selection->mt_mlan_spec[].
@@ -216,6 +217,8 @@ FORM sdm_logic .
     gs_sdm_objects-wlk1   = gt_wlk1_sdm[].
     gs_sdm_objects-wlk2   = gt_wlk2_sdm[].
     gs_sdm_objects-myms   = gt_myms_sdm[].
+    gs_sdm_objects-konh   = gt_konh_sdm[].
+
     gs_sdm_objects-/gda/sdm_mlan   = gt_mlan_sdm[].
 *    gs_sdm_objects-mamt   = gt_mamt_sdm[].
 *    gs_sdm_objects-malg   = gt_malg_sdm[].
@@ -257,6 +260,7 @@ FORM sdm_logic .
     gt_mlan_sdm,
     gt_mamt_sdm,
     gt_malg_sdm,
+    gt_konh_sdm,
     gt_tariff_sdm.
 *     gt_mlan_sdm,
 *     gt_steuer_sdm,

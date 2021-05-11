@@ -3106,6 +3106,7 @@ form sdm_main_article.
     gt_eord_sdm[]   = go_selection->mt_eord_spec[].
     gt_eina_sdm[]   = go_selection->mt_eina_spec[].
     gt_eine_sdm[]   = go_selection->mt_eine_spec[].
+    gt_konh_sdm[]   = go_selection->mt_konh_spec[].
     gt_tariff_sdm   = go_selection->mt_tariff_spec[].
     gs_syst_sdm     = syst.
     append go_selection->ms_makt_spec to gt_makt_sdm[].
@@ -3151,7 +3152,8 @@ form sdm_main_article.
      gs_sdm_objects.
     refresh:
      gt_mara_sdm,gt_marc_sdm,gt_mard_sdm,gt_mbew_sdm,gt_mlgn_sdm,gt_makt_sdm,gt_eord_sdm,
-     gt_mlan_sdm,gt_malg_sdm,gt_mamt_sdm,gt_maw1_sdm,gt_wlk1_sdm,gt_wlk2_sdm,gt_mwli_sdm.
+     gt_mlan_sdm,gt_malg_sdm,gt_mamt_sdm,gt_maw1_sdm,gt_wlk1_sdm,gt_wlk2_sdm,gt_mwli_sdm,
+     gt_konh_sdm.
   endloop.
 
   perform progress_bar using text-019.

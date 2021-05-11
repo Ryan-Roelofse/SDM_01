@@ -6,6 +6,14 @@ class /GDA/SDM_CL_ART_SELECTIONS definition
 
 public section.
 
+types begin of ty_cond_header.
+types: matnr type mara-matnr.
+types: knumh type konh-knumh.
+types end of ty_cond_header.
+
+  types:
+    TTY_KONH type standard table of konh,
+    TTY_COND_HDR  type sorted table of ty_cond_header with non-unique key matnr knumh.
   types:
     begin of ty_stpo,
               idnrk type stpo-idnrk,
@@ -143,6 +151,7 @@ types end of struc_rel .
   data MT_MAMT_SPEC type /GDA/SDM_T_MAMT_01 .
   data MT_TARIFF_SPEC type /GDA/SDM_T_TARIFFS_01 .
   data MT_MALG_SPEC type /GDA/SDM_T_MALG_01 .
+  data MT_KONH_SPEC type /GDA/SDM_T_KONH_01 .
   data MT_MARA_RELATIONS type TTY_MARA_RELATIONS .
 
   methods CONSTRUCTOR .
@@ -199,6 +208,8 @@ private section.
   data MT_PRICING type /GDA/SDM_T_PRICING_01 .
   data MT_MALG type /GDA/SDM_T_MALG_01 .
   data MT_STPO type TTY_STPO .
+  data MT_KONH type TTY_KONH .
+  data MT_COND_HEADER type TTY_COND_HDR .
   data MV_EINA_FIRST type C .
   data MV_EORD_FIRST type C .
   data MV_MVKE_FIRST type C .
@@ -670,7 +681,7 @@ CLASS /GDA/SDM_CL_ART_SELECTIONS IMPLEMENTATION.
         IF lt_matnr IS NOT INITIAL.
           CALL FUNCTION '/GDA/SDM_MM_MARA_GET_OLD2' "lv_function
             EXPORTING
-              x_max_rows   = me->ms_selscreen-max_rows
+*              x_max_rows   = me->ms_selscreen-max_rows
               xt_materials = lt_matnr
             IMPORTING
               xt_mara      = me->mt_mara[]
@@ -691,8 +702,8 @@ CLASS /GDA/SDM_CL_ART_SELECTIONS IMPLEMENTATION.
 
       ELSE.
         CALL FUNCTION '/GDA/SDM_MM_MARA_GET_OLD2' "lv_function
-          EXPORTING
-            x_max_rows = me->ms_selscreen-max_rows
+*          EXPORTING
+*            x_max_rows = me->ms_selscreen-max_rows
           IMPORTING
             xt_mara    = me->mt_mara[]
           TABLES
@@ -1445,7 +1456,10 @@ CLASS /GDA/SDM_CL_ART_SELECTIONS IMPLEMENTATION.
 
     DATA:
      lx_open_sql_error TYPE REF TO cx_sy_open_sql_error,
-      ls_pricing     type /gda/sdm_st_pricing_01.
+      ls_pricing     TYPE /gda/sdm_st_pricing_01,
+      ls_cond_header TYPE ty_cond_header,
+      ls_konh TYPE konh,
+      ls_konh_sdm     TYPE /gda/sdm_s_konh_01.
 
     TRY.
 * Tariff
@@ -1459,344 +1473,378 @@ CLASS /GDA/SDM_CL_ART_SELECTIONS IMPLEMENTATION.
 
           ls_pricing-matnr = <lfs_mara>-matnr.
           APPEND ls_pricing TO me->mt_pricing.
+
+          ls_cond_header-matnr = <lfs_mara>-matnr.
+          ls_cond_header-knumh = ls_pricing-knumh.
+          INSERT ls_cond_header INTO TABLE me->mt_cond_header.
+
+          CLEAR : ls_pricing,ls_cond_header.
+
         ENDLOOP.
+
+        IF me->mt_cond_header IS NOT INITIAL.
+          SELECT * FROM konh INTO TABLE me->mt_konh
+                   FOR ALL ENTRIES IN me->mt_cond_header
+                   WHERE knumh    =  me->mt_cond_header-knumh.
+        ENDIF.
+
     ENDTRY.
   ENDMETHOD.
 
 
-  method BUILD_SPEC.
+  METHOD build_spec.
 
 
-    data:
-      ls_mpop_sdm        type /gda/sdm_s_mpop_01, "Forecasting
-      ls_mpop            type mpop,            "Forecasting
-      ls_mfhm            type mfhm,            "PRT
-      ls_mfhm_sdm        type /gda/sdm_s_mfhm_06, "PRT
+    DATA:
+      ls_mpop_sdm        TYPE /gda/sdm_s_mpop_01, "Forecasting
+      ls_mpop            TYPE mpop,            "Forecasting
+      ls_mfhm            TYPE mfhm,            "PRT
+      ls_mfhm_sdm        TYPE /gda/sdm_s_mfhm_06, "PRT
 *      ls_smeinh          type smeinh,          "UoM
-      ls_smeinh_sdm      type /gda/sdm_s_meinh_01, "UoM
-      ls_mean_sdm        type /gda/sdm_s_mean_01,
-      ls_marm_sdm        type /gda/sdm_s_marm_01,
-      ls_maw1_sdm        type /gda/sdm_s_maw1_01,
-      ls_mwli_sdm        type /gda/sdm_s_mwli_01,
-      ls_tariffs_sdm     type /gda/sdm_s_tariffs_01,
+      ls_smeinh_sdm      TYPE /gda/sdm_s_meinh_01, "UoM
+      ls_mean_sdm        TYPE /gda/sdm_s_mean_01,
+      ls_marm_sdm        TYPE /gda/sdm_s_marm_01,
+      ls_maw1_sdm        TYPE /gda/sdm_s_maw1_01,
+      ls_mwli_sdm        TYPE /gda/sdm_s_mwli_01,
+      ls_tariffs_sdm     TYPE /gda/sdm_s_tariffs_01,
 
-      ls_wlk1_sdm        type /gda/sdm_s_wlk1_01,
-      ls_wlk2_sdm        type /gda/sdm_s_wlk2_01,
-      ls_myms_sdm        type /gda/sdm_s_myms_01,
-      ls_mamt_sdm        type /gda/sdm_s_mamt_01,
-      ls_malg_sdm        type /gda/sdm_s_malg_01,
+      ls_wlk1_sdm        TYPE /gda/sdm_s_wlk1_01,
+      ls_wlk2_sdm        TYPE /gda/sdm_s_wlk2_01,
+      ls_myms_sdm        TYPE /gda/sdm_s_myms_01,
+      ls_mamt_sdm        TYPE /gda/sdm_s_mamt_01,
+      ls_malg_sdm        TYPE /gda/sdm_s_malg_01,
+      ls_konh_sdm        TYPE /gda/sdm_s_konh_01,
 
-      ls_eord_sdm        type /gda/sdm_s_eord_01,
-      ls_mlan_sdm        type /gda/sdm_mlan,
-      lt_steuertab       type standard table of mg03steuer, "Table for Taxes
-      ls_steuertab_spec  type /gda/sdm_s_mg03steuer_01,
-      lt_steummtab       type standard table of mg03steumm, "Table for Taxes (Purchasing)
-      ls_steummtab_spec  type /gda/sdm_s_mg03steumm_06.
+      ls_eord_sdm        TYPE /gda/sdm_s_eord_01,
+      ls_mlan_sdm        TYPE /gda/sdm_mlan,
+      lt_steuertab       TYPE STANDARD TABLE OF mg03steuer, "Table for Taxes
+      ls_steuertab_spec  TYPE /gda/sdm_s_mg03steuer_01,
+      lt_steummtab       TYPE STANDARD TABLE OF mg03steumm, "Table for Taxes (Purchasing)
+      ls_steummtab_spec  TYPE /gda/sdm_s_mg03steumm_06.
 
-    field-symbols:
-      <ls_marc> type /gda/sdm_s_marc_01,
-      <ls_mast> type /gda/sdm_s_mast_01,
-      <ls_mard> type /gda/sdm_s_mard_01,
-      <ls_mvke> type /gda/sdm_s_mvke_01,
-      <ls_mbew> type /gda/sdm_s_mbew_01,
-      <ls_mlgn> type /gda/sdm_s_mlgn_01,
-      <ls_mlgt> type /gda/sdm_s_mlgt_01,
-      <ls_maw1> type /gda/sdm_s_maw1_01,
-      <ls_mwli> type /gda/sdm_s_mwli_01,
-      <ls_wlk1> type /gda/sdm_s_wlk1_01,
-      <ls_wlk2> type /gda/sdm_s_wlk2_01,
-      <ls_myms> type /gda/sdm_s_myms_01,
-      <ls_mamt> type /gda/sdm_s_mamt_01,
-      <ls_malg> type /gda/sdm_s_malg_01,
-      <ls_mapr> type /gda/sdm_s_mapr_06,
-      <ls_mean> type /gda/sdm_s_mean_01,
-      <ls_marm> type /gda/sdm_s_marm_01,
-      <ls_mlan> type /gda/sdm_s_mlan_01,
-      <ls_eord> type /gda/sdm_s_eord_01,
-      <ls_eina> type /gda/sdm_s_eina_01,
-      <ls_eine> type /gda/sdm_s_eine_01,
-      <ls_tariffs> type /gda/sdm_s_tariffs_01,
-      <steuertab> like line of lt_steuertab,
-      <steummtab> like line of lt_steummtab.
+    FIELD-SYMBOLS:
+      <ls_marc> TYPE /gda/sdm_s_marc_01,
+      <ls_mast> TYPE /gda/sdm_s_mast_01,
+      <ls_mard> TYPE /gda/sdm_s_mard_01,
+      <ls_mvke> TYPE /gda/sdm_s_mvke_01,
+      <ls_mbew> TYPE /gda/sdm_s_mbew_01,
+      <ls_mlgn> TYPE /gda/sdm_s_mlgn_01,
+      <ls_mlgt> TYPE /gda/sdm_s_mlgt_01,
+      <ls_maw1> TYPE /gda/sdm_s_maw1_01,
+      <ls_mwli> TYPE /gda/sdm_s_mwli_01,
+      <ls_wlk1> TYPE /gda/sdm_s_wlk1_01,
+      <ls_wlk2> TYPE /gda/sdm_s_wlk2_01,
+      <ls_myms> TYPE /gda/sdm_s_myms_01,
+      <ls_mamt> TYPE /gda/sdm_s_mamt_01,
+      <ls_malg> TYPE /gda/sdm_s_malg_01,
+      <ls_mapr> TYPE /gda/sdm_s_mapr_06,
+      <ls_mean> TYPE /gda/sdm_s_mean_01,
+      <ls_marm> TYPE /gda/sdm_s_marm_01,
+      <ls_mlan> TYPE /gda/sdm_s_mlan_01,
+      <ls_eord> TYPE /gda/sdm_s_eord_01,
+      <ls_eina> TYPE /gda/sdm_s_eina_01,
+      <ls_eine> TYPE /gda/sdm_s_eine_01,
+      <ls_konh> TYPE konh,
+      <ls_cond_header> TYPE ty_cond_header,
+      <ls_tariffs> TYPE /gda/sdm_s_tariffs_01,
+      <steuertab> LIKE LINE OF lt_steuertab,
+      <steummtab> LIKE LINE OF lt_steummtab.
 
 *    if me->ms_mara_spec-matnr is initial.
-      read table me->mt_mara into me->ms_mara_spec
-        with key matnr = me->MV_OBJECT.
+    READ TABLE me->mt_mara INTO me->ms_mara_spec
+      WITH KEY matnr = me->mv_object.
 *    endif.
 
 */ MAKT
-    if me->ms_selscreen-makt = abap_true.
-      read table me->mt_makt into me->ms_makt_spec
-        with key matnr = me->MV_OBJECT
+    IF me->ms_selscreen-makt = abap_true.
+      READ TABLE me->mt_makt INTO me->ms_makt_spec
+        WITH KEY matnr = me->mv_object
                  spras = sy-langu.
-    append  me->ms_makt_spec to me->mt_makt_spec.
-    endif.
+      APPEND  me->ms_makt_spec TO me->mt_makt_spec.
+    ENDIF.
 
 */ MARC
-    if me->ms_selscreen-marc = abap_true.
-      read table mt_marc transporting no fields
-        with key matnr = MV_OBJECT binary search.
-      if sy-subrc = 0.
-        loop at me->mt_marc assigning <ls_marc> from sy-tabix.
-          if <ls_marc>-matnr <> MV_OBJECT.
-            exit.
-          else.
-            insert <ls_marc> into table me->mt_marc_spec.
-          endif.
-        endloop.
-      endif.
-    endif.
+    IF me->ms_selscreen-marc = abap_true.
+      READ TABLE mt_marc TRANSPORTING NO FIELDS
+        WITH KEY matnr = mv_object BINARY SEARCH.
+      IF sy-subrc = 0.
+        LOOP AT me->mt_marc ASSIGNING <ls_marc> FROM sy-tabix.
+          IF <ls_marc>-matnr <> mv_object.
+            EXIT.
+          ELSE.
+            INSERT <ls_marc> INTO TABLE me->mt_marc_spec.
+          ENDIF.
+        ENDLOOP.
+      ENDIF.
+    ENDIF.
 
 */ MAST
-    if me->ms_selscreen-mast = abap_true.
-      read table mt_mast transporting no fields
-        with key matnr = MV_OBJECT binary search.
-      if sy-subrc = 0.
-        loop at me->mt_mast assigning <ls_mast> from sy-tabix.
-          if <ls_mast>-matnr <> MV_OBJECT.
-            exit.
-          else.
-            insert <ls_mast> into table me->mt_mast_spec.
-          endif.
-        endloop.
-      endif.
-    endif.
+    IF me->ms_selscreen-mast = abap_true.
+      READ TABLE mt_mast TRANSPORTING NO FIELDS
+        WITH KEY matnr = mv_object BINARY SEARCH.
+      IF sy-subrc = 0.
+        LOOP AT me->mt_mast ASSIGNING <ls_mast> FROM sy-tabix.
+          IF <ls_mast>-matnr <> mv_object.
+            EXIT.
+          ELSE.
+            INSERT <ls_mast> INTO TABLE me->mt_mast_spec.
+          ENDIF.
+        ENDLOOP.
+      ENDIF.
+    ENDIF.
 
 */ MARD
-    if me->ms_selscreen-mard = abap_true.
-      read table mt_mard transporting no fields
-        with key matnr = MV_OBJECT binary search.
-      if sy-subrc = 0.
-        loop at mt_mard assigning <ls_mard> from sy-tabix.
-          if <ls_mard>-matnr <> MV_OBJECT.
-            exit.
-          else.
-            insert <ls_mard> into table me->mt_mard_spec.
-          endif.
-        endloop.
-      endif.
-    endif.
+    IF me->ms_selscreen-mard = abap_true.
+      READ TABLE mt_mard TRANSPORTING NO FIELDS
+        WITH KEY matnr = mv_object BINARY SEARCH.
+      IF sy-subrc = 0.
+        LOOP AT mt_mard ASSIGNING <ls_mard> FROM sy-tabix.
+          IF <ls_mard>-matnr <> mv_object.
+            EXIT.
+          ELSE.
+            INSERT <ls_mard> INTO TABLE me->mt_mard_spec.
+          ENDIF.
+        ENDLOOP.
+      ENDIF.
+    ENDIF.
 
 */ MVKE
-    if me->ms_selscreen-mvke = abap_true.
-      read table mt_mvke transporting no fields
-        with key matnr = MV_OBJECT binary search.
-      if sy-subrc = 0.
-        loop at mt_mvke assigning <ls_mvke> from sy-tabix.
-          if <ls_mvke>-matnr <> MV_OBJECT.
-            exit.
-          else.
-            insert <ls_mvke> into table me->mt_mvke_spec.
-          endif.
-        endloop.
-      endif.
-    endif.
+    IF me->ms_selscreen-mvke = abap_true.
+      READ TABLE mt_mvke TRANSPORTING NO FIELDS
+        WITH KEY matnr = mv_object BINARY SEARCH.
+      IF sy-subrc = 0.
+        LOOP AT mt_mvke ASSIGNING <ls_mvke> FROM sy-tabix.
+          IF <ls_mvke>-matnr <> mv_object.
+            EXIT.
+          ELSE.
+            INSERT <ls_mvke> INTO TABLE me->mt_mvke_spec.
+          ENDIF.
+        ENDLOOP.
+      ENDIF.
+    ENDIF.
 
 */ MBEW
-    if me->ms_selscreen-mbew = abap_true.
-      read table mt_mbew transporting no fields
-        with key matnr = MV_OBJECT binary search.
-      if sy-subrc = 0.
-        loop at mt_mbew assigning <ls_mbew> from sy-tabix.
-          if <ls_mbew>-matnr <> MV_OBJECT.
-            exit.
-          else.
-            insert <ls_mbew> into table me->mt_mbew_spec.
-          endif.
-        endloop.
-      endif.
-    endif.
+    IF me->ms_selscreen-mbew = abap_true.
+      READ TABLE mt_mbew TRANSPORTING NO FIELDS
+        WITH KEY matnr = mv_object BINARY SEARCH.
+      IF sy-subrc = 0.
+        LOOP AT mt_mbew ASSIGNING <ls_mbew> FROM sy-tabix.
+          IF <ls_mbew>-matnr <> mv_object.
+            EXIT.
+          ELSE.
+            INSERT <ls_mbew> INTO TABLE me->mt_mbew_spec.
+          ENDIF.
+        ENDLOOP.
+      ENDIF.
+    ENDIF.
 
 */ MLGN
-    if me->ms_selscreen-mlgn = abap_true.
-      read table mt_mlgn transporting no fields
-        with key matnr = MV_OBJECT binary search.
-      if sy-subrc = 0.
-        loop at mt_mlgn assigning <ls_mlgn> from sy-tabix.
-          if <ls_mlgn>-matnr <> MV_OBJECT.
-            exit.
-          else.
-            insert <ls_mlgn> into table me->mt_mlgn_spec.
-          endif.
-        endloop.
-      endif.
-    endif.
+    IF me->ms_selscreen-mlgn = abap_true.
+      READ TABLE mt_mlgn TRANSPORTING NO FIELDS
+        WITH KEY matnr = mv_object BINARY SEARCH.
+      IF sy-subrc = 0.
+        LOOP AT mt_mlgn ASSIGNING <ls_mlgn> FROM sy-tabix.
+          IF <ls_mlgn>-matnr <> mv_object.
+            EXIT.
+          ELSE.
+            INSERT <ls_mlgn> INTO TABLE me->mt_mlgn_spec.
+          ENDIF.
+        ENDLOOP.
+      ENDIF.
+    ENDIF.
 
 */ MLGT
-    if me->ms_selscreen-mlgt = abap_true.
-      read table mt_mlgt transporting no fields
-        with key matnr = MV_OBJECT binary search.
-      if sy-subrc = 0.
-        loop at mt_mlgt assigning <ls_mlgt> from sy-tabix.
-          if <ls_mlgt>-matnr <> MV_OBJECT.
-            exit.
-          else.
-            insert <ls_mlgt> into table me->mt_mlgt_spec.
-          endif.
-        endloop.
-      endif.
-    endif.
+    IF me->ms_selscreen-mlgt = abap_true.
+      READ TABLE mt_mlgt TRANSPORTING NO FIELDS
+        WITH KEY matnr = mv_object BINARY SEARCH.
+      IF sy-subrc = 0.
+        LOOP AT mt_mlgt ASSIGNING <ls_mlgt> FROM sy-tabix.
+          IF <ls_mlgt>-matnr <> mv_object.
+            EXIT.
+          ELSE.
+            INSERT <ls_mlgt> INTO TABLE me->mt_mlgt_spec.
+          ENDIF.
+        ENDLOOP.
+      ENDIF.
+    ENDIF.
 
 */ MAW1
-    if me->ms_selscreen-maw1 = abap_true.
-      read table mt_maw1 transporting no fields
-        with key matnr = MV_OBJECT binary search.
-      if sy-subrc = 0.
-        loop at mt_maw1 assigning <ls_maw1> from sy-tabix.
-          if <ls_maw1>-matnr <> MV_OBJECT.
-            exit.
-          else.
-            insert <ls_maw1> into table me->mt_maw1_spec.
-          endif.
-        endloop.
-      endif.
-    endif.
+    IF me->ms_selscreen-maw1 = abap_true.
+      READ TABLE mt_maw1 TRANSPORTING NO FIELDS
+        WITH KEY matnr = mv_object BINARY SEARCH.
+      IF sy-subrc = 0.
+        LOOP AT mt_maw1 ASSIGNING <ls_maw1> FROM sy-tabix.
+          IF <ls_maw1>-matnr <> mv_object.
+            EXIT.
+          ELSE.
+            INSERT <ls_maw1> INTO TABLE me->mt_maw1_spec.
+          ENDIF.
+        ENDLOOP.
+      ENDIF.
+    ENDIF.
 
 */ TARIFFS
 
-      read table mt_tariff transporting no fields
-        with key matnr = MV_OBJECT binary search.
-      if sy-subrc = 0.
-        loop at mt_tariff assigning <ls_tariffs> from sy-tabix.
-          if <ls_tariffs>-matnr <> MV_OBJECT.
-            exit.
-          else.
-            insert <ls_tariffs> into table me->mt_tariff_spec.
-          endif.
-        endloop.
-      endif.
+    READ TABLE mt_tariff TRANSPORTING NO FIELDS
+      WITH KEY matnr = mv_object BINARY SEARCH.
+    IF sy-subrc = 0.
+      LOOP AT mt_tariff ASSIGNING <ls_tariffs> FROM sy-tabix.
+        IF <ls_tariffs>-matnr <> mv_object.
+          EXIT.
+        ELSE.
+          INSERT <ls_tariffs> INTO TABLE me->mt_tariff_spec.
+        ENDIF.
+      ENDLOOP.
+    ENDIF.
 
 
 */ MWLI
-    if me->ms_selscreen-mwli = abap_true.
-      read table mt_mwli transporting no fields
-        with key matnr = MV_OBJECT binary search.
-      if sy-subrc = 0.
-        loop at mt_mwli assigning <ls_mwli> from sy-tabix.
-          if <ls_mwli>-matnr <> MV_OBJECT.
-            exit.
-          else.
-            insert <ls_mwli> into table me->mt_mwli_spec.
-          endif.
-        endloop.
-      endif.
-    endif.
+    IF me->ms_selscreen-mwli = abap_true.
+      READ TABLE mt_mwli TRANSPORTING NO FIELDS
+        WITH KEY matnr = mv_object BINARY SEARCH.
+      IF sy-subrc = 0.
+        LOOP AT mt_mwli ASSIGNING <ls_mwli> FROM sy-tabix.
+          IF <ls_mwli>-matnr <> mv_object.
+            EXIT.
+          ELSE.
+            INSERT <ls_mwli> INTO TABLE me->mt_mwli_spec.
+          ENDIF.
+        ENDLOOP.
+      ENDIF.
+    ENDIF.
 
 */ WLK1
-    if me->ms_selscreen-wlk1 = abap_true.
-      read table mt_wlk1 transporting no fields
-        with key artnr = MV_OBJECT binary search.
-      if sy-subrc = 0.
-        loop at mt_wlk1 assigning <ls_wlk1> from sy-tabix.
-          if <ls_wlk1>-artnr <> MV_OBJECT.
-            exit.
-          else.
-            insert <ls_wlk1> into table me->mt_wlk1_spec.
-          endif.
-        endloop.
-      endif.
-    endif.
+    IF me->ms_selscreen-wlk1 = abap_true.
+      READ TABLE mt_wlk1 TRANSPORTING NO FIELDS
+        WITH KEY artnr = mv_object BINARY SEARCH.
+      IF sy-subrc = 0.
+        LOOP AT mt_wlk1 ASSIGNING <ls_wlk1> FROM sy-tabix.
+          IF <ls_wlk1>-artnr <> mv_object.
+            EXIT.
+          ELSE.
+            INSERT <ls_wlk1> INTO TABLE me->mt_wlk1_spec.
+          ENDIF.
+        ENDLOOP.
+      ENDIF.
+    ENDIF.
 
 */ WLK2
-    if me->ms_selscreen-wlk2 = abap_true.
-      read table mt_wlk2 transporting no fields
-        with key matnr = MV_OBJECT binary search.
-      if sy-subrc = 0.
-        loop at mt_wlk2 assigning <ls_wlk2> from sy-tabix.
-          if <ls_wlk2>-matnr <> MV_OBJECT.
-            exit.
-          else.
-            insert <ls_wlk2> into table me->mt_wlk2_spec.
-          endif.
-        endloop.
-      endif.
-    endif.
+    IF me->ms_selscreen-wlk2 = abap_true.
+      READ TABLE mt_wlk2 TRANSPORTING NO FIELDS
+        WITH KEY matnr = mv_object BINARY SEARCH.
+      IF sy-subrc = 0.
+        LOOP AT mt_wlk2 ASSIGNING <ls_wlk2> FROM sy-tabix.
+          IF <ls_wlk2>-matnr <> mv_object.
+            EXIT.
+          ELSE.
+            INSERT <ls_wlk2> INTO TABLE me->mt_wlk2_spec.
+          ENDIF.
+        ENDLOOP.
+      ENDIF.
+    ENDIF.
 
 */ MYMS
-    if me->ms_selscreen-myms = abap_true.
-      read table mt_myms transporting no fields
-        with key matnr = MV_OBJECT." binary search.
-      if sy-subrc = 0.
-        loop at mt_myms assigning <ls_myms> from sy-tabix.
-          if <ls_myms>-matnr <> MV_OBJECT.
-            exit.
-          else.
-            insert <ls_myms> into table me->mt_myms_spec.
-          endif.
-        endloop.
-      endif.
-    endif.
+    IF me->ms_selscreen-myms = abap_true.
+      READ TABLE mt_myms TRANSPORTING NO FIELDS
+        WITH KEY matnr = mv_object." binary search.
+      IF sy-subrc = 0.
+        LOOP AT mt_myms ASSIGNING <ls_myms> FROM sy-tabix.
+          IF <ls_myms>-matnr <> mv_object.
+            EXIT.
+          ELSE.
+            INSERT <ls_myms> INTO TABLE me->mt_myms_spec.
+          ENDIF.
+        ENDLOOP.
+      ENDIF.
+    ENDIF.
 
 */ MAMT
-    if me->ms_selscreen-mamt = abap_true.
-      read table mt_mamt transporting no fields
-        with key matnr = MV_OBJECT binary search.
-      if sy-subrc = 0.
-        loop at mt_mamt assigning <ls_mamt> from sy-tabix.
-          if <ls_mamt>-matnr <> MV_OBJECT.
-            exit.
-          else.
-            insert <ls_mamt> into table me->mt_mamt_spec.
-          endif.
-        endloop.
-      endif.
-    endif.
+    IF me->ms_selscreen-mamt = abap_true.
+      READ TABLE mt_mamt TRANSPORTING NO FIELDS
+        WITH KEY matnr = mv_object BINARY SEARCH.
+      IF sy-subrc = 0.
+        LOOP AT mt_mamt ASSIGNING <ls_mamt> FROM sy-tabix.
+          IF <ls_mamt>-matnr <> mv_object.
+            EXIT.
+          ELSE.
+            INSERT <ls_mamt> INTO TABLE me->mt_mamt_spec.
+          ENDIF.
+        ENDLOOP.
+      ENDIF.
+    ENDIF.
 
 */ MALG
-    if me->ms_selscreen-malg = abap_true.
-      read table mt_malg transporting no fields
-        with key matnr = MV_OBJECT binary search.
-      if sy-subrc = 0.
-        loop at mt_malg assigning <ls_malg> from sy-tabix.
-          if <ls_malg>-matnr <> MV_OBJECT.
-            exit.
-          else.
-            insert <ls_malg> into table me->mt_malg_spec.
-          endif.
-        endloop.
-      endif.
-    endif.
+    IF me->ms_selscreen-malg = abap_true.
+      READ TABLE mt_malg TRANSPORTING NO FIELDS
+        WITH KEY matnr = mv_object BINARY SEARCH.
+      IF sy-subrc = 0.
+        LOOP AT mt_malg ASSIGNING <ls_malg> FROM sy-tabix.
+          IF <ls_malg>-matnr <> mv_object.
+            EXIT.
+          ELSE.
+            INSERT <ls_malg> INTO TABLE me->mt_malg_spec.
+          ENDIF.
+        ENDLOOP.
+      ENDIF.
+    ENDIF.
+
+*KONH
+* KONH
+    READ TABLE me->mt_cond_header ASSIGNING <ls_cond_header>
+     WITH KEY matnr = mv_object BINARY SEARCH.
+    IF sy-subrc = 0.
+      LOOP AT me->mt_konh ASSIGNING <ls_konh> WHERE knumh = <ls_cond_header>-knumh.
+        MOVE-CORRESPONDING <ls_konh> TO ls_konh_sdm.
+        ls_konh_sdm-sdm_tabkey = /gda/cl_sdm_data_model_main=>build_string_from_key( i_tabname  = 'KONH'
+                                                                             i_contents = ls_konh_sdm ).
+
+        APPEND ls_konh_sdm TO me->mt_konh_spec.
+        CLEAR ls_konh_sdm.
+
+      ENDLOOP.
+    ENDIF.
+
 
 */ MAPR (Forecasting)
-    if me->ms_selscreen-mapr = abap_true.
-      read table mt_mapr transporting no fields
-        with key matnr = MV_OBJECT binary search.
-      if sy-subrc = 0.
-        loop at mt_mapr assigning <ls_mapr> from sy-tabix.
-          if <ls_mapr>-matnr <> MV_OBJECT.
-            exit.
-          else.
+    IF me->ms_selscreen-mapr = abap_true.
+      READ TABLE mt_mapr TRANSPORTING NO FIELDS
+        WITH KEY matnr = mv_object BINARY SEARCH.
+      IF sy-subrc = 0.
+        LOOP AT mt_mapr ASSIGNING <ls_mapr> FROM sy-tabix.
+          IF <ls_mapr>-matnr <> mv_object.
+            EXIT.
+          ELSE.
 */ Read with FM
-            call function 'MPOP_SINGLE_READ'
-              exporting
+            CALL FUNCTION 'MPOP_SINGLE_READ'
+              EXPORTING
 *               kzrfb      = SPACE    " Ind.: Refresh buffer entry for material no.
                 matnr      = <ls_mapr>-matnr
 *               maxtz      =     " Max. No. of Entries in Buffer
                 werks      = <ls_mapr>-werks
-              importing
+              IMPORTING
 *               wmpop      =     " Work area for MPOP
                 o_mpop     = ls_mpop
 *        TABLES
 *               prowf_tab  =     " Table of forecast values (w/o key)
-              exceptions
+              EXCEPTIONS
                 not_found  = 1
                 wrong_call = 2
-                others     = 3.
-            if sy-subrc = 0.
-              move-corresponding ls_mpop to ls_mpop_sdm.
+                OTHERS     = 3.
+            IF sy-subrc = 0.
+              MOVE-CORRESPONDING ls_mpop TO ls_mpop_sdm.
 *              ls_mpop_sdm-sdm_tabkey = <ls_mapr>-sdm_tabkey.
               ls_mpop_sdm-sdm_tabkey = /gda/cl_sdm_data_model_main=>build_string_from_key( i_tabname  = 'MARC'
                                                                            i_contents = ls_mpop_sdm ).
 
-              insert ls_mpop_sdm into table me->mt_mpop_spec.
-              clear:
+              INSERT ls_mpop_sdm INTO TABLE me->mt_mpop_spec.
+              CLEAR:
                ls_mpop,
                ls_mpop_sdm.
-            endif.
-          endif.
-        endloop.
-      endif.
-    endif.
+            ENDIF.
+          ENDIF.
+        ENDLOOP.
+      ENDIF.
+    ENDIF.
 
 */ CRVM (PRT)
 *    if me->ms_selscreen-crvm = abap_true.
@@ -1836,147 +1884,147 @@ CLASS /GDA/SDM_CL_ART_SELECTIONS IMPLEMENTATION.
 *    endif.
 
 */ MLAN (Taxes)
-    if me->ms_selscreen-mlan = abap_true.
-      call function 'STEUERTAB_READ'
-        exporting
+    IF me->ms_selscreen-mlan = abap_true.
+      CALL FUNCTION 'STEUERTAB_READ'
+        EXPORTING
 *         kzrfb           = ' '
-          matnr           = me->MV_OBJECT
-        tables
+          matnr           = me->mv_object
+        TABLES
           steuertab       = lt_steuertab
-        exceptions
+        EXCEPTIONS
           wrong_call      = 1
           steuertab_empty = 2
-          others          = 3. "#EC *
+          OTHERS          = 3. "#EC *
 
-      loop at lt_steuertab assigning <steuertab>.
-        move-corresponding <steuertab> to ls_steuertab_spec.
+      LOOP AT lt_steuertab ASSIGNING <steuertab>.
+        MOVE-CORRESPONDING <steuertab> TO ls_steuertab_spec.
         ls_steummtab_spec-matnr      = ms_mara_spec-matnr.
         ls_steuertab_spec-sdm_tabkey = ms_mara_spec-sdm_tabkey.
-        append ls_steuertab_spec to me->mt_steuertab_spec.
-        clear:
+        APPEND ls_steuertab_spec TO me->mt_steuertab_spec.
+        CLEAR:
          ls_steuertab_spec.
-      endloop.
+      ENDLOOP.
 
-      call function 'STEUMMTAB_READ'
-        exporting
+      CALL FUNCTION 'STEUMMTAB_READ'
+        EXPORTING
 *         kzrfb           = ' '
-          matnr           = me->MV_OBJECT
-        tables
+          matnr           = me->mv_object
+        TABLES
           steummtab       = lt_steummtab
-        exceptions
+        EXCEPTIONS
           wrong_call      = 1
           steummtab_empty = 2
-          others          = 3. "#EC *
+          OTHERS          = 3. "#EC *
 
-      loop at lt_steummtab assigning <steummtab>.
-        move-corresponding <steummtab> to ls_steummtab_spec.
+      LOOP AT lt_steummtab ASSIGNING <steummtab>.
+        MOVE-CORRESPONDING <steummtab> TO ls_steummtab_spec.
         ls_steummtab_spec-matnr      = ms_mara_spec-matnr.
         ls_steummtab_spec-sdm_tabkey = ms_mara_spec-sdm_tabkey.
-        append ls_steummtab_spec to me->mt_steummtab_spec.
-        clear:
+        APPEND ls_steummtab_spec TO me->mt_steummtab_spec.
+        CLEAR:
          ls_steummtab_spec.
-      endloop.
+      ENDLOOP.
 
-      if me->mt_steummtab_spec[] is initial.
+      IF me->mt_steummtab_spec[] IS INITIAL.
         ls_steummtab_spec-sdm_tabkey = ms_mara_spec-sdm_tabkey.
-        append ls_steummtab_spec to me->mt_steummtab_spec.
-      endif.
+        APPEND ls_steummtab_spec TO me->mt_steummtab_spec.
+      ENDIF.
 
-      read table mt_mlan transporting no fields
-        with key matnr = MV_OBJECT.
-      if sy-subrc = 0.
-        loop at mt_mlan assigning <ls_mlan> from sy-tabix.
-          if <ls_mlan>-matnr <> MV_OBJECT.
-            exit.
-          else.
-            move-corresponding <ls_mlan> to ls_mlan_sdm.
-            append ls_mlan_sdm to  me->mt_mlan_spec.
-          endif.
-        endloop.
-      endif.
-    endif.
+      READ TABLE mt_mlan TRANSPORTING NO FIELDS
+        WITH KEY matnr = mv_object.
+      IF sy-subrc = 0.
+        LOOP AT mt_mlan ASSIGNING <ls_mlan> FROM sy-tabix.
+          IF <ls_mlan>-matnr <> mv_object.
+            EXIT.
+          ELSE.
+            MOVE-CORRESPONDING <ls_mlan> TO ls_mlan_sdm.
+            APPEND ls_mlan_sdm TO  me->mt_mlan_spec.
+          ENDIF.
+        ENDLOOP.
+      ENDIF.
+    ENDIF.
 
 */ MARM (Units of Measure)
-    if me->ms_selscreen-marm = abap_true.
-      read table mt_marm transporting no fields
-       with key matnr = MV_OBJECT binary search.
-      if sy-subrc = 0.
-        loop at mt_marm assigning <ls_marm> from sy-tabix.
-          if <ls_marm>-matnr <> MV_OBJECT.
-            exit.
-          else.
-            move-corresponding <ls_marm> to ls_smeinh_sdm.
-            move-corresponding <ls_marm> to ls_marm_sdm.
+    IF me->ms_selscreen-marm = abap_true.
+      READ TABLE mt_marm TRANSPORTING NO FIELDS
+       WITH KEY matnr = mv_object BINARY SEARCH.
+      IF sy-subrc = 0.
+        LOOP AT mt_marm ASSIGNING <ls_marm> FROM sy-tabix.
+          IF <ls_marm>-matnr <> mv_object.
+            EXIT.
+          ELSE.
+            MOVE-CORRESPONDING <ls_marm> TO ls_smeinh_sdm.
+            MOVE-CORRESPONDING <ls_marm> TO ls_marm_sdm.
 
-            append ls_marm_sdm   to me->mt_marm_spec.
-            append ls_smeinh_sdm to me->mt_meinh_spec.
-            clear ls_smeinh_sdm.
-          endif.
-        endloop.
-      endif.
-    endif.
+            APPEND ls_marm_sdm   TO me->mt_marm_spec.
+            APPEND ls_smeinh_sdm TO me->mt_meinh_spec.
+            CLEAR ls_smeinh_sdm.
+          ENDIF.
+        ENDLOOP.
+      ENDIF.
+    ENDIF.
 
 */ MEAN (Additional EANs)
-    if me->ms_selscreen-mean = abap_true.
-      read table mt_mean transporting no fields
-       with key matnr = MV_OBJECT binary search.
-      if sy-subrc = 0.
-        loop at mt_mean assigning <ls_mean> from sy-tabix.
-          if <ls_mean>-matnr <> MV_OBJECT.
-            exit.
-          else.
-            move-corresponding <ls_mean> to ls_mean_sdm.
-            append ls_mean_sdm to me->mt_mean_spec.
-            clear:
+    IF me->ms_selscreen-mean = abap_true.
+      READ TABLE mt_mean TRANSPORTING NO FIELDS
+       WITH KEY matnr = mv_object BINARY SEARCH.
+      IF sy-subrc = 0.
+        LOOP AT mt_mean ASSIGNING <ls_mean> FROM sy-tabix.
+          IF <ls_mean>-matnr <> mv_object.
+            EXIT.
+          ELSE.
+            MOVE-CORRESPONDING <ls_mean> TO ls_mean_sdm.
+            APPEND ls_mean_sdm TO me->mt_mean_spec.
+            CLEAR:
              ls_mean_sdm.
-          endif.
-        endloop.
-      endif.
-    endif.
+          ENDIF.
+        ENDLOOP.
+      ENDIF.
+    ENDIF.
 
 */ EORD
-    if me->ms_selscreen-eord = abap_true.
-      read table mt_eord transporting no fields
-       with key matnr = MV_OBJECT binary search.
-      if sy-subrc = 0.
-        loop at mt_eord assigning <ls_eord> from sy-tabix.
-          if <ls_eord>-matnr <> MV_OBJECT.
-            exit.
-          else.
-            move-corresponding <ls_eord> to ls_eord_sdm.
-            append ls_eord_sdm to me->mt_eord_spec.
-            clear:
+    IF me->ms_selscreen-eord = abap_true.
+      READ TABLE mt_eord TRANSPORTING NO FIELDS
+       WITH KEY matnr = mv_object BINARY SEARCH.
+      IF sy-subrc = 0.
+        LOOP AT mt_eord ASSIGNING <ls_eord> FROM sy-tabix.
+          IF <ls_eord>-matnr <> mv_object.
+            EXIT.
+          ELSE.
+            MOVE-CORRESPONDING <ls_eord> TO ls_eord_sdm.
+            APPEND ls_eord_sdm TO me->mt_eord_spec.
+            CLEAR:
              ls_eord_sdm.
-          endif.
-        endloop.
-      endif.
-    endif.
+          ENDIF.
+        ENDLOOP.
+      ENDIF.
+    ENDIF.
 
 */ EINA
-    if me->ms_selscreen-eina = abap_true.
-      read table mt_eina transporting no fields
-        with key matnr = MV_OBJECT binary search.
-      if sy-subrc = 0.
-        loop at mt_eina assigning <ls_eina> from sy-tabix.
-          if <ls_eina>-matnr <> MV_OBJECT.
-            exit.
-          else.
-            insert <ls_eina> into table me->mt_eina_spec.
-          endif.
-        endloop.
-      endif.
-    endif.
+    IF me->ms_selscreen-eina = abap_true.
+      READ TABLE mt_eina TRANSPORTING NO FIELDS
+        WITH KEY matnr = mv_object BINARY SEARCH.
+      IF sy-subrc = 0.
+        LOOP AT mt_eina ASSIGNING <ls_eina> FROM sy-tabix.
+          IF <ls_eina>-matnr <> mv_object.
+            EXIT.
+          ELSE.
+            INSERT <ls_eina> INTO TABLE me->mt_eina_spec.
+          ENDIF.
+        ENDLOOP.
+      ENDIF.
+    ENDIF.
 
 */ EINE
-    if me->ms_selscreen-eine = abap_true.
-      loop at me->mt_eina_spec assigning field-symbol(<eina_spec>).
-        loop at mt_eine assigning  field-symbol(<eine>)
-           where infnr = <eina_spec>-infnr.
-          insert <eine> into table me->mt_eine_spec.
-        endloop.
-      endloop.
-    endif.
-  endmethod.
+    IF me->ms_selscreen-eine = abap_true.
+      LOOP AT me->mt_eina_spec ASSIGNING FIELD-SYMBOL(<eina_spec>).
+        LOOP AT mt_eine ASSIGNING  FIELD-SYMBOL(<eine>)
+           WHERE infnr = <eina_spec>-infnr.
+          INSERT <eine> INTO TABLE me->mt_eine_spec.
+        ENDLOOP.
+      ENDLOOP.
+    ENDIF.
+  ENDMETHOD.
 
 
   method BUILD_STEUMMTAB.
@@ -2263,6 +2311,7 @@ CLASS /GDA/SDM_CL_ART_SELECTIONS IMPLEMENTATION.
     me->build_mapr( ).
     me->build_mwli( ).
     me->build_tariffs( ).
+    me->build_pricing( ).
 
     me->build_myms( ).
     me->build_mamt( ).
