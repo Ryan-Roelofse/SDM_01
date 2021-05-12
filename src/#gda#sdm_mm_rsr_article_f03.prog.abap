@@ -73,6 +73,7 @@ FORM sdm_logic .
     gt_mean_sdm[]   = go_selection->mt_mean_spec[].
     gt_mpop_sdm[]   = go_selection->mt_mpop_spec[].
     gt_marm_sdm[]   = go_selection->mt_marm_spec[].
+    gt_mg03_sdm_brf[] = go_selection->mt_mg03_spec[].
 
     gt_maw1_sdm[]   = go_selection->mt_maw1_spec[].
     gt_eord_sdm[]   = go_selection->mt_eord_spec[].
@@ -209,6 +210,7 @@ FORM sdm_logic .
 *    gs_sdm_objects-mlan[]   = gt_mlan_sdm[].
     gs_sdm_objects-eine[]   = gt_eine_sdm[].
     gs_sdm_objects-eina[]   = gt_eina_sdm[].
+    gs_sdm_objects-mg03steuer   = gt_mg03_sdm_brf[].
 
     gs_sdm_objects-maw1   = gt_maw1_sdm[].
     gs_sdm_objects-eord   = gt_eord_sdm[].
@@ -261,6 +263,7 @@ FORM sdm_logic .
     gt_mamt_sdm,
     gt_malg_sdm,
     gt_konh_sdm,
+    gt_mg03_sdm_brf,
     gt_tariff_sdm.
 *     gt_mlan_sdm,
 *     gt_steuer_sdm,

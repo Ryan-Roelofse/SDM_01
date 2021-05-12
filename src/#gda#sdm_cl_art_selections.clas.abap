@@ -6,120 +6,128 @@ class /GDA/SDM_CL_ART_SELECTIONS definition
 
 public section.
 
-types begin of ty_cond_header.
-types: matnr type mara-matnr.
-types: knumh type konh-knumh.
-types end of ty_cond_header.
-
   types:
-    TTY_KONH type standard table of konh,
-    TTY_COND_HDR  type sorted table of ty_cond_header with non-unique key matnr knumh.
+    BEGIN OF ty_cond_header.
+    TYPES: matnr TYPE mara-matnr.
+    TYPES: knumh TYPE konh-knumh.
+    TYPES END OF ty_cond_header .
   types:
-    begin of ty_stpo,
-              idnrk type stpo-idnrk,
-              stlty type stpo-stlty,
-              stlnr type stpo-stlnr,
-              end of   ty_stpo .
+    BEGIN OF struc_tax.
+    TYPES: matnr     TYPE mara-matnr.
+    TYPES: mg03steuer TYPE mg03steuer.
+    TYPES END OF struc_tax .
   types:
-    tty_stpo type standard table of ty_stpo .
+    tty_konh TYPE STANDARD TABLE OF konh .
   types:
-    begin of struc_rel.
-types: matnr     type mara-matnr.
-types: matnr_rel type mara-matnr.
-types end of struc_rel .
+    tty_mg03 TYPE STANDARD TABLE OF struc_tax .
   types:
-    tty_mara_relations type standard table of struc_rel .
+    tty_cond_hdr  TYPE SORTED TABLE OF ty_cond_header WITH NON-UNIQUE KEY matnr knumh .
   types:
-    begin of ty_selscreen,
-                   matnr             type range of mara-matnr,
-                   ersda             type range of mara-ersda,
-                   aenam             type range of mara-aenam,
-                   laeda             type range of mara-laeda,
-                   ernam             type range of mara-ernam,
-                   mtart             type range of mara-mtart,
-                   prdha             type range of mara-prdha,
-                   mstae             type range of mara-mstae,
-                   bwscl             type range of mara-bwscl,
-                   attyp             type range of mara-attyp,
-                   matkl             type range of mara-matkl,
-                   mara_lvorm        type range of mara-lvorm,
-                   attyps            type range of mara-attyp,
-                   werks             type range of marc-werks,
-                   mmsta             type range of marc-mmsta,
-                   lgort             type range of mard-lgort,
-                   infnr             type range of eina-infnr,
-                   lifnr             type range of eina-lifnr,
-                   ekorg             type range of eine-ekorg,
-                   vdatu             type range of eord-vdatu,
-                   bdatu             type range of eord-bdatu,
-                   vkorg             type range of mvke-vkorg,
-                   vtweg             type range of mvke-vtweg,
-                   bwkey             type range of mbew-bwkey,
-                   bwtar             type range of mbew-bwtar,
-                   lgnum             type range of mlgn-lgnum,
-                   lgtyp             type range of mlgt-lgtyp,
-                   marc_lvorm        type range of marc-lvorm,
-                   mard_lvorm        type range of mard-lvorm,
-                   mvke_lvorm        type range of mvke-lvorm,
-                   mbew_lvorm        type range of mbew-lvorm,
-                   mlgn_lvorm        type range of mlgn-lvorm,
-                   mlgt_lvorm        type range of mlgt-lvorm,
-                   makt              type c length 1,
-                   marc              type c length 1,
-                   mard              type c length 1,
-                   mvke              type c length 1,
-                   mbew              type c length 1,
-                   mlgn              type c length 1,
-                   mlgt              type c length 1,
-                   maw1              type c length 1,
-                   mapr              type c length 1,
-                   crvm              type c length 1,
-                   mlan              type c length 1,
-                   marm              type c length 1,
-                   mean              type c length 1,
-                   eord              type c length 1,
-                   eina              type c length 1,
-                   eine              type c length 1,
-                   wlk1              type c length 1,
-                   wlk2              type c length 1,
-                   stpo              type c length 1,
-                   stko              type c length 1,
-                   mast              type c length 1,
-                   mg03              type c length 1,
-                   myms              type c length 1,
-                   mwli              type c length 1,
-                   mamt              type c length 1,
-                   malg              type c length 1,
-                   struc             type c length 1,
-                   msgno             type range of bapiret2-number,
-                   max_rows          type p_dbacc,
-                   record_statistics type c length 1,
-                   errors_only       type c length 1,
-                 end of ty_selscreen .
+    BEGIN OF ty_stpo,
+                idnrk TYPE stpo-idnrk,
+                stlty TYPE stpo-stlty,
+                stlnr TYPE stpo-stlnr,
+                END OF   ty_stpo .
   types:
-    begin of ty_report_output,
-                   matnr          type matnr,
-                   maktx          type maktx,
-                   mtart          type mtart,
-                   matkl          type matkl,
-                   mstae          type mstae,
-                   message        type bapi_msg,
-                   message_id     type symsgid,
-                   message_number type symsgno,
-                   message_type   type symsgty,
-                   count          type i,
-                   extra_v1       type symsgv,
-                   extra_v2       type symsgv,
-                   extra_v3       type symsgv,
-                   extra_v4       type symsgv,
-                   extra_v5       type symsgv,
-                   extra_v6       type symsgv,
-                 end of ty_report_output .
+    tty_stpo TYPE STANDARD TABLE OF ty_stpo .
   types:
-    ty_it_report_output type standard table of ty_report_output .
+    BEGIN OF struc_rel.
+    TYPES: matnr     TYPE mara-matnr.
+    TYPES: matnr_rel TYPE mara-matnr.
+    TYPES END OF struc_rel .
+  types:
+    tty_mara_relations TYPE STANDARD TABLE OF struc_rel .
+  types:
+    BEGIN OF ty_selscreen,
+                     matnr             TYPE RANGE OF mara-matnr,
+                     ersda             TYPE RANGE OF mara-ersda,
+                     aenam             TYPE RANGE OF mara-aenam,
+                     laeda             TYPE RANGE OF mara-laeda,
+                     ernam             TYPE RANGE OF mara-ernam,
+                     mtart             TYPE RANGE OF mara-mtart,
+                     prdha             TYPE RANGE OF mara-prdha,
+                     mstae             TYPE RANGE OF mara-mstae,
+                     bwscl             TYPE RANGE OF mara-bwscl,
+                     attyp             TYPE RANGE OF mara-attyp,
+                     matkl             TYPE RANGE OF mara-matkl,
+                     mara_lvorm        TYPE RANGE OF mara-lvorm,
+                     attyps            TYPE RANGE OF mara-attyp,
+                     werks             TYPE RANGE OF marc-werks,
+                     mmsta             TYPE RANGE OF marc-mmsta,
+                     lgort             TYPE RANGE OF mard-lgort,
+                     infnr             TYPE RANGE OF eina-infnr,
+                     lifnr             TYPE RANGE OF eina-lifnr,
+                     ekorg             TYPE RANGE OF eine-ekorg,
+                     vdatu             TYPE RANGE OF eord-vdatu,
+                     bdatu             TYPE RANGE OF eord-bdatu,
+                     vkorg             TYPE RANGE OF mvke-vkorg,
+                     vtweg             TYPE RANGE OF mvke-vtweg,
+                     bwkey             TYPE RANGE OF mbew-bwkey,
+                     bwtar             TYPE RANGE OF mbew-bwtar,
+                     lgnum             TYPE RANGE OF mlgn-lgnum,
+                     lgtyp             TYPE RANGE OF mlgt-lgtyp,
+                     marc_lvorm        TYPE RANGE OF marc-lvorm,
+                     mard_lvorm        TYPE RANGE OF mard-lvorm,
+                     mvke_lvorm        TYPE RANGE OF mvke-lvorm,
+                     mbew_lvorm        TYPE RANGE OF mbew-lvorm,
+                     mlgn_lvorm        TYPE RANGE OF mlgn-lvorm,
+                     mlgt_lvorm        TYPE RANGE OF mlgt-lvorm,
+                     makt              TYPE c LENGTH 1,
+                     marc              TYPE c LENGTH 1,
+                     mard              TYPE c LENGTH 1,
+                     mvke              TYPE c LENGTH 1,
+                     mbew              TYPE c LENGTH 1,
+                     mlgn              TYPE c LENGTH 1,
+                     mlgt              TYPE c LENGTH 1,
+                     maw1              TYPE c LENGTH 1,
+                     mapr              TYPE c LENGTH 1,
+                     crvm              TYPE c LENGTH 1,
+                     mlan              TYPE c LENGTH 1,
+                     marm              TYPE c LENGTH 1,
+                     mean              TYPE c LENGTH 1,
+                     eord              TYPE c LENGTH 1,
+                     eina              TYPE c LENGTH 1,
+                     eine              TYPE c LENGTH 1,
+                     wlk1              TYPE c LENGTH 1,
+                     wlk2              TYPE c LENGTH 1,
+                     stpo              TYPE c LENGTH 1,
+                     stko              TYPE c LENGTH 1,
+                     mast              TYPE c LENGTH 1,
+                     mg03              TYPE c LENGTH 1,
+                     myms              TYPE c LENGTH 1,
+                     mwli              TYPE c LENGTH 1,
+                     mamt              TYPE c LENGTH 1,
+                     malg              TYPE c LENGTH 1,
+                     struc             TYPE c LENGTH 1,
+                     msgno             TYPE RANGE OF bapiret2-number,
+                     max_rows          TYPE p_dbacc,
+                     record_statistics TYPE c LENGTH 1,
+                     errors_only       TYPE c LENGTH 1,
+                   END OF ty_selscreen .
+  types:
+    BEGIN OF ty_report_output,
+                     matnr          TYPE matnr,
+                     maktx          TYPE maktx,
+                     mtart          TYPE mtart,
+                     matkl          TYPE matkl,
+                     mstae          TYPE mstae,
+                     message        TYPE bapi_msg,
+                     message_id     TYPE symsgid,
+                     message_number TYPE symsgno,
+                     message_type   TYPE symsgty,
+                     count          TYPE i,
+                     extra_v1       TYPE symsgv,
+                     extra_v2       TYPE symsgv,
+                     extra_v3       TYPE symsgv,
+                     extra_v4       TYPE symsgv,
+                     extra_v5       TYPE symsgv,
+                     extra_v6       TYPE symsgv,
+                   END OF ty_report_output .
+  types:
+    ty_it_report_output TYPE STANDARD TABLE OF ty_report_output .
 
   data:
-    mt_mara           type standard table of /gda/sdm_s_mara_01 .
+    mt_mara           TYPE STANDARD TABLE OF /gda/sdm_s_mara_01 .
   data MS_MARA_SPEC type /GDA/SDM_S_MARA_01 .
   data MS_MAKT_SPEC type /GDA/SDM_S_MAKT_01 .
   data MT_MAKT_SPEC type /GDA/SDM_T_MAKT_01 .
@@ -151,6 +159,7 @@ types end of struc_rel .
   data MT_MAMT_SPEC type /GDA/SDM_T_MAMT_01 .
   data MT_TARIFF_SPEC type /GDA/SDM_T_TARIFFS_01 .
   data MT_MALG_SPEC type /GDA/SDM_T_MALG_01 .
+  data MT_MG03_SPEC type /GDA/SDM_T_MAT_STEUER_01 .
   data MT_KONH_SPEC type /GDA/SDM_T_KONH_01 .
   data MT_MARA_RELATIONS type TTY_MARA_RELATIONS .
 
@@ -210,6 +219,7 @@ private section.
   data MT_STPO type TTY_STPO .
   data MT_KONH type TTY_KONH .
   data MT_COND_HEADER type TTY_COND_HDR .
+  data MT_MG03 type TTY_MG03 .
   data MV_EINA_FIRST type C .
   data MV_EORD_FIRST type C .
   data MV_MVKE_FIRST type C .
@@ -292,6 +302,9 @@ private section.
     raising
       /GDA/CX_SDM_EXCEPTION_HANDL .
   methods BUILD_PRICING
+    raising
+      /GDA/CX_SDM_EXCEPTION_HANDL .
+  methods BUILD_MG03
     raising
       /GDA/CX_SDM_EXCEPTION_HANDL .
 ENDCLASS.
@@ -615,6 +628,9 @@ CLASS /GDA/SDM_CL_ART_SELECTIONS IMPLEMENTATION.
     DATA:
      lx_open_sql_error TYPE REF TO cx_sy_open_sql_error.
 
+    DATA: r_attyp TYPE RANGE OF attyp,
+          r_attyp_line LIKE LINE OF r_attyp.
+
     FIELD-SYMBOLS:
       <ls_mara> LIKE LINE OF me->mt_mara.
     CONSTANTS lc_sap_version TYPE syst_saprl VALUE '750'.
@@ -676,12 +692,18 @@ CLASS /GDA/SDM_CL_ART_SELECTIONS IMPLEMENTATION.
         ENDIF.
       ENDIF.
 
+      IF me->ms_selscreen-attyps IS INITIAL.
+        r_attyp_line-sign = 'I'.
+        r_attyp_line-option = 'EQ'.
+        r_attyp_line-low = '00'.
+        APPEND  r_attyp_line TO me->ms_selscreen-attyp.
+      ENDIF.
 
       IF mv_eina_first = abap_true OR mv_eord_first = abap_true OR mv_mvke_first = abap_true.
         IF lt_matnr IS NOT INITIAL.
           CALL FUNCTION '/GDA/SDM_MM_MARA_GET_OLD2' "lv_function
             EXPORTING
-*              x_max_rows   = me->ms_selscreen-max_rows
+*             x_max_rows   = me->ms_selscreen-max_rows
               xt_materials = lt_matnr
             IMPORTING
               xt_mara      = me->mt_mara[]
@@ -705,20 +727,20 @@ CLASS /GDA/SDM_CL_ART_SELECTIONS IMPLEMENTATION.
 *          EXPORTING
 *            x_max_rows = me->ms_selscreen-max_rows
           IMPORTING
-            xt_mara    = me->mt_mara[]
+            xt_mara  = me->mt_mara[]
           TABLES
-            xt_matnr   = me->ms_selscreen-matnr
-            xt_ersda   = me->ms_selscreen-ersda
-            xt_ernam   = me->ms_selscreen-ernam
-            xt_laeda   = me->ms_selscreen-laeda
-            xt_aenam   = me->ms_selscreen-aenam
-            xt_mtart   = me->ms_selscreen-mtart
-            xt_matkl   = me->ms_selscreen-matkl
-            xt_mstae   = me->ms_selscreen-mstae
-            xt_bwscl   = me->ms_selscreen-bwscl
-            xt_attyp   = me->ms_selscreen-attyp
-            xt_werks   = me->ms_selscreen-werks
-            xt_mmsta   = me->ms_selscreen-mmsta.
+            xt_matnr = me->ms_selscreen-matnr
+            xt_ersda = me->ms_selscreen-ersda
+            xt_ernam = me->ms_selscreen-ernam
+            xt_laeda = me->ms_selscreen-laeda
+            xt_aenam = me->ms_selscreen-aenam
+            xt_mtart = me->ms_selscreen-mtart
+            xt_matkl = me->ms_selscreen-matkl
+            xt_mstae = me->ms_selscreen-mstae
+            xt_bwscl = me->ms_selscreen-bwscl
+            xt_attyp = me->ms_selscreen-attyp
+            xt_werks = me->ms_selscreen-werks
+            xt_mmsta = me->ms_selscreen-mmsta.
       ENDIF.
 
       IF lines( me->mt_mara ) = 0.
@@ -731,7 +753,14 @@ CLASS /GDA/SDM_CL_ART_SELECTIONS IMPLEMENTATION.
     ELSE. "STRUCTURED MATERIAL
 
       TRY.
+
 */ Select Data
+          IF me->ms_selscreen-attyps IS INITIAL.
+            r_attyp_line-sign = 'I'.
+            r_attyp_line-option = 'NE'.
+            r_attyp_line-low = space.
+            APPEND  r_attyp_line TO me->ms_selscreen-attyps.
+          ENDIF.
 
           SELECT (me->mt_field_list)
                   UP TO me->ms_selscreen-max_rows ROWS
@@ -759,7 +788,8 @@ CLASS /GDA/SDM_CL_ART_SELECTIONS IMPLEMENTATION.
        lt_mara_variants.
 
 * Strip out any items which are not top level!
-      DELETE me->mt_mara WHERE attyp = '00'.
+*      DELETE me->mt_mara WHERE attyp EQ space." AND attyp eq '00'.
+      DELETE me->mt_mara WHERE attyp EQ '00'.
 
       IF lines( me->mt_mara ) = 0.
         me->mv_message = text-901. "'No data selected'.
@@ -824,6 +854,7 @@ CLASS /GDA/SDM_CL_ART_SELECTIONS IMPLEMENTATION.
 *    APPEND LINES OF GT_MARA_VARIANTS TO GT_MARA.
       SORT me->mt_mara.
       DELETE ADJACENT DUPLICATES FROM me->mt_mara.
+      DELETE me->mt_mara WHERE attyp EQ '00'.
 
       lt_relations[] = gt_relations[].
       me->mt_mara_relations = gt_relations[].
@@ -1162,6 +1193,72 @@ CLASS /GDA/SDM_CL_ART_SELECTIONS IMPLEMENTATION.
 
 
   endmethod.
+
+
+  METHOD build_mg03.
+
+    DATA:
+     lx_open_sql_error TYPE REF TO cx_sy_open_sql_error,
+     ls_mg03steuer   TYPE mg03steuer,
+     lt_steuer       LIKE TABLE OF ls_mg03steuer,
+*     lt_mg03         TYPE STANDARD TABLE OF struc_tax,
+     ls_mg03         TYPE struc_tax.
+
+    LOOP AT me->mt_mara ASSIGNING FIELD-SYMBOL(<lfs_mara>).
+
+      CALL FUNCTION 'STEUERTAB_READ'
+        EXPORTING
+*         KZRFB           = ' '
+          matnr           = <lfs_mara>-matnr
+        TABLES
+          steuertab       = lt_steuer
+        EXCEPTIONS
+          wrong_call      = 1
+          steuertab_empty = 2
+          OTHERS          = 3.
+
+      IF sy-subrc = 0.
+        LOOP AT lt_steuer ASSIGNING FIELD-SYMBOL(<lfs_steuer>).
+          ls_mg03-matnr      = <lfs_mara>-matnr.
+          ls_mg03-mg03steuer = <lfs_steuer>.
+          APPEND ls_mg03 TO me->mt_mg03.
+          CLEAR:
+            ls_mg03.
+        ENDLOOP.
+      ENDIF.
+    ENDLOOP.
+*    field-symbols:
+*      <ls_myms> like line of me->mt_myms.
+*
+*    if me->ms_selscreen-myms = abap_false.
+*      return.
+*    endif.
+*
+*    me->build_field_selection( iv_struct_name = '/GDA/SDM_S_MYMS_01' ).
+*
+*    try.
+**/ Select Data
+*        select (me->mt_field_list)
+*          from myms
+*          into table me->mt_myms
+*         for all entries in me->mt_mara
+*        where matnr = me->mt_mara-matnr.
+*
+*      catch cx_sy_open_sql_error into lx_open_sql_error.
+*        me->mv_message = lx_open_sql_error->get_text( ).
+*        me->mv_message = |Error /GDA/SDM_S_MYMS_01:| && me->mv_message.
+*        raise exception type /gda/cx_sdm_exception_handl
+*          exporting
+*            mv_text = mv_message.
+*    endtry.
+*
+*
+*    loop at me->mt_myms assigning <ls_myms>.
+*      <ls_myms>-sdm_tabkey = /gda/cl_sdm_data_model_main=>build_string_from_key( i_tabname  = 'MYMS'
+*                                                                           i_contents = <ls_myms> ).
+*    endloop.
+
+  ENDMETHOD.
 
 
   METHOD build_mlan.
@@ -1514,6 +1611,7 @@ CLASS /GDA/SDM_CL_ART_SELECTIONS IMPLEMENTATION.
       ls_mamt_sdm        TYPE /gda/sdm_s_mamt_01,
       ls_malg_sdm        TYPE /gda/sdm_s_malg_01,
       ls_konh_sdm        TYPE /gda/sdm_s_konh_01,
+      ls_mg03            TYPE struc_tax,
 
       ls_eord_sdm        TYPE /gda/sdm_s_eord_01,
       ls_mlan_sdm        TYPE /gda/sdm_mlan,
@@ -1544,6 +1642,7 @@ CLASS /GDA/SDM_CL_ART_SELECTIONS IMPLEMENTATION.
       <ls_eord> TYPE /gda/sdm_s_eord_01,
       <ls_eina> TYPE /gda/sdm_s_eina_01,
       <ls_eine> TYPE /gda/sdm_s_eine_01,
+      <ls_mg03> TYPE struc_tax,
       <ls_konh> TYPE konh,
       <ls_cond_header> TYPE ty_cond_header,
       <ls_tariffs> TYPE /gda/sdm_s_tariffs_01,
@@ -1788,7 +1887,21 @@ CLASS /GDA/SDM_CL_ART_SELECTIONS IMPLEMENTATION.
       ENDIF.
     ENDIF.
 
-*KONH
+* MG03 - TAX
+    LOOP AT mt_mg03 ASSIGNING <ls_mg03> WHERE matnr = mv_object.
+*    move-corresponding <mg03>-mg03steuer to gs_mg03_sdm.
+*    gs_mg03_sdm-matnr = <mg03>-matnr.
+*    append gs_mg03_sdm to gt_mg03_sdm.
+      ls_steuertab_spec-sdm_tabkey = ls_steuertab_spec-matnr = <ls_mg03>-matnr.
+      MOVE-CORRESPONDING <ls_mg03>-mg03steuer TO ls_steuertab_spec.
+*        ls_steuertab_spec-sdm_tabkey = /gda/cl_sdm_data_model_main=>build_string_from_key( i_tabname  = 'KONH'
+*                                                                             i_contents = ls_konh_sdm ).
+
+      INSERT ls_steuertab_spec INTO TABLE me->mt_mg03_spec.
+
+      CLEAR: ls_steuertab_spec.
+    ENDLOOP.
+
 * KONH
     READ TABLE me->mt_cond_header ASSIGNING <ls_cond_header>
      WITH KEY matnr = mv_object BINARY SEARCH.
@@ -2310,6 +2423,7 @@ CLASS /GDA/SDM_CL_ART_SELECTIONS IMPLEMENTATION.
     me->build_mast( ).
     me->build_mapr( ).
     me->build_mwli( ).
+    me->build_mg03( ).
     me->build_tariffs( ).
     me->build_pricing( ).
 

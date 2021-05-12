@@ -911,7 +911,13 @@
      <SPRSL>E</SPRSL>
      <ARBGB>/GDA/SDM_ART</ARBGB>
      <MSGNR>596</MSGNR>
-     <TEXT>SDM Article (Product Costing: DC): Origin group must be BIKE</TEXT>
+     <TEXT>SDM Article (Storage location): ABC Indicator must be A</TEXT>
+    </T100>
+    <T100>
+     <SPRSL>E</SPRSL>
+     <ARBGB>/GDA/SDM_ART</ARBGB>
+     <MSGNR>597</MSGNR>
+     <TEXT>SDM Article (Pricing): CondRecNo must be blank</TEXT>
     </T100>
     <T100>
      <SPRSL>E</SPRSL>

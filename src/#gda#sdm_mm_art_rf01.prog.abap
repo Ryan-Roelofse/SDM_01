@@ -3108,6 +3108,7 @@ form sdm_main_article.
     gt_eine_sdm[]   = go_selection->mt_eine_spec[].
     gt_konh_sdm[]   = go_selection->mt_konh_spec[].
     gt_tariff_sdm   = go_selection->mt_tariff_spec[].
+    gt_mg03_sdm_brf[] = go_selection->mt_mg03_spec[].
     gs_syst_sdm     = syst.
     append go_selection->ms_makt_spec to gt_makt_sdm[].
 

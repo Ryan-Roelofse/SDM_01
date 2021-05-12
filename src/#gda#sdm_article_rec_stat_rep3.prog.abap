@@ -25,7 +25,7 @@ INCLUDE /gda/sdm_common_mm_article."zmat_test."gda/sdm_common_mm_mat.
 INITIALIZATION.
   PERFORM auth_check USING gc_auth_rsr.
   PERFORM init       USING gc_object gc_object_id.
-
+*  perform init_art_rsr.
   PERFORM set_post_processing.
   PERFORM sdm_init_common USING gc_object
                        CHANGING gv_object gv_type gv_source go_selection.
