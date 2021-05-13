@@ -922,8 +922,62 @@
     <T100>
      <SPRSL>E</SPRSL>
      <ARBGB>/GDA/SDM_ART</ARBGB>
+     <MSGNR>598</MSGNR>
+     <TEXT>SDM Article (POS): Descr. for unit must be Yoghurt</TEXT>
+    </T100>
+    <T100>
+     <SPRSL>E</SPRSL>
+     <ARBGB>/GDA/SDM_ART</ARBGB>
+     <MSGNR>599</MSGNR>
+     <TEXT>SDM Article (DC_PCOST): Valuation class must be 3100</TEXT>
+    </T100>
+    <T100>
+     <SPRSL>E</SPRSL>
+     <ARBGB>/GDA/SDM_ART</ARBGB>
      <MSGNR>600</MSGNR>
-     <TEXT>MARA TEST</TEXT>
+     <TEXT>SDM Article (PP): Description must contain TEST</TEXT>
+    </T100>
+    <T100>
+     <SPRSL>E</SPRSL>
+     <ARBGB>/GDA/SDM_ART</ARBGB>
+     <MSGNR>601</MSGNR>
+     <TEXT>SDM Article (PP): Shelf section must be 5</TEXT>
+    </T100>
+    <T100>
+     <SPRSL>E</SPRSL>
+     <ARBGB>/GDA/SDM_ART</ARBGB>
+     <MSGNR>602</MSGNR>
+     <TEXT>SDM Article (PP): Counter must be 20</TEXT>
+    </T100>
+    <T100>
+     <SPRSL>E</SPRSL>
+     <ARBGB>/GDA/SDM_ART</ARBGB>
+     <MSGNR>603</MSGNR>
+     <TEXT>SDM Article (PP): EAN Category must be IE</TEXT>
+    </T100>
+    <T100>
+     <SPRSL>E</SPRSL>
+     <ARBGB>/GDA/SDM_ART</ARBGB>
+     <MSGNR>604</MSGNR>
+     <TEXT>SDM Article (PP): Listing source must be 1</TEXT>
+    </T100>
+    <T100>
+     <SPRSL>E</SPRSL>
+     <ARBGB>/GDA/SDM_ART</ARBGB>
+     <MSGNR>605</MSGNR>
+     <TEXT>SDM Article (PP): Storage Section Indicators must be 002</TEXT>
+    </T100>
+    <T100>
+     <SPRSL>E</SPRSL>
+     <ARBGB>/GDA/SDM_ART</ARBGB>
+     <MSGNR>606</MSGNR>
+     <TEXT>SDM Article (PP): Storage Bin must be PVB1-01</TEXT>
+    </T100>
+    <T100>
+     <SPRSL>E</SPRSL>
+     <ARBGB>/GDA/SDM_ART</ARBGB>
+     <MSGNR>607</MSGNR>
+     <TEXT>SDM Article (PP): Pool number must be 0003</TEXT>
     </T100>
     <T100>
      <SPRSL>E</SPRSL>
