@@ -965,7 +965,7 @@
      <SPRSL>E</SPRSL>
      <ARBGB>/GDA/SDM_ART</ARBGB>
      <MSGNR>605</MSGNR>
-     <TEXT>SDM Article (PP): Storage Section Indicators must be 002</TEXT>
+     <TEXT>SDM Article (Warehouse Data): Storage Section Indicators must be 002</TEXT>
     </T100>
     <T100>
      <SPRSL>E</SPRSL>
@@ -978,6 +978,35 @@
      <ARBGB>/GDA/SDM_ART</ARBGB>
      <MSGNR>607</MSGNR>
      <TEXT>SDM Article (PP): Pool number must be 0003</TEXT>
+    </T100>
+    <T100>
+     <SPRSL>E</SPRSL>
+     <ARBGB>/GDA/SDM_ART</ARBGB>
+     <MSGNR>608</MSGNR>
+     <TEXT>SDM Article (Basic Data): Vendor Mat. No. cannot be blank</TEXT>
+    </T100>
+    <T100>
+     <SPRSL>E</SPRSL>
+     <ARBGB>/GDA/SDM_ART</ARBGB>
+     <MSGNR>609</MSGNR>
+     <TEXT>SDM Article (DC QM): Inspection interval must be 7 days</TEXT>
+    </T100>
+    <T100>
+     <SPRSL>E</SPRSL>
+     <ARBGB>/GDA/SDM_ART</ARBGB>
+     <MSGNR>610</MSGNR>
+     <TEXT>SDM Article (DC ACC): Base Unit of Measure must be PC</TEXT>
+    </T100>
+    <T100>
+     <SPRSL>E</SPRSL>
+     <ARBGB>/GDA/SDM_ART</ARBGB>
+     <MSGNR>611</MSGNR>
+     <TEXT>SDM Article (Other DC Logistics): Max Storage period must be 5 days</TEXT>
+    </T100>
+    <T100>
+     <SPRSL>E</SPRSL>
+     <ARBGB>/GDA/SDM_ART</ARBGB>
+     <MSGNR>623</MSGNR>
     </T100>
     <T100>
      <SPRSL>E</SPRSL>

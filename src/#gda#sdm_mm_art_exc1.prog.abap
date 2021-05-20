@@ -3,50 +3,50 @@
 *&---------------------------------------------------------------------*
 *&
 *&---------------------------------------------------------------------*
-report /gda/sdm_mm_art_exc1 message-id /gda/sdm_pp1.
+REPORT /gda/sdm_mm_art_exc1 MESSAGE-ID /gda/sdm_pp1.
 
 *INCLUDE /gda/sdm_mm_article_lcl.
-parameters: p_vari   type slis_vari no-display.
+PARAMETERS: p_vari   TYPE slis_vari NO-DISPLAY.
 
-include /gda/sdm_common_core_data.
-include /gda/sdm_mm_poi_art_data.
-include /gda/sdm_mm_art_obj_data_rep.
-include /gda/sdm_mm_art_data_decl.
+INCLUDE /gda/sdm_common_core_data.
+INCLUDE /gda/sdm_mm_poi_art_data.
+INCLUDE /gda/sdm_mm_art_obj_data_rep.
+INCLUDE /gda/sdm_mm_art_data_decl.
 *include /GDA/SDM_MM_ARTICLE_DATA3.
-include /gda/sdm_mm_art_sel_scrn.
-include /gda/sdm_mm_art_sel_scrn_dum.
-include /gda/sdm_include_sdm_scr3.
-include /gda/sdm_include_sdm_scr4.
-include /gda/sdm_mm_art_rf01.
-include /gda/sdm_common_core.
-include /gda/sdm_common_article.
-include /gda/sdm_mm_art_exc1_screenf01.
+INCLUDE /gda/sdm_mm_art_sel_scrn.
+INCLUDE /gda/sdm_mm_art_sel_scrn_dum.
+INCLUDE /gda/sdm_include_sdm_scr3.
+INCLUDE /gda/sdm_include_sdm_scr4.
+INCLUDE /gda/sdm_mm_art_rf01.
+INCLUDE /gda/sdm_common_core.
+INCLUDE /gda/sdm_common_article.
+INCLUDE /gda/sdm_mm_art_exc1_screenf01.
 *INCLUDE /gda/sdm_common_mm_article.
 *include /GDA/SDM_MM_RSR_ARTICLE_F03.
 
-initialization.
-  perform auth_check using gc_auth_e.
-  perform set_post_processing.
+INITIALIZATION.
+  PERFORM auth_check USING gc_auth_e.
+  PERFORM set_post_processing.
   PERFORM sdm_init_common USING gc_object
                        CHANGING gv_object gv_type gv_source go_selection.
 
-at selection-screen output.
+AT SELECTION-SCREEN OUTPUT.
 * SDM (common exception report)
-  perform selection_screen_output.
+  PERFORM selection_screen_output.
 * SDM (Article report)
-  perform screen_output_art_exc.
+  PERFORM screen_output_art_exc.
 
-at selection-screen.
+AT SELECTION-SCREEN.
 * SDM (common exception report)
-  perform at_sel_scrn_excep.
+  PERFORM at_sel_scrn_excep.
 
-start-of-selection.
-  perform get_sdm_types using gc_object gc_object_id gv_type p_user.
-  perform selection_screen.
+START-OF-SELECTION.
+  PERFORM get_sdm_types USING gc_object gc_object_id gv_type p_user.
+  PERFORM selection_screen.
 
-  if gv_execute_report = abap_false.
-    return.
-  endif.
+  IF gv_execute_report = abap_false.
+    RETURN.
+  ENDIF.
 
   TRY.
       go_selection->main( ).
@@ -60,10 +60,14 @@ start-of-selection.
       RETURN.
   ENDTRY.
 
+  IF p_struc = abap_true.
+    gt_relations[]   = go_selection->mt_mara_relations.
+  ENDIF.
+
   PERFORM sdm_main_article.
 
-end-of-selection.
+END-OF-SELECTION.
 
-  perform display_results_excep_report using gt_objects
+  PERFORM display_results_excep_report USING gt_objects
                                              gt_sdm_articles
                                              gc_object.

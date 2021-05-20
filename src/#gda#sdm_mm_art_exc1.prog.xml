@@ -210,6 +210,12 @@
     </item>
     <item>
      <ID>I</ID>
+     <KEY>813</KEY>
+     <ENTRY>Structured</ENTRY>
+     <LENGTH>10</LENGTH>
+    </item>
+    <item>
+     <ID>I</ID>
      <KEY>900</KEY>
      <ENTRY>Tools</ENTRY>
      <LENGTH>15</LENGTH>
@@ -324,13 +330,6 @@
     </item>
     <item>
      <ID>S</ID>
-     <KEY>S_LGORT</KEY>
-     <ENTRY>.</ENTRY>
-     <LENGTH>24</LENGTH>
-     <SPLIT>D</SPLIT>
-    </item>
-    <item>
-     <ID>S</ID>
      <KEY>S_MATKL</KEY>
      <ENTRY>.</ENTRY>
      <LENGTH>22</LENGTH>
@@ -345,13 +344,6 @@
     </item>
     <item>
      <ID>S</ID>
-     <KEY>S_MMSTA</KEY>
-     <ENTRY>.</ENTRY>
-     <LENGTH>28</LENGTH>
-     <SPLIT>D</SPLIT>
-    </item>
-    <item>
-     <ID>S</ID>
      <KEY>S_MSTAE</KEY>
      <ENTRY>.</ENTRY>
      <LENGTH>27</LENGTH>
@@ -362,13 +354,6 @@
      <KEY>S_MTART</KEY>
      <ENTRY>.</ENTRY>
      <LENGTH>21</LENGTH>
-     <SPLIT>D</SPLIT>
-    </item>
-    <item>
-     <ID>S</ID>
-     <KEY>S_WERKS</KEY>
-     <ENTRY>.</ENTRY>
-     <LENGTH>13</LENGTH>
      <SPLIT>D</SPLIT>
     </item>
    </TPOOL>

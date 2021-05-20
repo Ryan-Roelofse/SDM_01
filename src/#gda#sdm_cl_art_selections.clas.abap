@@ -710,7 +710,7 @@ CLASS /GDA/SDM_CL_ART_SELECTIONS IMPLEMENTATION.
         IF lt_matnr IS NOT INITIAL.
           CALL FUNCTION '/GDA/SDM_MM_MARA_GET_OLD2' "lv_function
             EXPORTING
-*             x_max_rows   = me->ms_selscreen-max_rows
+             x_max_rows   = me->ms_selscreen-max_rows
               xt_materials = lt_matnr
             IMPORTING
               xt_mara      = me->mt_mara[]
@@ -731,8 +731,8 @@ CLASS /GDA/SDM_CL_ART_SELECTIONS IMPLEMENTATION.
 
       ELSE.
         CALL FUNCTION '/GDA/SDM_MM_MARA_GET_OLD2' "lv_function
-*          EXPORTING
-*            x_max_rows = me->ms_selscreen-max_rows
+          EXPORTING
+            x_max_rows = me->ms_selscreen-max_rows
           IMPORTING
             xt_mara  = me->mt_mara[]
           TABLES

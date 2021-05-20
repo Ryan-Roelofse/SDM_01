@@ -204,7 +204,7 @@ FORM sdm_logic .
     gs_sdm_objects-mbew[]   = gt_mbew_sdm[].
 *    gs_sdm_objects-meinh[]  = gt_meinh_sdm[].
 *    gs_sdm_objects-mfhm[]   = gt_mfhm_sdm[].
-*    gs_sdm_objects-mlgn[]   = gt_mlgn_sdm[].
+    gs_sdm_objects-mlgn[]   = gt_mlgn_sdm[].
 *    gs_sdm_objects-mlgt[]   = gt_mlgt_sdm[].
     gs_sdm_objects-mvke[]   = gt_mvke_sdm[].
     gs_sdm_objects-mlea[]   = gt_mlea_sdm[].

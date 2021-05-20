@@ -3150,6 +3150,25 @@ form sdm_main_article.
     check gv_config_err = abap_false.
 
     gs_sdm_objects-article = go_selection->ms_mara_spec-matnr.
+    gs_sdm_objects-attyp = go_selection->ms_mara_spec-attyp.
+*****
+      READ TABLE gt_relations ASSIGNING FIELD-SYMBOL(<relations>)
+                              WITH KEY matnr_rel = go_selection->ms_mara_spec-matnr.
+      IF sy-subrc = 0.
+        gs_sdm_objects-linkage = <relations>-matnr.
+      ELSE.
+        IF go_selection->ms_mara_spec-attyp = '11' OR
+           go_selection->ms_mara_spec-attyp =  '01' OR
+          go_selection->ms_mara_spec-attyp = '10'  OR
+          go_selection->ms_mara_spec-attyp = '12'.
+          gs_sdm_objects-linkage = go_selection->ms_mara_spec-matnr.
+        ENDIF.
+      ENDIF.
+      IF <relations> IS ASSIGNED.
+        DELETE gt_relations WHERE matnr     = <relations>-matnr
+                              AND matnr_rel = <relations>-matnr_rel.
+      ENDIF.
+****
     append gs_sdm_objects to gt_sdm_articles.
 
     clear:

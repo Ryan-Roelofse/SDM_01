@@ -1,96 +1,129 @@
-class /GDA/SDM_CL_ARTICLE definition
-  public
-  inheriting from /GDA/SDM_CL_CORE
-  final
-  create public .
+CLASS /gda/sdm_cl_article DEFINITION
+  PUBLIC
+  INHERITING FROM /gda/sdm_cl_core
+  FINAL
+  CREATE PUBLIC .
 
-public section.
+  PUBLIC SECTION.
 
-  interfaces /GDA/SDM_IF_CORE_STATICS .
+    INTERFACES /gda/sdm_if_core_statics .
 
-  types:
-    begin of ty_report_output,
-            matnr          type matnr,
-            maktx          type maktx,
-            mtart          type mtart,
-            matkl          type matkl,
-            mstae          type mstae,
-            message        type /gda/sdm_de_message,
-            message_id     type symsgid,
-            message_number type symsgno,
-            message_type   type symsgty,
-            count          type /gda/sdm_de_counter,
-            extra_v1       type /gda/sdm_extra_information,
-            extra_v2       type /gda/sdm_extra_information,
-            extra_v3       type /gda/sdm_extra_information,
-            extra_v4       type /gda/sdm_extra_information,
-            extra_v5       type /gda/sdm_extra_information,
-            extra_v6       type /gda/sdm_extra_information,
-        end of ty_report_output .
-  types:
-    ty_it_report_output type table of ty_report_output .
-  types:
-    begin of ty_report_output_der,
-            sdm_type        type  /gda/sdm_de_type,
-            sdm_description type val_text,
-            matnr           type  matnr,
-            table           type  table_name,
-            field           type  field_name,
-            value           type  text200,
-            skip_derivation type  xfeld,
-            screen_name     type  text132,
-            grey_out        type  /gda/sdm_de_sc_grey,
-            hide            type  /gda/sdm_de_sc_hide,
-            required        type  /gda/sdm_de_sc_required,
-            bold            type  /gda/sdm_de_sc_bold,
-            group1          type  /gda/sdm_de_sc_grp1,
-            group2          type  /gda/sdm_de_sc_grp2,
-            group3          type  /gda/sdm_de_sc_grp3,
-            group4          type  /gda/sdm_de_sc_grp4 ,
-            sdm_tabkey      type cdtabkey,
-            message1        type  char255,
-            message2        type  char255,
-            message3        type  char255,
-        end of ty_report_output_der .
-  types:
-    ty_it_report_output_der type table of ty_report_output_der .
+    TYPES:
+      BEGIN OF ty_report_output,
+              matnr          TYPE matnr,
+              maktx          TYPE maktx,
+              mtart          TYPE mtart,
+              matkl          TYPE matkl,
+              mstae          TYPE mstae,
+              message        TYPE /gda/sdm_de_message,
+              message_id     TYPE symsgid,
+              message_number TYPE symsgno,
+              message_type   TYPE symsgty,
+              count          TYPE /gda/sdm_de_counter,
+              extra_v1       TYPE /gda/sdm_extra_information,
+              extra_v2       TYPE /gda/sdm_extra_information,
+              extra_v3       TYPE /gda/sdm_extra_information,
+              extra_v4       TYPE /gda/sdm_extra_information,
+              extra_v5       TYPE /gda/sdm_extra_information,
+              extra_v6       TYPE /gda/sdm_extra_information,
+          END OF ty_report_output .
+    TYPES:
+      ty_it_report_output TYPE TABLE OF ty_report_output .
+    TYPES:
+      BEGIN OF ty_report_output_der,
+              sdm_type        TYPE  /gda/sdm_de_type,
+              sdm_description TYPE val_text,
+              matnr           TYPE  matnr,
+              linkage         TYPE  matnr,
+              attyp           TYPE  attyp,
+              table           TYPE  table_name,
+              field           TYPE  field_name,
+              value           TYPE  text200,
+              skip_derivation TYPE  xfeld,
+              screen_name     TYPE  text132,
+              grey_out        TYPE  /gda/sdm_de_sc_grey,
+              hide            TYPE  /gda/sdm_de_sc_hide,
+              required        TYPE  /gda/sdm_de_sc_required,
+              bold            TYPE  /gda/sdm_de_sc_bold,
+              group1          TYPE  /gda/sdm_de_sc_grp1,
+              group2          TYPE  /gda/sdm_de_sc_grp2,
+              group3          TYPE  /gda/sdm_de_sc_grp3,
+              group4          TYPE  /gda/sdm_de_sc_grp4 ,
+              sdm_tabkey      TYPE cdtabkey,
+              message1        TYPE  char255,
+              message2        TYPE  char255,
+              message3        TYPE  char255,
+          END OF ty_report_output_der .
+    TYPES:
+      ty_it_report_output_der TYPE TABLE OF ty_report_output_der .
 
-  constants MC_PRIMARY type TYPENAME value 'MATNR'. "#EC NOTEXT
-  class-data MC_OBJECT type /GDA/SDM_DE_OBJECT value 'ARTICLE'. "#EC NOTEXT .  .  .  . " .
-  class-data MC_OBJECT_ID type /GDA/SDM_DE_OBJECT_ID value 01. "#EC NOTEXT .  .  .  . " .
-  constants MC_BOR type MASSOBJTYP value 'BUS1001'. "#EC NOTEXT
+    TYPES:
+      BEGIN OF ty_rept_output,
+              sdm_type        TYPE /gda/sdm_de_type,
+              sdm_description TYPE val_text,
+              matnr           TYPE matnr,
+              linkage         TYPE matnr,
+              attyp           TYPE attyp,
+              maktx           TYPE maktx,
+              mtart           TYPE mtart,
+              matkl           TYPE matkl,
+              mstae           TYPE mstae,
+              type            TYPE bapi_mtype,
+              id              TYPE symsgid,
+              number          TYPE symsgno,
+              message	        TYPE bapi_msg,
+              message_v1      TYPE symsgv,
+              message_v2      TYPE symsgv,
+              message_v3      TYPE symsgv,
+              message_v4      TYPE symsgv,
+              extra_v1        TYPE /gda/sdm_extra_information,
+              extra_v2        TYPE /gda/sdm_extra_information,
+              extra_v3        TYPE /gda/sdm_extra_information,
+              extra_v4        TYPE /gda/sdm_extra_information,
+              extra_v5        TYPE /gda/sdm_extra_information,
+              extra_v6        TYPE /gda/sdm_extra_information,
+              ds_link_id      TYPE /gda/sdm_de_ds_link8,
+              sdm_tabkey      TYPE cdtabkey,
+          END OF ty_rept_output .
+    TYPES:
+      ty_it_rept_output TYPE TABLE OF ty_rept_output .
 
-  methods CONSTRUCTOR
-    importing
-      !IV_OBJECT_TYPE type /GDA/SDM_DE_OBJECT
-      !IV_SOURCE type /GDA/SDM_DE_SOURCE
-      !IV_TYPE type /GDA/SDM_DE_TYPE
-      !IV_STATS type BOOLEAN
-      !IV_STATS_BRF type BOOLEAN optional
-      !IV_ERRORS_ONLY type BOOLEAN optional
-      !IV_SPRINT type BOOLEAN optional
-      !IV_MAPPING type ref to /GDA/SDM_CL_BRF_MAPPING optional
-      !IV_STEWARDSHIP type ref to /GDA/SDM_CL_STWD_APP_MAIN optional
-    raising
-      CX_FDT_INPUT .
-  class-methods CLASS_CONSTRUCTOR .
+    CONSTANTS mc_primary TYPE typename VALUE 'MATNR'.       "#EC NOTEXT
+    CLASS-DATA mc_object TYPE /gda/sdm_de_object VALUE 'ARTICLE'. "#EC NOTEXT .  .  .  . " .
+    CLASS-DATA mc_object_id TYPE /gda/sdm_de_object_id VALUE 01. "#EC NOTEXT .  .  .  . " .
+    CONSTANTS mc_bor TYPE massobjtyp VALUE 'BUS1001'.       "#EC NOTEXT
 
-  methods /GDA/SDM_IF_ACTION_PROCESSOR~PROCESS_ACTION
-    redefinition .
-  methods CREATE_BRF_RESULT_STRUCTURE
-    redefinition .
-  methods GET_OBJECT_KEYS
-    redefinition .
-  methods GET_PRIMARY_OBJECT
-    redefinition .
-  methods GET_RSR_STRUCTURE
-    redefinition .
-  methods GET_RSR_STRUCTURE_KEY
-    redefinition .
-  methods GET_TABLE_FROM_STRUCTURE
-    redefinition .
-  methods RETURN_BRF_RESULT_STRUCTURE
-    redefinition .
+    METHODS constructor
+      IMPORTING
+        !iv_object_type TYPE /gda/sdm_de_object
+        !iv_source TYPE /gda/sdm_de_source
+        !iv_type TYPE /gda/sdm_de_type
+        !iv_stats TYPE boolean
+        !iv_stats_brf TYPE boolean OPTIONAL
+        !iv_errors_only TYPE boolean OPTIONAL
+        !iv_sprint TYPE boolean OPTIONAL
+        !iv_mapping TYPE REF TO /gda/sdm_cl_brf_mapping OPTIONAL
+        !iv_stewardship TYPE REF TO /gda/sdm_cl_stwd_app_main OPTIONAL
+      RAISING
+        cx_fdt_input .
+    CLASS-METHODS class_constructor .
+
+    METHODS /gda/sdm_if_action_processor~process_action
+      REDEFINITION .
+    METHODS create_brf_result_structure
+      REDEFINITION .
+    METHODS get_object_keys
+      REDEFINITION .
+    METHODS get_primary_object
+      REDEFINITION .
+    METHODS get_rsr_structure
+      REDEFINITION .
+    METHODS get_rsr_structure_key
+      REDEFINITION .
+    METHODS get_table_from_structure
+      REDEFINITION .
+    METHODS return_brf_result_structure
+      REDEFINITION .
 protected section.
 
   methods CALL_BRF
@@ -190,8 +223,10 @@ CLASS /GDA/SDM_CL_ARTICLE IMPLEMENTATION.
   method call_brf.
 
     data:
-      lt_sdm_gui_out       type standard table of /gda/sdm_s_val_results_key,
-      ls_sdm_gui_out       type /gda/sdm_s_val_results_key,
+*      lt_sdm_gui_out       type standard table of /gda/sdm_s_val_results_key,
+      lt_sdm_gui_out       type standard table of ty_rept_output,
+*      ls_sdm_gui_out       type /gda/sdm_s_val_results_key,
+      ls_sdm_gui_out       type ty_rept_output,
       lt_report_output_der type standard table of ty_report_output_der,
       ls_report_output_der type ty_report_output_der,
       lv_message           type string,
@@ -696,7 +731,8 @@ CLASS /GDA/SDM_CL_ARTICLE IMPLEMENTATION.
 
     DATA:
       er_data_empty        TYPE REF TO data,
-      lt_sdm_gui_out       TYPE STANDARD TABLE OF /gda/sdm_s_val_results_key,
+*      lt_sdm_gui_out       TYPE STANDARD TABLE OF /gda/sdm_s_val_results_key,
+      lt_sdm_gui_out       TYPE STANDARD TABLE OF ty_rept_output,
       lt_report_output_der TYPE STANDARD TABLE OF ty_report_output_der.
 
 
