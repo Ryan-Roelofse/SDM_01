@@ -911,7 +911,7 @@
      <SPRSL>E</SPRSL>
      <ARBGB>/GDA/SDM_ART</ARBGB>
      <MSGNR>596</MSGNR>
-     <TEXT>SDM Article (Storage location): ABC Indicator must be A</TEXT>
+     <TEXT>SDM Article (MRP): ABC Indicator must be A</TEXT>
     </T100>
     <T100>
      <SPRSL>E</SPRSL>
@@ -971,7 +971,7 @@
      <SPRSL>E</SPRSL>
      <ARBGB>/GDA/SDM_ART</ARBGB>
      <MSGNR>606</MSGNR>
-     <TEXT>SDM Article (PP): Storage Bin must be PVB1-01</TEXT>
+     <TEXT>SDM Article (Warehouse Data): Storage Bin must be PVB1-01</TEXT>
     </T100>
     <T100>
      <SPRSL>E</SPRSL>
@@ -1002,6 +1002,24 @@
      <ARBGB>/GDA/SDM_ART</ARBGB>
      <MSGNR>611</MSGNR>
      <TEXT>SDM Article (Other DC Logistics): Max Storage period must be 5 days</TEXT>
+    </T100>
+    <T100>
+     <SPRSL>E</SPRSL>
+     <ARBGB>/GDA/SDM_ART</ARBGB>
+     <MSGNR>612</MSGNR>
+     <TEXT>SDM Article (MRP): Sloc mrp indicator must be 1</TEXT>
+    </T100>
+    <T100>
+     <SPRSL>E</SPRSL>
+     <ARBGB>/GDA/SDM_ART</ARBGB>
+     <MSGNR>613</MSGNR>
+     <TEXT>SDM Article (Basic Data): Gross Weight must be blank</TEXT>
+    </T100>
+    <T100>
+     <SPRSL>E</SPRSL>
+     <ARBGB>/GDA/SDM_ART</ARBGB>
+     <MSGNR>614</MSGNR>
+     <TEXT>SDM Article (PP): Country must be DE</TEXT>
     </T100>
     <T100>
      <SPRSL>E</SPRSL>
