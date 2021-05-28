@@ -13,6 +13,14 @@ IMPORT screen_control = lt_screen_control FROM MEMORY ID 'GD_MM_BRF_SCREEN_CONTR
 
 READ TABLE lt_screen_control INTO ls_brf_screen_control
                                  WITH KEY screen_name = fauswtab-fname.
+
+ loop at lt_screen_control assigning field-symbol(<screen_control>).
+   if <screen_control>-screen_name cs fauswtab-fname.
+     ls_brf_screen_control = <screen_control>.
+     continue.
+   endif.
+ endloop.
+
 IF sy-subrc = 0.
   IF ls_brf_screen_control-grey_out IS NOT INITIAL.
     fauswtab-kzinp = '0'.
@@ -31,4 +39,5 @@ IF sy-subrc = 0.
   IF ls_brf_screen_control-bold IS NOT INITIAL.
     fauswtab-kzint = '1'.
   ENDIF.
+
 ENDIF.

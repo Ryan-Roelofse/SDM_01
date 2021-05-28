@@ -3100,6 +3100,8 @@ form sdm_main_article.
     gt_mlan_sdm[]   = go_selection->mt_mlan_spec[].
     gt_mlea_sdm[]   = go_selection->mt_mlea_spec[].
     gt_malg_sdm[]   = go_selection->mt_malg_spec[].
+    gt_mpgd_sdm[]   = go_selection->mt_mpgd_spec[].
+    gt_wrpl_sdm[]   = go_selection->mt_wrpl_spec[].
     gt_mamt_sdm[]   = go_selection->mt_mamt_spec[].
     gt_myms_sdm[]   = go_selection->mt_myms_spec[].
     gt_rmmw1_sdm[]   = go_selection->mt_rmmw1_spec[].
@@ -3176,7 +3178,7 @@ form sdm_main_article.
     refresh:
      gt_mara_sdm,gt_marc_sdm,gt_mard_sdm,gt_mbew_sdm,gt_mlgn_sdm,gt_makt_sdm,gt_eord_sdm,
      gt_mlan_sdm,gt_malg_sdm,gt_mamt_sdm,gt_maw1_sdm,gt_wlk1_sdm,gt_wlk2_sdm,gt_mwli_sdm,
-     gt_konh_sdm,gt_rmmw1_sdm,gt_mlea_sdm.
+     gt_konh_sdm,gt_rmmw1_sdm,gt_mlea_sdm,gt_mpgd_sdm,gt_wrpl_sdm.
   endloop.
 
   perform progress_bar using text-019.

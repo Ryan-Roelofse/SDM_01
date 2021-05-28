@@ -1024,6 +1024,24 @@
     <T100>
      <SPRSL>E</SPRSL>
      <ARBGB>/GDA/SDM_ART</ARBGB>
+     <MSGNR>615</MSGNR>
+     <TEXT>SDM Article (MRP): Planning material cannot be blank</TEXT>
+    </T100>
+    <T100>
+     <SPRSL>E</SPRSL>
+     <ARBGB>/GDA/SDM_ART</ARBGB>
+     <MSGNR>616</MSGNR>
+     <TEXT>SDM Article (PP): Alternative BOM cannot be blank</TEXT>
+    </T100>
+    <T100>
+     <SPRSL>E</SPRSL>
+     <ARBGB>/GDA/SDM_ART</ARBGB>
+     <MSGNR>618</MSGNR>
+     <TEXT>SDM Article (Sales): Item cat.group must be 0001</TEXT>
+    </T100>
+    <T100>
+     <SPRSL>E</SPRSL>
+     <ARBGB>/GDA/SDM_ART</ARBGB>
      <MSGNR>623</MSGNR>
     </T100>
     <T100>

@@ -40,6 +40,7 @@ data:
   gt_mg03steumm_sdm type /gda/sdm_t_mg03steumm_01,
   gt_mpop_sdm     type /gda/sdm_t_mpop_01,
   gt_mpgd_sdm     type /gda/sdm_t_mpgd_01,
+  gt_wrpl_sdm     type /gda/sdm_t_wrpl_01,
   gt_mlan_sdm     type /gda/sdm_t_mlan_01,
 * Available for use in SDM config start***************************>>>
   gs_mara_sdm     type /gda/sdm_s_mara_01,

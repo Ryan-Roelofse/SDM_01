@@ -15,6 +15,7 @@ DATA:
   ls_syst         TYPE syst,
   ls_mg03_sdm_brf TYPE mg03steuer,
   ls_eina         TYPE eina,
+  ls_mwli         TYPE mwli,
   ls_eine         TYPE eine,
   ls_merrdat      TYPE merrdat,
   ls_rmmw1        TYPE rmmw1,
@@ -52,14 +53,25 @@ MOVE-CORRESPONDING wmarc TO ls_marc.
 MOVE-CORRESPONDING wmarc TO gs_marc_sdm.
 gs_marc_sdm-sdm_tabkey = /gda/cl_sdm_data_model_main=>build_string_from_key( i_tabname  = 'MARC'
                                                                          i_contents = gs_marc_sdm ).
-*append gs_marc_sdm to gt_marc_sdm.
+append gs_marc_sdm to gt_marc_sdm.
 
 * Storage Location
-MOVE-CORRESPONDING wmard TO gs_marc_sdm.
+MOVE-CORRESPONDING wmard TO gs_mard_sdm.
 gs_mard_sdm-sdm_tabkey = /gda/cl_sdm_data_model_main=>build_string_from_key( i_tabname  = 'MARD'
                                                                         i_contents = gs_mard_sdm ).
 APPEND gs_mard_sdm TO gt_mard_sdm.
 
+*Change Document Structure for Material Master/Product Group
+MOVE-CORRESPONDING wmpgd TO gs_mpgd_sdm.
+gs_mpgd_sdm-sdm_tabkey = /gda/cl_sdm_data_model_main=>build_string_from_key( i_tabname  = 'MARA'
+                                                                         i_contents = gs_mara_sdm ).
+APPEND gs_mpgd_sdm TO gt_mpgd_sdm.
+
+** Material Descriptions
+*MOVE-CORRESPONDING wmakt TO gs_makt_sdm.
+*gs_makt_sdm-sdm_tabkey = /gda/cl_sdm_data_model_main=>build_string_from_key( i_tabname  = 'MAKT'
+*                                                                         i_contents = gs_makt_sdm ).
+*APPEND gs_makt_sdm TO gt_makt_sdm.
 
 * PIR General and Purch Org
 IMPORT eina TO ls_eina eine TO ls_eine FROM MEMORY ID 'GD_MM_ARTICLE_VAL_EINA_EINE'.
@@ -108,6 +120,12 @@ gs_mvke_sdm-sdm_tabkey = /gda/cl_sdm_data_model_main=>build_string_from_key( i_t
                                                                         i_contents = gs_mvke_sdm ).
 APPEND gs_mvke_sdm TO gt_mvke_sdm.
 
+* Material Master: Default Fields and Special Retail Fields
+MOVE-CORRESPONDING wmaw1 TO gs_maw1_sdm.
+gs_maw1_sdm-sdm_tabkey = /gda/cl_sdm_data_model_main=>build_string_from_key( i_tabname  = 'MAW1'
+                                                                         i_contents = gs_maw1_sdm ).
+APPEND gs_maw1_sdm TO gt_maw1_sdm.
+
 * LIFO-relevant materials
 IF wmbew-xlifo = abap_true.
   MOVE-CORRESPONDING wmyms TO gs_myms_sdm.
@@ -116,12 +134,11 @@ IF wmbew-xlifo = abap_true.
   APPEND gs_myms_sdm TO gt_myms_sdm.
 ENDIF.
 
-* Material Master: Default Fields and Special Retail Fields
-MOVE-CORRESPONDING wmaw1 TO   gs_maw1_sdm.
-gs_maw1_sdm-sdm_tabkey = /gda/cl_sdm_data_model_main=>build_string_from_key( i_tabname  = 'MAW1'
-                                                                        i_contents = gs_maw1_sdm ).
-APPEND gs_maw1_sdm TO gt_maw1_sdm.
-
+* Forecast Parameters
+MOVE-CORRESPONDING wmpop TO gs_mpop_sdm.
+gs_mpop_sdm-sdm_tabkey = /gda/cl_sdm_data_model_main=>build_string_from_key( i_tabname  = 'MPOP'
+                                                                         i_contents = gs_mpop_sdm ).
+APPEND gs_mpop_sdm TO gt_mpop_sdm.
 
 * Article Master Data SAP Retail / Part POS Control Data
 MOVE-CORRESPONDING wwlk2 TO gs_wlk2_sdm. "ls_wlk2.
@@ -130,11 +147,29 @@ gs_wlk2_sdm-sdm_tabkey = /gda/cl_sdm_data_model_main=>build_string_from_key( i_t
 APPEND gs_wlk2_sdm TO gt_wlk2_sdm.
 
 * Listing (Retail)
+IF wmwli-matnr IS INITIAL.
+  CALL FUNCTION 'MWLI_GET_BILD'
+    EXPORTING
+      matnr = wrmmg1-matnr
+      vkorg = wrmmg1-vkorg
+      vtweg = wrmmg1-vtweg
+      wmvke = wmvke
+*     omvke = *mvke
+      wmaw1 = wmaw1
+*     omaw1 = *maw1
+    IMPORTING
+      wmwli = ls_mwli.
+*    xmwli = *mwli.
+
+  IF ls_mwli-matnr IS NOT INITIAL.
+    wmwli = ls_mwli.
+  ENDIF.
+ENDIF.
+
 MOVE-CORRESPONDING wmwli TO gs_mwli_sdm. "ls_mwli.
 gs_mwli_sdm-sdm_tabkey = /gda/cl_sdm_data_model_main=>build_string_from_key( i_tabname  = 'MARA'
                                                                         i_contents = gs_mara_sdm ).
 APPEND gs_mwli_sdm TO gt_mwli_sdm.
-
 *ls_t130m = wstat.
 *
 *lt_malg = tmalg[].
@@ -278,16 +313,16 @@ IF sy-tfill = lv_count.
 *    ENDIF.
 
     TRY.
-    gt_attributes = <objects>-object->get_object_attributes( iv_type = <objects>-type   ).
+        gt_attributes = <objects>-object->get_object_attributes( iv_type = <objects>-type   ).
 
-    LOOP AT gt_attributes ASSIGNING <attribute>.
-      ASSIGN (<attribute>-abap_type) TO <set_data>.
-      CHECK sy-subrc = 0.
-      <objects>-object->set_selection( iv_name = <attribute>-name
-                                       iv_data = <set_data>
-                                       iv_type = <attribute>-type ).
+        LOOP AT gt_attributes ASSIGNING <attribute>.
+          ASSIGN (<attribute>-abap_type) TO <set_data>.
+          CHECK sy-subrc = 0.
+          <objects>-object->set_selection( iv_name = <attribute>-name
+                                           iv_data = <set_data>
+                                           iv_type = <attribute>-type ).
 
-    ENDLOOP.
+        ENDLOOP.
 
         <objects>-object->main( ).
       CATCH /gda/cx_sdm_exception_handl INTO gx_sdm_root.

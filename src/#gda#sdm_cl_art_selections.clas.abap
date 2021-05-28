@@ -99,6 +99,8 @@ public section.
                      mwli              TYPE c LENGTH 1,
                      mamt              TYPE c LENGTH 1,
                      malg              TYPE c LENGTH 1,
+                     mpgd              TYPE c LENGTH 1,
+                     wrpl              TYPE c LENGTH 1,
                      struc             TYPE c LENGTH 1,
                      msgno             TYPE RANGE OF bapiret2-number,
                      max_rows          TYPE p_dbacc,
@@ -162,6 +164,8 @@ public section.
   data MT_MAMT_SPEC type /GDA/SDM_T_MAMT_01 .
   data MT_TARIFF_SPEC type /GDA/SDM_T_TARIFFS_01 .
   data MT_MALG_SPEC type /GDA/SDM_T_MALG_01 .
+  data MT_MPGD_SPEC type /GDA/SDM_T_MPGD_01 .
+  data MT_WRPL_SPEC type /GDA/SDM_T_WRPL_01 .
   data MT_MG03_SPEC type /GDA/SDM_T_MAT_STEUER_01 .
   data MT_KONH_SPEC type /GDA/SDM_T_KONH_01 .
   data MT_MARA_RELATIONS type TTY_MARA_RELATIONS .
@@ -220,6 +224,8 @@ private section.
   data MT_TARIFF type /GDA/SDM_T_TARIFFS_01 .
   data MT_PRICING type /GDA/SDM_T_PRICING_01 .
   data MT_MALG type /GDA/SDM_T_MALG_01 .
+  data MT_MPGD type /GDA/SDM_T_MPGD_01 .
+  data MT_WRPL type /GDA/SDM_T_WRPL_01 .
   data MT_STPO type TTY_STPO .
   data MT_KONH type TTY_KONH .
   data MT_COND_HEADER type TTY_COND_HDR .
@@ -294,6 +300,12 @@ private section.
     raising
       /GDA/CX_SDM_EXCEPTION_HANDL .
   methods BUILD_MALG
+    raising
+      /GDA/CX_SDM_EXCEPTION_HANDL .
+  methods BUILD_MPGD
+    raising
+      /GDA/CX_SDM_EXCEPTION_HANDL .
+  methods BUILD_WRPL
     raising
       /GDA/CX_SDM_EXCEPTION_HANDL .
   methods BUILD_STPO
@@ -1463,6 +1475,45 @@ CLASS /GDA/SDM_CL_ART_SELECTIONS IMPLEMENTATION.
   endmethod.
 
 
+  METHOD build_mpgd.
+
+    DATA:
+     lx_open_sql_error TYPE REF TO cx_sy_open_sql_error.
+
+    FIELD-SYMBOLS:
+      <ls_mpgd> LIKE LINE OF me->mt_mpgd.
+
+    IF me->ms_selscreen-mpgd = abap_false.
+      RETURN.
+    ENDIF.
+
+    me->build_field_selection( iv_struct_name = '/GDA/SDM_S_MPGD_01' ).
+
+    TRY.
+*/ Select Data
+        SELECT (me->mt_field_list)
+          FROM mpgd_v
+          INTO CORRESPONDING FIELDS OF TABLE me->mt_mpgd
+         FOR ALL ENTRIES IN me->mt_mara
+        WHERE matnr = me->mt_mara-matnr.
+
+      catch cx_sy_open_sql_error into lx_open_sql_error.
+*        me->mv_message = lx_open_sql_error->get_text( ).
+*        me->mv_message = |Error /GDA/SDM_S_MPGD_01:| && me->mv_message.
+*        raise exception type /gda/cx_sdm_exception_handl
+*          exporting
+*            mv_text = mv_message.
+    ENDTRY.
+
+
+*    loop at me->mt_mpgd assigning <ls_mpgd>.
+*      <ls_mpgd>-sdm_tabkey = /gda/cl_sdm_data_model_main=>build_string_from_key( i_tabname  = 'MPGD_V'
+*                                                                           i_contents = <ls_malg> ).
+*    endloop.
+
+  ENDMETHOD.
+
+
   method BUILD_MVKE.
 
 
@@ -1646,6 +1697,7 @@ CLASS /GDA/SDM_CL_ART_SELECTIONS IMPLEMENTATION.
       ls_mamt_sdm        TYPE /gda/sdm_s_mamt_01,
       ls_malg_sdm        TYPE /gda/sdm_s_malg_01,
       ls_mlea_sdm        TYPE /gda/sdm_s_mlea_01,
+
       ls_konh_sdm        TYPE /gda/sdm_s_konh_01,
       ls_mg03            TYPE struc_tax,
 
@@ -1671,6 +1723,8 @@ CLASS /GDA/SDM_CL_ART_SELECTIONS IMPLEMENTATION.
       <ls_myms> TYPE /gda/sdm_s_myms_01,
       <ls_mamt> TYPE /gda/sdm_s_mamt_01,
       <ls_malg> TYPE /gda/sdm_s_malg_01,
+      <ls_mpgd> TYPE /gda/sdm_s_mpgd_01,
+      <ls_wrpl> TYPE /gda/sdm_s_wrpl_01,
       <ls_mlea> TYPE /gda/sdm_s_mlea_01,
       <ls_mapr> TYPE /gda/sdm_s_mapr_06,
       <ls_mean> TYPE /gda/sdm_s_mean_01,
@@ -1799,6 +1853,40 @@ CLASS /GDA/SDM_CL_ART_SELECTIONS IMPLEMENTATION.
             EXIT.
           ELSE.
             INSERT <ls_mlea> INTO TABLE me->mt_mlea_spec.
+          ENDIF.
+        ENDLOOP.
+      ENDIF.
+    ENDIF.
+
+* MPGD
+
+    IF me->ms_selscreen-mpgd = abap_true.
+      READ TABLE mt_mpgd TRANSPORTING NO FIELDS
+        WITH KEY matnr = mv_object BINARY SEARCH.
+      IF sy-subrc = 0.
+        LOOP AT mt_mpgd ASSIGNING <ls_mpgd> FROM sy-tabix.
+          <ls_mpgd>-sdm_tabkey = <ls_mpgd>-matnr.
+          IF <ls_mpgd>-matnr <> mv_object.
+            EXIT.
+          ELSE.
+            INSERT <ls_mpgd> INTO TABLE me->mt_mpgd_spec.
+          ENDIF.
+        ENDLOOP.
+      ENDIF.
+    ENDIF.
+
+* WRPL
+
+    IF me->ms_selscreen-wrpl = abap_true.
+      READ TABLE mt_wrpl TRANSPORTING NO FIELDS
+        WITH KEY matnr = mv_object BINARY SEARCH.
+      IF sy-subrc = 0.
+        LOOP AT mt_wrpl ASSIGNING <ls_wrpl> FROM sy-tabix.
+*          <ls_wrpl>-sdm_tabkey = <ls_wrpl>-matnr.
+          IF <ls_wrpl>-matnr <> mv_object.
+            EXIT.
+          ELSE.
+            INSERT <ls_wrpl> INTO TABLE me->mt_wrpl_spec.
           ENDIF.
         ENDLOOP.
       ENDIF.
@@ -2199,7 +2287,7 @@ CLASS /GDA/SDM_CL_ART_SELECTIONS IMPLEMENTATION.
                         WHERE werks = <lfs_marc>-werks
                          AND vlfkz = 'A'.
       CHECK sy-subrc = 0.
-      MOVE-CORRESPONDING <lfs_marc> to gs_rmmw1.
+      MOVE-CORRESPONDING <lfs_marc> TO gs_rmmw1.
       APPEND gs_rmmw1 TO me->mt_rmmw1_spec.
     ENDLOOP.
 
@@ -2211,7 +2299,7 @@ CLASS /GDA/SDM_CL_ART_SELECTIONS IMPLEMENTATION.
                         WHERE werks = <lfs_marc>-werks
                           AND vlfkz = 'B'.
       CHECK sy-subrc = 0.
-      MOVE-CORRESPONDING <lfs_marc> to gs_rmmw1.
+      MOVE-CORRESPONDING <lfs_marc> TO gs_rmmw1.
       APPEND gs_rmmw1 TO me->mt_rmmw1_spec.
     ENDLOOP.
 
@@ -2220,7 +2308,7 @@ CLASS /GDA/SDM_CL_ART_SELECTIONS IMPLEMENTATION.
     LOOP AT me->mt_mvke_spec ASSIGNING FIELD-SYMBOL(<lfs_mvke>).
       gs_rmmw1-vkorg = <lfs_mvke>-vkorg.
       gs_rmmw1-vtweg = <lfs_mvke>-vtweg.
-      MOVE-CORRESPONDING <lfs_mvke> to gs_rmmw1.
+      MOVE-CORRESPONDING <lfs_mvke> TO gs_rmmw1.
       COLLECT gs_rmmw1 INTO me->mt_rmmw1_spec.
     ENDLOOP.
 
@@ -2232,8 +2320,8 @@ CLASS /GDA/SDM_CL_ART_SELECTIONS IMPLEMENTATION.
       IF <lfs_eine> IS ASSIGNED.
         gs_rmmw1-ekorg = <lfs_eine>-ekorg.
       ENDIF.
-      MOVE-CORRESPONDING <lfs_eina> to gs_rmmw1.
-      MOVE-CORRESPONDING <lfs_eine> to gs_rmmw1.
+      MOVE-CORRESPONDING <lfs_eina> TO gs_rmmw1.
+      MOVE-CORRESPONDING <lfs_eine> TO gs_rmmw1.
       APPEND gs_rmmw1 TO  me->mt_rmmw1_spec.
     ENDLOOP.
 
@@ -2465,6 +2553,45 @@ CLASS /GDA/SDM_CL_ART_SELECTIONS IMPLEMENTATION.
   endmethod.
 
 
+  METHOD BUILD_WRPL.
+
+    DATA:
+     lx_open_sql_error TYPE REF TO cx_sy_open_sql_error.
+
+    FIELD-SYMBOLS:
+      <ls_wrpl> LIKE LINE OF me->mt_wrpl.
+
+    IF me->ms_selscreen-wrpl = abap_false.
+      RETURN.
+    ENDIF.
+
+    me->build_field_selection( iv_struct_name = '/GDA/SDM_S_WRPL_01' ).
+
+    TRY.
+*/ Select Data
+        SELECT (me->mt_field_list)
+          FROM wrpl
+          INTO CORRESPONDING FIELDS OF TABLE me->mt_wrpl
+         FOR ALL ENTRIES IN me->mt_mara
+        WHERE matnr = me->mt_mara-matnr.
+
+      catch cx_sy_open_sql_error into lx_open_sql_error.
+*        me->mv_message = lx_open_sql_error->get_text( ).
+*        me->mv_message = |Error /GDA/SDM_S_MPGD_01:| && me->mv_message.
+*        raise exception type /gda/cx_sdm_exception_handl
+*          exporting
+*            mv_text = mv_message.
+    ENDTRY.
+
+
+    loop at me->mt_wrpl assigning <ls_wrpl>.
+      <ls_wrpl>-sdm_tabkey = /gda/cl_sdm_data_model_main=>build_string_from_key( i_tabname  = 'WRPL'
+                                                                           i_contents = <ls_wrpl> ).
+    endloop.
+
+  ENDMETHOD.
+
+
   method CONSTRUCTOR.
 
     super->constructor( ).
@@ -2518,6 +2645,8 @@ CLASS /GDA/SDM_CL_ART_SELECTIONS IMPLEMENTATION.
 *    me->build_mpop( ).
     me->build_mbew( ).
     me->build_mlgn( ).
+    me->build_mpgd( ).
+    me->build_wrpl( ).
     me->build_mlea( ).
     me->build_mlgt( ).
     me->build_maw1( ).
@@ -2564,7 +2693,8 @@ CLASS /GDA/SDM_CL_ART_SELECTIONS IMPLEMENTATION.
           me->mt_myms_spec, me->mt_mwli_spec,
           me->mt_mamt_spec, me->mt_malg_spec,
           me->mt_eord_spec, me->mt_tariff_spec,
-          me->mt_rmmw1_spec, me->mt_mlea_spec.
+          me->mt_rmmw1_spec, me->mt_mlea_spec,
+          me->mt_mpgd_spec, me->mt_wrpl_spec.
 
 
   ENDMETHOD.
@@ -2597,6 +2727,8 @@ CLASS /GDA/SDM_CL_ART_SELECTIONS IMPLEMENTATION.
     me->ms_selscreen-mamt = abap_true.
     me->ms_selscreen-malg = abap_true.
     me->ms_selscreen-mlea = abap_true.
+    me->ms_selscreen-mpgd = abap_true.
+    me->ms_selscreen-wrpl = abap_true.
 
   endmethod.
 ENDCLASS.

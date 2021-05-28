@@ -68,6 +68,8 @@ FORM sdm_logic .
     gt_meinh_sdm[]  = go_selection->mt_meinh_spec[].
 *    gt_mfhm_sdm[]   = go_selection->mt_mfhm_spec[].
     gt_mlgn_sdm[]   = go_selection->mt_mlgn_spec[].
+    gt_mpgd_sdm[]   = go_selection->mt_mpgd_spec[].
+    gt_wrpl_sdm[]   = go_selection->mt_wrpl_spec[].
     gt_mlea_sdm[]   = go_selection->mt_mlea_spec[].
     gt_mlgt_sdm[]   = go_selection->mt_mlgt_spec[].
     gt_mvke_sdm[]   = go_selection->mt_mvke_spec[].
@@ -205,6 +207,8 @@ FORM sdm_logic .
 *    gs_sdm_objects-meinh[]  = gt_meinh_sdm[].
 *    gs_sdm_objects-mfhm[]   = gt_mfhm_sdm[].
     gs_sdm_objects-mlgn[]   = gt_mlgn_sdm[].
+    gs_sdm_objects-mpgd[]   = gt_mpgd_sdm[].
+    gs_sdm_objects-wrpl[]   = gt_wrpl_sdm[].
 *    gs_sdm_objects-mlgt[]   = gt_mlgt_sdm[].
     gs_sdm_objects-mvke[]   = gt_mvke_sdm[].
     gs_sdm_objects-mlea[]   = gt_mlea_sdm[].
@@ -269,6 +273,8 @@ FORM sdm_logic .
     gt_mlan_sdm,
     gt_mamt_sdm,
     gt_malg_sdm,
+    gt_mpgd_sdm,
+    gt_wrpl_sdm,
     gt_konh_sdm,
 gt_mat_steur_sdm,
 gt_rmmw1_sdm,
