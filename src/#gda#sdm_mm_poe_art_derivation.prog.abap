@@ -28,6 +28,7 @@ FIELD-SYMBOLS:
   <mlea>        LIKE LINE OF tmlea,
   <meinh>       LIKE LINE OF wmeinh,
   <tsteuertab>  LIKE LINE OF wsteuertab,
+  <wsteummtab>  LIKE LINE OF wsteummtab,
   <mamt>        LIKE LINE OF tmamt,
   <malg>        LIKE LINE OF tmalg.
 
@@ -184,6 +185,17 @@ ENDIF.
 *4WSTEUMMTAB
 *6WMALG
 
+*2 Unit of Measure for Display
+LOOP AT wsteummtab ASSIGNING <wsteummtab>.
+  MOVE-CORRESPONDING <wsteummtab> TO gs_steummtab_sdm.
+  gs_steummtab_sdm-sdm_tabkey = /gda/cl_sdm_data_model_main=>build_string_from_key( i_tabname  = 'MARA'
+                                                                          i_contents = gs_mara_sdm ).
+
+  APPEND gs_steummtab_sdm TO GT_MG03STEUMM_SDM.
+  CLEAR:
+   gs_meinh_sdm.
+ENDLOOP.
+
 
 *2 Unit of Measure for Display
 LOOP AT wmeinh ASSIGNING <meinh>.
@@ -206,13 +218,23 @@ LOOP AT wsteuertab ASSIGNING <tsteuertab>.
 ENDLOOP.
 
 *5 Material Master Texts per Unit of Measure and Text ID
-LOOP AT tmamt ASSIGNING <mamt>.
-  MOVE-CORRESPONDING <mamt> TO gs_mamt_sdm.
-  gs_mamt_sdm-sdm_tabkey = /gda/cl_sdm_data_model_main=>build_string_from_key( i_tabname  = 'MAMT'
-                                                                           i_contents = gs_mamt_sdm ).
+IF tmamt[] IS NOT INITIAL.
+  LOOP AT tmamt ASSIGNING <mamt>.
+    MOVE-CORRESPONDING <mamt> TO gs_mamt_sdm.
+    gs_mamt_sdm-sdm_tabkey = /gda/cl_sdm_data_model_main=>build_string_from_key( i_tabname  = 'MAMT'
+                                                                             i_contents = gs_mamt_sdm ).
 
-  APPEND gs_mamt_sdm TO gt_mamt_sdm.
-ENDLOOP.
+    APPEND gs_mamt_sdm TO gt_mamt_sdm.
+  ENDLOOP.
+ELSE.
+  LOOP AT wmamt ASSIGNING <mamt>.
+    MOVE-CORRESPONDING <mamt> TO gs_mamt_sdm.
+    gs_mamt_sdm-sdm_tabkey = /gda/cl_sdm_data_model_main=>build_string_from_key( i_tabname  = 'MAMT'
+                                                                             i_contents = gs_mamt_sdm ).
+
+    APPEND gs_mamt_sdm TO gt_mamt_sdm.
+  ENDLOOP.
+ENDIF.
 
 * Assignment of Layout Modules to Materials
 *loop at tmalg assigning <malg>.
@@ -351,6 +373,33 @@ LOOP AT <results_der_all> INTO gs_result_der.
   ENDIF.
   IF ls_screen_control-screen_name = 'MLGN-LETY1'.
     ls_screen_control-screen_name = '*MLGN-LETY1'.
+    INSERT ls_screen_control INTO TABLE lt_screen_control.
+  ENDIF.
+*POS
+  IF ls_screen_control-screen_name = 'MAMT-SPRAS'.
+    ls_screen_control-screen_name = '*MAMT-SPRAS'.
+    INSERT ls_screen_control INTO TABLE lt_screen_control.
+  ENDIF.
+  IF ls_screen_control-screen_name = 'MAMT-MEINH'.
+    ls_screen_control-screen_name = '*MAMT-MEINH'.
+    INSERT ls_screen_control INTO TABLE lt_screen_control.
+  ENDIF.
+  IF ls_screen_control-screen_name = 'MAMT-MAKTM'.
+    ls_screen_control-screen_name = '*MAMT-MAKTM'.
+    INSERT ls_screen_control INTO TABLE lt_screen_control.
+  ENDIF.
+  IF ls_screen_control-screen_name = 'MAMT-LFDNR'.
+    ls_screen_control-screen_name = '*MAMT-LFDNR'.
+    INSERT ls_screen_control INTO TABLE lt_screen_control.
+  ENDIF.
+  IF ls_screen_control-screen_name = 'MAMT-MTXID'.
+    ls_screen_control-screen_name = '*MAMT-MTXID'.
+    INSERT ls_screen_control INTO TABLE lt_screen_control.
+  ENDIF.
+  IF ls_screen_control-screen_name = 'EINA-MAHN1' OR
+     ls_screen_control-screen_name = 'EINA-MAHN2' OR
+     ls_screen_control-screen_name = 'EINA-MAHN3' .
+    ls_screen_control-screen_name = 'MAHNSTAFFEL'.
     INSERT ls_screen_control INTO TABLE lt_screen_control.
   ENDIF.
 ENDLOOP.

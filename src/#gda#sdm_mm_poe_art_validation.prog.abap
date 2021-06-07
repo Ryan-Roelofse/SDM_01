@@ -15,6 +15,7 @@ DATA:
   ls_syst         TYPE syst,
   ls_mg03_sdm_brf TYPE mg03steuer,
   ls_eina         TYPE eina,
+  ls_wrpl         TYPE wrpl,
   ls_mwli         TYPE mwli,
   ls_eine         TYPE eine,
   ls_merrdat      TYPE merrdat,
@@ -173,7 +174,21 @@ APPEND gs_mwli_sdm TO gt_mwli_sdm.
 *ls_t130m = wstat.
 *
 *lt_malg = tmalg[].
+* Replenishment: quantities per customer/material
+CALL FUNCTION 'WRPL_GET_BILD'
+  EXPORTING
+    matnr = wrmmg1-matnr
+    kunnr = wrmmg1-kunnr
+  IMPORTING
+    wwrpl = ls_wrpl.
 
+IF ls_wrpl-matnr IS NOT INITIAL.
+  MOVE-CORRESPONDING ls_wrpl TO gs_wrpl_sdm.
+  gs_wrpl_sdm-sdm_tabkey = /gda/cl_sdm_data_model_main=>build_string_from_key( i_tabname  = 'MARA'
+                                                                           i_contents = gs_mara_sdm ).
+
+  APPEND gs_wrpl_sdm TO gt_wrpl_sdm.
+ENDIF.
 * Vendor-Specific EANs
 LOOP AT tmlea ASSIGNING <mlea>.
   MOVE-CORRESPONDING <mlea> TO gs_mlea_sdm.

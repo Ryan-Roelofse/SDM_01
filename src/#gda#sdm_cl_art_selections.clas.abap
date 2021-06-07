@@ -208,9 +208,12 @@ private section.
   data:
     mt_eord       type sorted table of /gda/sdm_s_eord_01
                     with unique key matnr werks zeord .
+*  data:
+*    mt_mlan       type sorted table of /gda/sdm_s_mlan_01
+*                    with unique key matnr aland lfdnr tatyp .
   data:
-    mt_mlan       type sorted table of /gda/sdm_s_mlan_01
-                    with unique key matnr aland lfdnr tatyp .
+    mt_mlan       type STANDARD TABLE OF /gda/sdm_s_mlan_01.
+*                    with unique key matnr aland lfdnr tatyp .
   data MT_EINA type /GDA/SDM_T_EINA_01 .
   data MT_EINE type /GDA/SDM_T_EINE_01 .
   data MT_MG03STEUMM type /GDA/SDM_T_MG03STEUMM_01 .
@@ -722,7 +725,7 @@ CLASS /GDA/SDM_CL_ART_SELECTIONS IMPLEMENTATION.
         IF lt_matnr IS NOT INITIAL.
           CALL FUNCTION '/GDA/SDM_MM_MARA_GET_OLD2' "lv_function
             EXPORTING
-             x_max_rows   = me->ms_selscreen-max_rows
+              x_max_rows   = me->ms_selscreen-max_rows
               xt_materials = lt_matnr
             IMPORTING
               xt_mara      = me->mt_mara[]
@@ -742,24 +745,45 @@ CLASS /GDA/SDM_CL_ART_SELECTIONS IMPLEMENTATION.
         ENDIF.
 
       ELSE.
-        CALL FUNCTION '/GDA/SDM_MM_MARA_GET_OLD2' "lv_function
-          EXPORTING
-            x_max_rows = me->ms_selscreen-max_rows
-          IMPORTING
-            xt_mara  = me->mt_mara[]
-          TABLES
-            xt_matnr = me->ms_selscreen-matnr
-            xt_ersda = me->ms_selscreen-ersda
-            xt_ernam = me->ms_selscreen-ernam
-            xt_laeda = me->ms_selscreen-laeda
-            xt_aenam = me->ms_selscreen-aenam
-            xt_mtart = me->ms_selscreen-mtart
-            xt_matkl = me->ms_selscreen-matkl
-            xt_mstae = me->ms_selscreen-mstae
-            xt_bwscl = me->ms_selscreen-bwscl
-            xt_attyp = me->ms_selscreen-attyp
-            xt_werks = me->ms_selscreen-werks
-            xt_mmsta = me->ms_selscreen-mmsta.
+        IF me->ms_selscreen-max_rows IS NOT INITIAL.
+          CALL FUNCTION '/GDA/SDM_MM_MARA_GET_OLD2' "lv_function
+            EXPORTING
+              x_max_rows = me->ms_selscreen-max_rows
+            IMPORTING
+              xt_mara    = me->mt_mara[]
+            TABLES
+              xt_matnr   = me->ms_selscreen-matnr
+              xt_ersda   = me->ms_selscreen-ersda
+              xt_ernam   = me->ms_selscreen-ernam
+              xt_laeda   = me->ms_selscreen-laeda
+              xt_aenam   = me->ms_selscreen-aenam
+              xt_mtart   = me->ms_selscreen-mtart
+              xt_matkl   = me->ms_selscreen-matkl
+              xt_mstae   = me->ms_selscreen-mstae
+              xt_bwscl   = me->ms_selscreen-bwscl
+              xt_attyp   = me->ms_selscreen-attyp
+              xt_werks   = me->ms_selscreen-werks
+              xt_mmsta   = me->ms_selscreen-mmsta.
+        ELSE.
+          CALL FUNCTION '/GDA/SDM_MM_MARA_GET_OLD2' "lv_function
+*          EXPORTING
+*            x_max_rows = me->ms_selscreen-max_rows
+            IMPORTING
+              xt_mara  = me->mt_mara[]
+            TABLES
+              xt_matnr = me->ms_selscreen-matnr
+              xt_ersda = me->ms_selscreen-ersda
+              xt_ernam = me->ms_selscreen-ernam
+              xt_laeda = me->ms_selscreen-laeda
+              xt_aenam = me->ms_selscreen-aenam
+              xt_mtart = me->ms_selscreen-mtart
+              xt_matkl = me->ms_selscreen-matkl
+              xt_mstae = me->ms_selscreen-mstae
+              xt_bwscl = me->ms_selscreen-bwscl
+              xt_attyp = me->ms_selscreen-attyp
+              xt_werks = me->ms_selscreen-werks
+              xt_mmsta = me->ms_selscreen-mmsta.
+        ENDIF.
       ENDIF.
 
       IF lines( me->mt_mara ) = 0.
@@ -833,7 +857,7 @@ CLASS /GDA/SDM_CL_ART_SELECTIONS IMPLEMENTATION.
               CLEAR   gs_relations.
             ENDLOOP.
 
-            APPEND LINES OF lt_mara_variants TO me->mt_mara.
+*            APPEND LINES OF lt_mara_variants TO me->mt_mara.
 
 * Pre-Pack, Sales Sets, Display Articles etc
           WHEN OTHERS.
@@ -861,7 +885,7 @@ CLASS /GDA/SDM_CL_ART_SELECTIONS IMPLEMENTATION.
                   CLEAR   gs_relations.
                 ENDLOOP.
 
-                APPEND LINES OF lt_mara_variants TO me->mt_mara.
+*                APPEND LINES OF lt_mara_variants TO me->mt_mara.
               ENDIF.
 
             ENDIF.
@@ -1506,10 +1530,10 @@ CLASS /GDA/SDM_CL_ART_SELECTIONS IMPLEMENTATION.
     ENDTRY.
 
 
-*    loop at me->mt_mpgd assigning <ls_mpgd>.
-*      <ls_mpgd>-sdm_tabkey = /gda/cl_sdm_data_model_main=>build_string_from_key( i_tabname  = 'MPGD_V'
-*                                                                           i_contents = <ls_malg> ).
-*    endloop.
+    loop at me->mt_mpgd assigning <ls_mpgd>.
+      <ls_mpgd>-sdm_tabkey = /gda/cl_sdm_data_model_main=>build_string_from_key( i_tabname  = 'MARC'
+                                                                           i_contents = <ls_mpgd> ).
+    endloop.
 
   ENDMETHOD.
 
@@ -1865,7 +1889,6 @@ CLASS /GDA/SDM_CL_ART_SELECTIONS IMPLEMENTATION.
         WITH KEY matnr = mv_object BINARY SEARCH.
       IF sy-subrc = 0.
         LOOP AT mt_mpgd ASSIGNING <ls_mpgd> FROM sy-tabix.
-          <ls_mpgd>-sdm_tabkey = <ls_mpgd>-matnr.
           IF <ls_mpgd>-matnr <> mv_object.
             EXIT.
           ELSE.
