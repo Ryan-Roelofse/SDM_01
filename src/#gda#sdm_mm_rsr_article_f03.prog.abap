@@ -207,6 +207,7 @@ FORM sdm_logic .
 *    gs_sdm_objects-meinh[]  = gt_meinh_sdm[].
 *    gs_sdm_objects-mfhm[]   = gt_mfhm_sdm[].
     gs_sdm_objects-mlgn[]   = gt_mlgn_sdm[].
+    gs_sdm_objects-mlgt[]   = gt_mlgt_sdm[].
     gs_sdm_objects-mpgd[]   = gt_mpgd_sdm[].
     gs_sdm_objects-wrpl[]   = gt_wrpl_sdm[].
 *    gs_sdm_objects-mlgt[]   = gt_mlgt_sdm[].
@@ -230,6 +231,7 @@ FORM sdm_logic .
     gs_sdm_objects-wlk2   = gt_wlk2_sdm[].
     gs_sdm_objects-myms   = gt_myms_sdm[].
     gs_sdm_objects-konh   = gt_konh_sdm[].
+    gs_sdm_objects-mamt   = gt_mamt_sdm[].
 
     gs_sdm_objects-/gda/sdm_mlan   = gt_mlan_sdm[].
 *    gs_sdm_objects-mamt   = gt_mamt_sdm[].

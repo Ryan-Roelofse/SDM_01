@@ -104,6 +104,7 @@ CLASS /GDA/SDM_CL_SPR_01 IMPLEMENTATION.
       is_headdata          TYPE bapie1mathead,
       lt_clientdata        TYPE bapie1marart_tab,
       lt_clientdatax       TYPE bapie1marartx_tab,
+      is_plantdata         type BAPIE1MARCRT,
       it_plantdata         TYPE bapie1marcrt_tab,
       it_plantdatax        TYPE bapie1marcrtx_tab,
       it_salesdata         TYPE bapie1mvkert_tab,
@@ -138,9 +139,10 @@ CLASS /GDA/SDM_CL_SPR_01 IMPLEMENTATION.
       me->pv_message-message_v2 = me->pv_exception_details-field.
       RETURN.
     ENDIF.
+    is_headdata-no_appl_log = abap_true.
 
     CASE me->ps_mapping-bapi_structure.
-      WHEN 'BAPI_MARA'.
+      WHEN 'BAPIE1MARART'.
         is_headdata-basic_view = abap_true.
 
         APPEND INITIAL LINE TO lt_clientdata  ASSIGNING FIELD-SYMBOL(<lfs_clientdata>).
@@ -150,7 +152,7 @@ CLASS /GDA/SDM_CL_SPR_01 IMPLEMENTATION.
         APPEND INITIAL LINE TO lt_clientdatax ASSIGNING FIELD-SYMBOL(<lfs_clientdatax>).
         ASSIGN COMPONENT me->ps_mapping-bapi_fieldname OF STRUCTURE <lfs_clientdatax> TO <update_fieldx>.
         <update_fieldx>        = abap_true.
-      WHEN 'BAPI_MAKT'.
+      WHEN 'BAPIE1MAKTRT'.
         is_headdata-basic_view = abap_true.
 
         APPEND INITIAL LINE TO it_mat_desc  ASSIGNING FIELD-SYMBOL(<lfs_mat_desc>).
@@ -159,6 +161,40 @@ CLASS /GDA/SDM_CL_SPR_01 IMPLEMENTATION.
         <lfs_mat_desc>-langu     = sy-langu.
         <lfs_mat_desc>-langu_iso = sy-langu.
 
+      WHEN 'BAPIE1MARCRT'.
+
+        DATA:
+          view TYPE t130f-pstat,
+          name TYPE t130f-fname.
+
+        CONCATENATE  sap_table '-' me->ps_mapping-sdm_fieldname INTO name.
+
+* Determine which view to update...
+        SELECT SINGLE pstat FROM t130f
+                        INTO view
+                         WHERE fname = name.
+        is_headdata-logdc_view = abap_true.
+        is_headdata-logst_view = abap_true.
+
+        READ TABLE keys ASSIGNING <key> WITH KEY  fieldname = 'WERKS'.
+        IF sy-subrc = 0.
+*          is_plantdata-plant = <key>-value.
+*          ASSIGN COMPONENT me->ps_mapping-bapi_fieldname OF STRUCTURE is_plantdata TO <update_field>.
+*          <update_field>        = me->pv_update_value.
+*
+*          is_plantdatax-plant = <key>-value.
+*          ASSIGN COMPONENT me->ps_mapping-bapi_fieldname OF STRUCTURE is_plantdatax TO <update_fieldx>.
+*          <update_fieldx>        = abap_true.
+
+        ELSE.
+          me->pv_message-type       = 'E'.
+          me->pv_message-id         = '/GDA/SDM_SPRINT'.
+          me->pv_message-number     = '012'.
+          me->pv_message-message_v1 = me->pv_exception_details-tabname.
+          me->pv_message-message_v2 = me->pv_exception_details-field.
+          RETURN.
+
+        ENDIF.
       WHEN OTHERS.
     ENDCASE.
 
@@ -337,7 +373,7 @@ CLASS /GDA/SDM_CL_SPR_01 IMPLEMENTATION.
 
     ENDIF.
 
-    MOVE-CORRESPONDING ls_return to me->pv_message.
+    MOVE-CORRESPONDING ls_return TO me->pv_message.
 *    me->pv_message = cs_messages.
 
 * ST-386

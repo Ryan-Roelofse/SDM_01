@@ -191,7 +191,7 @@ LOOP AT wsteummtab ASSIGNING <wsteummtab>.
   gs_steummtab_sdm-sdm_tabkey = /gda/cl_sdm_data_model_main=>build_string_from_key( i_tabname  = 'MARA'
                                                                           i_contents = gs_mara_sdm ).
 
-  APPEND gs_steummtab_sdm TO GT_MG03STEUMM_SDM.
+  APPEND gs_steummtab_sdm TO gt_mg03steumm_sdm.
   CLEAR:
    gs_meinh_sdm.
 ENDLOOP.

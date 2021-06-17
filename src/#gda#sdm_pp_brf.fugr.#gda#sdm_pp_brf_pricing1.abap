@@ -114,6 +114,7 @@ FUNCTION /gda/sdm_pp_brf_pricing1.
 *      IF ( <datab> <= sy-datum AND <datbi> >= sy-datum ).
       y_result-id     = '0'.
       y_result-knumh  =  <knumh>.
+      y_result-kschl  =  ls_struc-kschl.
       EXIT.
 *      ELSE.
 *        y_result-id     = 'W'.
@@ -149,6 +150,7 @@ FUNCTION /gda/sdm_pp_brf_pricing1.
 *      ELSE.
         y_result-id     = 'W'.
         y_result-knumh  =  <knumh>.
+        y_result-kschl  =  ls_struc-kschl.
         EXIT.
 *      ENDIF.
 *    ELSE.

@@ -9,175 +9,175 @@
 *      -->P_COLUMN  text
 *      -->P_<STATUS>  text
 *----------------------------------------------------------------------*
-form set_view_output_new using x_column type lvc_s_col x_status.
+FORM set_view_output_new USING x_column TYPE lvc_s_col x_status.
 
-  data:
-    ls_layout           type lvc_s_layo,
-    ro_data             type ref to data,
-    ro_data_empty       type ref to data,
-    lv_view             type /gda/sdm_de_view,
-    lt_sequence_primary type standard table of /gda/sdm_setup5,
-    lt_sequence_second  type standard table of /gda/sdm_setup5,
-    lv_field            type fieldname,
-    lv_table            type tabname,"tabname16,
+  DATA:
+    ls_layout           TYPE lvc_s_layo,
+    ro_data             TYPE REF TO data,
+    ro_data_empty       TYPE REF TO data,
+    lv_view             TYPE /gda/sdm_de_view,
+    lt_sequence_primary TYPE STANDARD TABLE OF /gda/sdm_setup5,
+    lt_sequence_second  TYPE STANDARD TABLE OF /gda/sdm_setup5,
+    lv_field            TYPE fieldname,
+    lv_table            TYPE tabname,"tabname16,
 *    lv_key_table        TYPE tabname16,
-    lv_key_node         type  field,
-    lv_key_att          type  field.
+    lv_key_node         TYPE  field,
+    lv_key_att          TYPE  field.
 
 
-  field-symbols:
-    <field>            type any,
-    <field_check>      type any,
-    <field_check2>     type any,
+  FIELD-SYMBOLS:
+    <field>            TYPE any,
+    <field_check>      TYPE any,
+    <field_check2>     TYPE any,
 *    <field_context> TYPE any,
-    <brf_key>          type any,
-    <brf_key6>         type any,
-    <message>          type any,
-    <material>         type any,
+    <brf_key>          TYPE any,
+    <brf_key6>         TYPE any,
+    <message>          TYPE any,
+    <material>         TYPE any,
 *    <description>   TYPE any,
-    <result>           type any,
-    <field_alv>        type any,
-    <results>          type table,
-    <results_temp>     type  table,
-    <results_collated> type standard table,
+    <result>           TYPE any,
+    <field_alv>        TYPE any,
+    <results>          TYPE table,
+    <results_temp>     TYPE  table,
+    <results_collated> TYPE STANDARD TABLE,
 *    <view_table>       like line of gt_view_tables,
-    <sdm_object>       like line of gt_sdm_articles,
-    <instances>        like line of <sdm_object>-sdm_instances.
+    <sdm_object>       LIKE LINE OF gt_sdm_articles,
+    <instances>        LIKE LINE OF <sdm_object>-sdm_instances.
 
-  field-symbols:
-    <setup>           like line of gt_pp_main_setup,
-    <primary>         like line of lt_sequence_primary,
-    <secondary>       like line of lt_sequence_second,
-    <table_primary>   type any table,
-    <table_secondary> type any table,
-    <line_primary>    type any,
-    <line_secondary>  type any.
+  FIELD-SYMBOLS:
+    <setup>           LIKE LINE OF gt_pp_main_setup,
+    <primary>         LIKE LINE OF lt_sequence_primary,
+    <secondary>       LIKE LINE OF lt_sequence_second,
+    <table_primary>   TYPE ANY TABLE,
+    <table_secondary> TYPE ANY TABLE,
+    <line_primary>    TYPE any,
+    <line_secondary>  TYPE any.
 
-  perform build_structure using x_column
+  PERFORM build_structure USING x_column
                                 gc_object
                                 space.
-  perform build_dynamic_itab using x_column
-                             changing ro_data.
+  PERFORM build_dynamic_itab USING x_column
+                             CHANGING ro_data.
 
-  refresh:
+  REFRESH:
    <dyn_table_view>.
 
-  if x_status <> '@08@'.
+  IF x_status <> '@08@'.
     lv_view = x_column.
 
-    move-corresponding <dyn_wa> to <dyn_wa_view>.
-    assign component 'KEY_MATNR' of structure <dyn_wa> to <material>.
+    MOVE-CORRESPONDING <dyn_wa> TO <dyn_wa_view>.
+    ASSIGN COMPONENT 'KEY_MATNR' OF STRUCTURE <dyn_wa> TO <material>.
 
-    read table gt_sdm_articles assigning <sdm_object> with key article = <material>.
-    check sy-subrc = 0.
-    if <sdm_object> is assigned.
+    READ TABLE gt_sdm_articles ASSIGNING <sdm_object> WITH KEY article = <material>.
+    CHECK sy-subrc = 0.
+    IF <sdm_object> IS ASSIGNED.
 * Collate results tab
-      loop at <sdm_object>-sdm_instances assigning <instances>.
-        if <instances>-object is initial.
-          continue.
-        endif.
-        if <results> is not assigned.
+      LOOP AT <sdm_object>-sdm_instances ASSIGNING <instances>.
+        IF <instances>-object IS INITIAL.
+          CONTINUE.
+        ENDIF.
+        IF <results> IS NOT ASSIGNED.
           ro_data_empty  = <instances>-object->return_brf_result_structure( ).
-          assign ro_data_empty->* to <results>.
-          refresh:
+          ASSIGN ro_data_empty->* TO <results>.
+          REFRESH:
            <results>.
-        endif.
+        ENDIF.
 
         ro_data        = <instances>-object->return_brf_result( ).
-        assign ro_data->* to <results_temp>.
+        ASSIGN ro_data->* TO <results_temp>.
 
-        if <results_temp> is assigned and <results_temp> is not initial.
-          append lines of <results_temp> to <results>.
-        endif.
-      endloop.
+        IF <results_temp> IS ASSIGNED AND <results_temp> IS NOT INITIAL.
+          APPEND LINES OF <results_temp> TO <results>.
+        ENDIF.
+      ENDLOOP.
 
-      sort <results>.
-      delete adjacent duplicates from <results>.
+      SORT <results>.
+      DELETE ADJACENT DUPLICATES FROM <results>.
 
-      read table gt_pp_main_setup assigning <setup> with key object_view = lv_view.
+      READ TABLE gt_pp_main_setup ASSIGNING <setup> WITH KEY object_view = lv_view.
 
-      check sy-subrc = 0.
+      CHECK sy-subrc = 0.
       lt_sequence_primary[] =  <setup>-sequence[].
-      loop at lt_sequence_primary assigning <primary> where seq = '01'.
+      LOOP AT lt_sequence_primary ASSIGNING <primary> WHERE seq = '01'.
 *        lv_key_table = <primary>-tabname.
         lv_key_node  = <primary>-node_level.
 
-        assign component <primary>-tabname of structure <sdm_object> to <table_primary>.
-        loop at <table_primary> assigning <line_primary>.
-          move-corresponding <line_primary> to <dyn_wa_view>.
+        ASSIGN COMPONENT <primary>-tabname OF STRUCTURE <sdm_object> TO <table_primary>.
+        LOOP AT <table_primary> ASSIGNING <line_primary>.
+          MOVE-CORRESPONDING <line_primary> TO <dyn_wa_view>.
 * populate output with Secondary table values
-          loop at lt_sequence_second assigning <secondary> where seq ne '01'.
-            assign component <secondary>-tabname of structure <sdm_object> to <table_secondary>.
-            loop at <table_secondary> assigning <line_secondary>.
-              move-corresponding <line_secondary> to <dyn_wa_view>.
-            endloop.
-          endloop.
+          LOOP AT lt_sequence_second ASSIGNING <secondary> WHERE seq NE '01'.
+            ASSIGN COMPONENT <secondary>-tabname OF STRUCTURE <sdm_object> TO <table_secondary>.
+            LOOP AT <table_secondary> ASSIGNING <line_secondary>.
+              MOVE-CORRESPONDING <line_secondary> TO <dyn_wa_view>.
+            ENDLOOP.
+          ENDLOOP.
 
-          append <dyn_wa_view> to <dyn_table_view>.
-        endloop.
-      endloop.
+          APPEND <dyn_wa_view> TO <dyn_table_view>.
+        ENDLOOP.
+      ENDLOOP.
 
 
-      loop at <dyn_table_view> assigning <dyn_wa_view>.
+      LOOP AT <dyn_table_view> ASSIGNING <dyn_wa_view>.
 
-        loop at <results> assigning <result>.
+        LOOP AT <results> ASSIGNING <result>.
 * we now have a valid error for the line
-          assign component 'EXTRA_V1' of structure <result> to <field>.
-          if <field> is assigned.
-            split <field> at '-' into lv_table lv_field.
-            read table <setup>-tabstruc  with key fieldname = lv_field
-                                                  tabname   = lv_table transporting no fields.
-            if sy-subrc <> 0.
-              continue.
-            endif.
-          endif.
+          ASSIGN COMPONENT 'EXTRA_V1' OF STRUCTURE <result> TO <field>.
+          IF <field> IS ASSIGNED.
+            SPLIT <field> AT '-' INTO lv_table lv_field.
+            READ TABLE <setup>-tabstruc  WITH KEY fieldname = lv_field
+                                                  tabname   = lv_table TRANSPORTING NO FIELDS.
+            IF sy-subrc <> 0.
+              CONTINUE.
+            ENDIF.
+          ENDIF.
 
 * Potential Valid error found
 * Key Field Value
-          assign component 'EXTRA_V5' of structure <result> to <brf_key>.
-          if <brf_key> is assigned and <brf_key> is initial.
+          ASSIGN COMPONENT 'EXTRA_V5' OF STRUCTURE <result> TO <brf_key>.
+          IF <brf_key> IS ASSIGNED AND <brf_key> IS INITIAL.
 * Then set to material
             <brf_key>     =  <material>.
             lv_key_node = 'KEY_MATNR'.
-          endif.
+          ENDIF.
 
 * get Key Field attribute Value
-          assign component 'EXTRA_V6' of structure <result> to <brf_key6>.
-          if <brf_key6> is assigned and <brf_key6> is not initial.
+          ASSIGN COMPONENT 'EXTRA_V6' OF STRUCTURE <result> TO <brf_key6>.
+          IF <brf_key6> IS ASSIGNED AND <brf_key6> IS NOT INITIAL.
 * Special Conditions - Get corresponding key field attribute value from context
-            if lv_key_node = 'VKORG'.
+            IF lv_key_node = 'VKORG'.
               lv_key_att = 'VTWEG'.
-              assign component lv_key_att of structure <dyn_wa_view> to <field_check2>.
-            endif.
-          endif.
+              ASSIGN COMPONENT lv_key_att OF STRUCTURE <dyn_wa_view> TO <field_check2>.
+            ENDIF.
+          ENDIF.
 
-          assign component lv_key_node of structure <dyn_wa_view> to <field_check>. "lv_field
+          ASSIGN COMPONENT lv_key_node OF STRUCTURE <dyn_wa_view> TO <field_check>. "lv_field
 
-          if sy-subrc = 0 and <brf_key> is assigned and <brf_key6> is initial.
-            if <brf_key> = <field_check>.
+          IF sy-subrc = 0 AND <brf_key> IS ASSIGNED AND <brf_key6> IS INITIAL.
+            IF <brf_key> = <field_check>.
 * Pass the BRF message to the screen
-              assign component 'MESSAGE' of structure <result> to <message>.
-              if sy-subrc = 0 and <message> is assigned.
-                assign component 'MESSAGE' of structure <dyn_wa_view> to <field_alv>.
-                if sy-subrc = 0 and <field_alv> is assigned.
+              ASSIGN COMPONENT 'MESSAGE' OF STRUCTURE <result> TO <message>.
+              IF sy-subrc = 0 AND <message> IS ASSIGNED.
+                ASSIGN COMPONENT 'MESSAGE' OF STRUCTURE <dyn_wa_view> TO <field_alv>.
+                IF sy-subrc = 0 AND <field_alv> IS ASSIGNED.
                   <field_alv> = <message>.
-                  exit.
-                endif.
-              endif.
-            endif.
-          elseif sy-subrc = 0 and <brf_key> is assigned and <brf_key6> is not initial.
-            if <brf_key> = <field_check> and <brf_key6> = <field_check2>.
+                  EXIT.
+                ENDIF.
+              ENDIF.
+            ENDIF.
+          ELSEIF sy-subrc = 0 AND <brf_key> IS ASSIGNED AND <brf_key6> IS NOT INITIAL.
+            IF <brf_key> = <field_check> AND <brf_key6> = <field_check2>.
 ** Pass the BRF message to the screen
-              assign component 'MESSAGE' of structure <result> to <message>.
-              if sy-subrc = 0 and <message> is assigned.
-                assign component 'MESSAGE' of structure <dyn_wa_view> to <field_alv>.
-                if sy-subrc = 0 and <field_alv> is assigned.
+              ASSIGN COMPONENT 'MESSAGE' OF STRUCTURE <result> TO <message>.
+              IF sy-subrc = 0 AND <message> IS ASSIGNED.
+                ASSIGN COMPONENT 'MESSAGE' OF STRUCTURE <dyn_wa_view> TO <field_alv>.
+                IF sy-subrc = 0 AND <field_alv> IS ASSIGNED.
                   <field_alv> = <message>.
-                  exit.
-                endif.
-              endif.
-            endif.
-          endif.
+                  EXIT.
+                ENDIF.
+              ENDIF.
+            ENDIF.
+          ENDIF.
 
 ** Is this context field found in the current structure?
 *        ASSIGN COMPONENT lv_field OF STRUCTURE <dyn_wa_view> TO <field_context>. "lv_key_att
@@ -227,38 +227,38 @@ form set_view_output_new using x_column type lvc_s_col x_status.
 *
 *          ENDIF.
 *        ENDIF.
-        endloop.
-      endloop.
-    endif.
-  endif.
+        ENDLOOP.
+      ENDLOOP.
+    ENDIF.
+  ENDIF.
 
-  if go_alv is bound.
+  IF go_alv IS BOUND.
     go_alv->free( ).
-    free go_alv.
-  endif.
+    FREE go_alv.
+  ENDIF.
 
-  if go_tree is bound.
+  IF go_tree IS BOUND.
     go_tree->free( ).
-    free go_tree.
-  endif.
+    FREE go_tree.
+  ENDIF.
 
 * create an instance of alv control
-  create object go_alv
-    exporting
+  CREATE OBJECT go_alv
+    EXPORTING
       i_parent = go_parent2.
 
   ls_layout-cwidth_opt = abap_true.
 
-  read table gt_pp_main_setup assigning <main_setup> with key object_view = lv_view.
+  READ TABLE gt_pp_main_setup ASSIGNING <main_setup> WITH KEY object_view = lv_view.
 
-  call method go_alv->set_table_for_first_display
-    exporting
+  CALL METHOD go_alv->set_table_for_first_display
+    EXPORTING
       is_layout       = ls_layout
-    changing
+    CHANGING
       it_fieldcatalog = <main_setup>-tabstruc[]
       it_outtab       = <dyn_table_view>.
 
-endform.
+ENDFORM.
 *&---------------------------------------------------------------------*
 *&      Form  SET_VIEW_OUTPUT_TREE
 *&---------------------------------------------------------------------*
@@ -267,67 +267,67 @@ endform.
 *      -->P_COLUMN  text
 *      -->P_<STATUS>  text
 *----------------------------------------------------------------------*
-form set_view_output_tree using x_column x_status.
-  data:
-    ls_hier_hdr type treev_hhdr,
-    ls_variant  type disvariant,
-    lt_keys     type lvc_t_nkey.
+FORM set_view_output_tree USING x_column x_status.
+  DATA:
+    ls_hier_hdr TYPE treev_hhdr,
+    ls_variant  TYPE disvariant,
+    lt_keys     TYPE lvc_t_nkey.
 *    lt_result   TYPE STANDARD TABLE OF /gda/sdm_s_val_results. " Empty
 
-  field-symbols:
-    <material>    type any,
-    <description> type any.
+  FIELD-SYMBOLS:
+    <material>    TYPE any,
+    <description> TYPE any.
 
-  perform build_structure    using x_column
+  PERFORM build_structure    USING x_column
                                    gc_object
                                    p_struc.
-  perform build_dynamic_itab using x_column
-                             changing ro_data.
+  PERFORM build_dynamic_itab USING x_column
+                             CHANGING ro_data.
 
-  refresh:
+  REFRESH:
    <dyn_table_view>.
 
 * Set key fields..
-  move-corresponding <dyn_wa> to <dyn_wa_view>.
-  assign component 'KEY_MATNR' of structure <dyn_wa> to <material>.
+  MOVE-CORRESPONDING <dyn_wa> TO <dyn_wa_view>.
+  ASSIGN COMPONENT 'KEY_MATNR' OF STRUCTURE <dyn_wa> TO <material>.
 
 *  CLEAR: GS_MARA.
-  read table gt_mara into gs_mara with key matnr = <material>.
-  move-corresponding gs_mara to <dyn_wa_view>.
+  READ TABLE gt_mara INTO gs_mara WITH KEY matnr = <material>.
+  MOVE-CORRESPONDING gs_mara TO <dyn_wa_view>.
 
-  clear:
+  CLEAR:
    gs_makt.
-  if gt_makt is not initial.
-    assign component 'MAKTX' of structure <dyn_wa_view> to <description>.
-    read table gt_makt into gs_makt with key matnr = <material>.
-    if <description> is assigned.
+  IF gt_makt IS NOT INITIAL.
+    ASSIGN COMPONENT 'MAKTX' OF STRUCTURE <dyn_wa_view> TO <description>.
+    READ TABLE gt_makt INTO gs_makt WITH KEY matnr = <material>.
+    IF <description> IS ASSIGNED.
       <description> = gs_makt-maktx.
-    endif.
-  endif.
+    ENDIF.
+  ENDIF.
 
 * Get BRF+ results for Article..
 ** Only if in Error..
-  if x_status = icon_red_light or x_status = icon_green_light  or x_status = icon_yellow_light.
-    if go_alv is bound.
+  IF x_status = icon_red_light OR x_status = icon_green_light  OR x_status = icon_yellow_light.
+    IF go_alv IS BOUND.
       go_alv->free( ).
-      free go_alv.
-    endif.
+      FREE go_alv.
+    ENDIF.
 
-    if go_tree is bound.
+    IF go_tree IS BOUND.
       go_tree->free( ).
-      free go_tree.
-    endif.
+      FREE go_tree.
+    ENDIF.
 
-    if go_tree is initial.
+    IF go_tree IS INITIAL.
 * create tree control
-      create object go_tree
-        exporting
+      CREATE OBJECT go_tree
+        EXPORTING
           parent                      = go_parent2
           node_selection_mode         = cl_gui_column_tree=>node_sel_mode_single
           item_selection              = 'X'
           no_html_header              = 'X'
           no_toolbar                  = ''
-        exceptions
+        EXCEPTIONS
           cntl_error                  = 1
           cntl_system_error           = 2
           create_error                = 3
@@ -335,52 +335,52 @@ form set_view_output_tree using x_column x_status.
           illegal_node_selection_mode = 5
           failed                      = 6
           illegal_column_name         = 7.
-      if sy-subrc <> 0.
-        message x208(00) with 'ERROR'.                      "#EC NOTEXT
-      endif.
+      IF sy-subrc <> 0.
+        MESSAGE x208(00) WITH 'ERROR'.                      "#EC NOTEXT
+      ENDIF.
 
-    endif.
+    ENDIF.
 
-    perform build_hierarchy_header changing ls_hier_hdr.
+    PERFORM build_hierarchy_header CHANGING ls_hier_hdr.
 
     ls_variant-report = sy-repid.
     ls_variant-variant = '/DEFAULT'.
 
-    call method go_tree->set_table_for_first_display
-      exporting
+    CALL METHOD go_tree->set_table_for_first_display
+      EXPORTING
         is_variant          = ls_variant
         i_save              = 'A'
         i_default           = 'X'
         i_structure_name    = '/GDA/SDM_S_VAL_RETURN_GUI' "'/GDA/SDM_S_VAL_RESULTS'
         is_hierarchy_header = ls_hier_hdr
-      changing
+      CHANGING
         it_outtab           = gt_result.
 
-    if x_status = icon_red_light or x_status = icon_yellow_light.
+    IF x_status = icon_red_light OR x_status = icon_yellow_light.
 * Create hierachy -
 * Folders - BRF Errors All, Context
-      perform create_hierarchy using
+      PERFORM create_hierarchy USING
                                 <material>
                                 x_column
                                 lt_keys.
-    endif.
+    ENDIF.
 * Send data to frontend.
-    call method go_tree->expand_nodes( it_node_key = lt_keys ).
-    call method go_tree->frontend_update.
-  endif.
+    CALL METHOD go_tree->expand_nodes( it_node_key = lt_keys ).
+    CALL METHOD go_tree->frontend_update.
+  ENDIF.
 
 
-endform.
+ENDFORM.
 
-form build_hierarchy_header changing
-                               p_hierarchy_header type treev_hhdr.
+FORM build_hierarchy_header CHANGING
+                               p_hierarchy_header TYPE treev_hhdr.
 
   p_hierarchy_header-heading = text-010.
   p_hierarchy_header-tooltip = text-011.
   p_hierarchy_header-width = 75.
   p_hierarchy_header-width_pix = ' '.
 
-endform.
+ENDFORM.
 *&---------------------------------------------------------------------*
 *&      Form  INIT
 *&---------------------------------------------------------------------*
@@ -856,174 +856,174 @@ endform.
 *  -->  p1        text
 *  <--  p2        text
 *----------------------------------------------------------------------*
-form get_data .
+FORM get_data .
 
-  data:
-    ls_pricing     type /gda/sdm_st_pricing_01,
-    ls_cond_header type cond_header.
+  DATA:
+    ls_pricing     TYPE /gda/sdm_st_pricing_01,
+    ls_cond_header TYPE cond_header.
 
-  field-symbols:
+  FIELD-SYMBOLS:
 *    <mara>   like line of gt_mara,
-    <steuer> like line of  gt_steuer.
+    <steuer> LIKE LINE OF  gt_steuer.
 
 *Get the data from the table Mara and makt (for the description of mataerial)
-  refresh:
+  REFRESH:
     gt_mara.
 
-  perform progress_bar using text-016.
+  PERFORM progress_bar USING text-016.
 
-  perform determine_selection.
+  PERFORM determine_selection.
 
-  if p_struc = abap_false.
-    perform material.
-  else.
-    perform material_structured.
-  endif.
+  IF p_struc = abap_false.
+    PERFORM material.
+  ELSE.
+    PERFORM material_structured.
+  ENDIF.
 
-  refresh:
+  REFRESH:
    gt_makt,gt_marc,gt_mard,gt_maw1,gt_mean,gt_eina,gt_eine,gt_eord,gt_mbew,gt_mvke,gt_wlk1,
    gt_wlk2,gt_stpo,gt_stko,gt_eqst,gt_mast,gt_mg03,gt_steuer,gt_mlgn,gt_mlgt,gt_myms,
    gt_mwli,gt_marm,gt_mamt,gt_malg.
 
-  if gt_mara[] is not initial.
-    select * from makt
-             into corresponding fields of table gt_makt
-             for all entries in gt_mara
-             where matnr      =  gt_mara-matnr
-             and spras        =  sy-langu.
-  endif.
+  IF gt_mara[] IS NOT INITIAL.
+    SELECT * FROM makt
+             INTO CORRESPONDING FIELDS OF TABLE gt_makt
+             FOR ALL ENTRIES IN gt_mara
+             WHERE matnr      =  gt_mara-matnr
+             AND spras        =  sy-langu.
+  ENDIF.
 
-  if gt_mara[] is not initial.
-    select * from marc
-             into corresponding fields of table gt_marc
-             for all entries in gt_mara
-                  where matnr      =  gt_mara-matnr
-                    and werks      in s_werks
-                    and mmsta      in s_mmsta.
+  IF gt_mara[] IS NOT INITIAL.
+    SELECT * FROM marc
+             INTO CORRESPONDING FIELDS OF TABLE gt_marc
+             FOR ALL ENTRIES IN gt_mara
+                  WHERE matnr      =  gt_mara-matnr
+                    AND werks      IN s_werks
+                    AND mmsta      IN s_mmsta.
 
-    select * from mard into corresponding fields of table gt_mard
-             for all entries in gt_mara
-             where matnr     =  gt_mara-matnr
-               and werks      in s_werks
-               and lgort      in s_lgort.
+    SELECT * FROM mard INTO CORRESPONDING FIELDS OF TABLE gt_mard
+             FOR ALL ENTRIES IN gt_mara
+             WHERE matnr     =  gt_mara-matnr
+               AND werks      IN s_werks
+               AND lgort      IN s_lgort.
 
-    select * from mlgn into corresponding fields of table gt_mlgn
-             for all entries in gt_mara
-             where matnr      =  gt_mara-matnr.
+    SELECT * FROM mlgn INTO CORRESPONDING FIELDS OF TABLE gt_mlgn
+             FOR ALL ENTRIES IN gt_mara
+             WHERE matnr      =  gt_mara-matnr.
 
-    select * from mlgt into corresponding fields of table gt_mlgt
-             for all entries in gt_mara
-             where matnr      =  gt_mara-matnr.
+    SELECT * FROM mlgt INTO CORRESPONDING FIELDS OF TABLE gt_mlgt
+             FOR ALL ENTRIES IN gt_mara
+             WHERE matnr      =  gt_mara-matnr.
 
-    select * from maw1 into corresponding fields of table gt_maw1
-             for all entries in gt_mara
-             where matnr      =  gt_mara-matnr.
+    SELECT * FROM maw1 INTO CORRESPONDING FIELDS OF TABLE gt_maw1
+             FOR ALL ENTRIES IN gt_mara
+             WHERE matnr      =  gt_mara-matnr.
 
-    select * from mean into corresponding fields of table gt_mean
-             for all entries in gt_mara
-             where matnr      =  gt_mara-matnr.
+    SELECT * FROM mean INTO CORRESPONDING FIELDS OF TABLE gt_mean
+             FOR ALL ENTRIES IN gt_mara
+             WHERE matnr      =  gt_mara-matnr.
 
-    select * from myms into corresponding fields of table gt_myms
-             for all entries in gt_mara
-             where matnr      =  gt_mara-matnr.
+    SELECT * FROM myms INTO CORRESPONDING FIELDS OF TABLE gt_myms
+             FOR ALL ENTRIES IN gt_mara
+             WHERE matnr      =  gt_mara-matnr.
 
-    select * from marm into corresponding fields of table gt_marm
-             for all entries in gt_mara
-             where matnr      =  gt_mara-matnr.
+    SELECT * FROM marm INTO CORRESPONDING FIELDS OF TABLE gt_marm
+             FOR ALL ENTRIES IN gt_mara
+             WHERE matnr      =  gt_mara-matnr.
 
-    select * from mamt into corresponding fields of table gt_mamt
-             for all entries in gt_mara
-             where matnr      =  gt_mara-matnr.
+    SELECT * FROM mamt INTO CORRESPONDING FIELDS OF TABLE gt_mamt
+             FOR ALL ENTRIES IN gt_mara
+             WHERE matnr      =  gt_mara-matnr.
 
-    select * from malg into corresponding fields of table gt_malg
-             for all entries in gt_mara
-             where matnr      =  gt_mara-matnr.
+    SELECT * FROM malg INTO CORRESPONDING FIELDS OF TABLE gt_malg
+             FOR ALL ENTRIES IN gt_mara
+             WHERE matnr      =  gt_mara-matnr.
 
 *    SELECT * FROM MWLI INTO CORRESPONDING FIELDS OF TABLE gt_mwli
 *             FOR ALL ENTRIES IN gt_mara
 *             WHERE matnr      =  gt_mara-matnr.
 
-    if gt_eina is initial.
-      select * from eina into corresponding fields of table gt_eina
-               for all entries in gt_mara
-               where matnr      =  gt_mara-matnr
-                 and matkl      in s_matkl
-                 and lifnr      in s_lifnr
-                 and infnr      in s_infnr.
+    IF gt_eina IS INITIAL.
+      SELECT * FROM eina INTO CORRESPONDING FIELDS OF TABLE gt_eina
+               FOR ALL ENTRIES IN gt_mara
+               WHERE matnr      =  gt_mara-matnr
+                 AND matkl      IN s_matkl
+                 AND lifnr      IN s_lifnr
+                 AND infnr      IN s_infnr.
 
-      select * from eine into table gt_eine
-               for all entries in gt_eina
-               where infnr = gt_eina-infnr
-               and ekorg in s_ekorg
-               and loekz = space.
+      SELECT * FROM eine INTO TABLE gt_eine
+               FOR ALL ENTRIES IN gt_eina
+               WHERE infnr = gt_eina-infnr
+               AND ekorg IN s_ekorg
+               AND loekz = space.
 
-      sort gt_eina.
-      sort gt_eine.
-    endif.
+      SORT gt_eina.
+      SORT gt_eine.
+    ENDIF.
 
-    if gt_eord is initial.
-      select * from eord into corresponding fields of table gt_eord
-               for all entries in gt_mara
-               where matnr      =  gt_mara-matnr
-                 and werks      in s_werks
-                 and lifnr      in s_lifnr
-                 and vdatu      in s_vdatu
-                 and bdatu      in s_bdatu.
-    endif.
+    IF gt_eord IS INITIAL.
+      SELECT * FROM eord INTO CORRESPONDING FIELDS OF TABLE gt_eord
+               FOR ALL ENTRIES IN gt_mara
+               WHERE matnr      =  gt_mara-matnr
+                 AND werks      IN s_werks
+                 AND lifnr      IN s_lifnr
+                 AND vdatu      IN s_vdatu
+                 AND bdatu      IN s_bdatu.
+    ENDIF.
 
-    select * from mvke into corresponding fields of table gt_mvke
-             for all entries in gt_mara
-             where matnr      =  gt_mara-matnr
-               and vkorg      in s_vkorg
-               and vtweg      in s_vtweg.
+    SELECT * FROM mvke INTO CORRESPONDING FIELDS OF TABLE gt_mvke
+             FOR ALL ENTRIES IN gt_mara
+             WHERE matnr      =  gt_mara-matnr
+               AND vkorg      IN s_vkorg
+               AND vtweg      IN s_vtweg.
 
-    select * from mbew into corresponding fields of table gt_mbew
-             for all entries in gt_mara
-             where matnr      =  gt_mara-matnr.
+    SELECT * FROM mbew INTO CORRESPONDING FIELDS OF TABLE gt_mbew
+             FOR ALL ENTRIES IN gt_mara
+             WHERE matnr      =  gt_mara-matnr.
 
-    select * from wlk1 into corresponding fields of table gt_wlk1
-             for all entries in gt_mara
-             where artnr      =  gt_mara-matnr.
+    SELECT * FROM wlk1 INTO CORRESPONDING FIELDS OF TABLE gt_wlk1
+             FOR ALL ENTRIES IN gt_mara
+             WHERE artnr      =  gt_mara-matnr.
 
-    select * from wlk2 into corresponding fields of table gt_wlk2
-             for all entries in gt_mara
-             where matnr      =  gt_mara-matnr
-               and vkorg      in s_vkorg
-               and vtweg      in s_vtweg.
+    SELECT * FROM wlk2 INTO CORRESPONDING FIELDS OF TABLE gt_wlk2
+             FOR ALL ENTRIES IN gt_mara
+             WHERE matnr      =  gt_mara-matnr
+               AND vkorg      IN s_vkorg
+               AND vtweg      IN s_vtweg.
 
-    select * from stpo into corresponding fields of table gt_stpo
-             for all entries in gt_mara
-             where idnrk      =  gt_mara-matnr.
+    SELECT * FROM stpo INTO CORRESPONDING FIELDS OF TABLE gt_stpo
+             FOR ALL ENTRIES IN gt_mara
+             WHERE idnrk      =  gt_mara-matnr.
 
 
-  endif.
+  ENDIF.
 
-  if gt_stpo is not initial.
+  IF gt_stpo IS NOT INITIAL.
 *    SELECT * FROM tpst INTO CORRESPONDING FIELDS OF TABLE gt_tpst
 *             FOR ALL ENTRIES IN gt_stpo
 *             WHERE werks      IN s_werks
 *             AND stlnr      =  gt_stpo-stlnr.
 
-    select * from stko into corresponding fields of table gt_stko
-             for all entries in gt_stpo
-             where stlnr      =  gt_stpo-stlnr.
+    SELECT * FROM stko INTO CORRESPONDING FIELDS OF TABLE gt_stko
+             FOR ALL ENTRIES IN gt_stpo
+             WHERE stlnr      =  gt_stpo-stlnr.
 
-    select * from eqst into corresponding fields of table gt_eqst
-             for all entries in gt_stpo
-             where stlnr    =  gt_stpo-stlnr
-             and werks      in s_werks.
+    SELECT * FROM eqst INTO CORRESPONDING FIELDS OF TABLE gt_eqst
+             FOR ALL ENTRIES IN gt_stpo
+             WHERE stlnr    =  gt_stpo-stlnr
+             AND werks      IN s_werks.
 
-    select * from mast into corresponding fields of table gt_mast
-             for all entries in gt_stpo
-             where matnr    =  gt_stpo-idnrk
-             and werks      in s_werks.
+    SELECT * FROM mast INTO CORRESPONDING FIELDS OF TABLE gt_mast
+             FOR ALL ENTRIES IN gt_stpo
+             WHERE matnr    =  gt_stpo-idnrk
+             AND werks      IN s_werks.
 
-    select * from mast into corresponding fields of table gt_mast
-             for all entries in gt_stpo
-             where werks    in s_werks
-             and stlnr      =  gt_stpo-stlnr.
+    SELECT * FROM mast INTO CORRESPONDING FIELDS OF TABLE gt_mast
+             FOR ALL ENTRIES IN gt_stpo
+             WHERE werks    IN s_werks
+             AND stlnr      =  gt_stpo-stlnr.
 
-  endif.
+  ENDIF.
 
 *  IF gt_tpst IS NOT INITIAL.
 *    SELECT * FROM iflo INTO CORRESPONDING FIELDS OF TABLE gt_iflo
@@ -1032,26 +1032,26 @@ form get_data .
 *  ENDIF.
 
 
-  loop at gt_mara assigning <mara_struc>.
-    call function 'STEUERTAB_READ'
-      exporting
+  LOOP AT gt_mara ASSIGNING <mara_struc>.
+    CALL FUNCTION 'STEUERTAB_READ'
+      EXPORTING
 *       KZRFB           = ' '
         matnr           = <mara_struc>-matnr
-      tables
+      TABLES
         steuertab       = gt_steuer
-      exceptions
+      EXCEPTIONS
         wrong_call      = 1
         steuertab_empty = 2
-        others          = 3.
-    if sy-subrc = 0.
-      loop at gt_steuer assigning <steuer>.
+        OTHERS          = 3.
+    IF sy-subrc = 0.
+      LOOP AT gt_steuer ASSIGNING <steuer>.
         gs_mg03-matnr      = <mara_struc>-matnr.
         gs_mg03-mg03steuer = <steuer>.
-        append gs_mg03 to gt_mg03.
-        clear:
+        APPEND gs_mg03 TO gt_mg03.
+        CLEAR:
           gs_mg03.
-      endloop.
-    endif.
+      ENDLOOP.
+    ENDIF.
 
 * KONH Records..
     call function '/GDA/SDM_PP_BRF_PRICING1'
@@ -1083,20 +1083,20 @@ form get_data .
 *    ls_cond_header-knumh = ls_pricing-knumh.
 *    INSERT ls_cond_header INTO TABLE gt_cond_header.
 
-  endloop.
+  ENDLOOP.
 
-  if gt_cond_header is not initial.
+  IF gt_cond_header IS NOT INITIAL.
 *    SORT gt_cond_header ASCENDING.
-    select * from konh into table gt_konh
-             for all entries in gt_cond_header
-             where knumh    =  gt_cond_header-knumh.
-  endif.
+    SELECT * FROM konh INTO TABLE gt_konh
+             FOR ALL ENTRIES IN gt_cond_header
+             WHERE knumh    =  gt_cond_header-knumh.
+  ENDIF.
 
 
 ENHANCEMENT-POINT /gda/sdm_mm_art_ep4 SPOTS /gda/sdm_mm_art_es4 .
 
-  perform progress_bar using text-017.
-endform.
+  PERFORM progress_bar USING text-017.
+ENDFORM.
 *&---------------------------------------------------------------------*
 *&      Form  GET_FIELDS
 *&---------------------------------------------------------------------*
@@ -1129,97 +1129,97 @@ endform.
 *  -->  p1        text
 *  <--  p2        text
 *----------------------------------------------------------------------*
-form set_alv_data_new .
-  data:
-    ro_data       type ref to data,
-    ro_data_empty type ref to data,
-    lv_field      type fieldname,
-    lv_table      type tabname, "16,
-    lt_general    type standard table of /gda/sdm_setup4,
-    ls_icons      type /gda/sdm_s_icons,
-    lt_icons      type standard table of /gda/sdm_s_icons,
-    lv_count      type p,
-    lv_pur        type p,
-    lv_text       type string,
-    lv_pur_text   type string,
+FORM set_alv_data_new .
+  DATA:
+    ro_data       TYPE REF TO data,
+    ro_data_empty TYPE REF TO data,
+    lv_field      TYPE fieldname,
+    lv_table      TYPE tabname, "16,
+    lt_general    TYPE STANDARD TABLE OF /gda/sdm_setup4,
+    ls_icons      TYPE /gda/sdm_s_icons,
+    lt_icons      TYPE STANDARD TABLE OF /gda/sdm_s_icons,
+    lv_count      TYPE p,
+    lv_pur        TYPE p,
+    lv_text       TYPE string,
+    lv_pur_text   TYPE string,
     lv_exit.
 
-  field-symbols:
-    <icon>            type any,
-    <results>         type standard table,
-    <results_temp>    type standard table,
-    <results_pp1>     type standard table,
-    <result>          type any,
-    <field>           type any,
-    <type>            type any,
+  FIELD-SYMBOLS:
+    <icon>            TYPE any,
+    <results>         TYPE STANDARD TABLE,
+    <results_temp>    TYPE STANDARD TABLE,
+    <results_pp1>     TYPE STANDARD TABLE,
+    <result>          TYPE any,
+    <field>           TYPE any,
+    <type>            TYPE any,
 *    <number>          type any,
-    <brf_key4>        type any,
-    <brf_key5>        type any,
-    <brf_key6>        type any,
-    <field_alv>       type any,
-    <general>         like line of lt_general,
+    <brf_key4>        TYPE any,
+    <brf_key5>        TYPE any,
+    <brf_key6>        TYPE any,
+    <field_alv>       TYPE any,
+    <general>         LIKE LINE OF lt_general,
 *    <general_default> like line of gt_default_fields,
-    <general_default> like line of gt_alvtop_key_fields,
-    <view_table>      like line of gt_view_tables,
-    <maw1>            like line of gt_maw1_sdm,
-    <mean>            like line of gt_mean_sdm,
-    <eine>            like line of gt_eine_sdm,
-    <eina>            like line of gt_eina_sdm,
-    <sdm_articles>    like line of gt_sdm_articles,
-    <instances>       like line of <sdm_articles>-sdm_instances,
-    <objects>         like line of gt_objects.
+    <general_default> LIKE LINE OF gt_alvtop_key_fields,
+    <view_table>      LIKE LINE OF gt_view_tables,
+    <maw1>            LIKE LINE OF gt_maw1_sdm,
+    <mean>            LIKE LINE OF gt_mean_sdm,
+    <eine>            LIKE LINE OF gt_eine_sdm,
+    <eina>            LIKE LINE OF gt_eina_sdm,
+    <sdm_articles>    LIKE LINE OF gt_sdm_articles,
+    <instances>       LIKE LINE OF <sdm_articles>-sdm_instances,
+    <objects>         LIKE LINE OF gt_objects.
 
-  perform progress_bar using text-018.
+  PERFORM progress_bar USING text-018.
 
-  describe table gt_mara lines lv_count.
-  perform progress_bar using text-018.
+  DESCRIBE TABLE gt_mara LINES lv_count.
+  PERFORM progress_bar USING text-018.
 
-  select * from /gda/sdm_setup4
-    into table lt_general
-    where  object_type = gc_object
+  SELECT * FROM /gda/sdm_setup4
+    INTO TABLE lt_general
+    WHERE  object_type = gc_object
 *      AND  field       = lv_field
 *      AND  tabname     = lv_table
-      and  outp        = abap_true.
+      AND  outp        = abap_true.
 
-  loop at gt_mara into gs_mara.
-    clear:
+  LOOP AT gt_mara INTO gs_mara.
+    CLEAR:
       lv_pur_text,
       lv_pur,
       lv_text.
 
-    refresh:
+    REFRESH:
      gt_mara_sdm,gt_marc_sdm,gt_mard_sdm,gt_mbew_sdm,gt_mlgn_sdm,
      gt_mlgt_sdm,gt_mvke_sdm,gt_myms_sdm,gt_maw1_sdm,gt_mean_sdm,
      gt_mwli_sdm,gt_meinh_sdm,gt_mamt_sdm,gt_malg_sdm,gt_ktex,
      gt_basic_text,gt_eine_sdm,gt_eina_sdm,gt_makt_sdm,gt_rmmw1_sdm,
      gt_konh_sdm,gt_wlk2_sdm,gt_wlk1_sdm,gt_mast_sdm,gt_mg03_sdm,
-     gt_eord_sdm,gt_mg03_sdm_brf,gt_tariff_sdm, gt_src_list_sdm,gt_pricing_sdm.
+     gt_eord_sdm,gt_mg03_sdm, gt_tariff_sdm, gt_src_list_sdm,gt_pricing_sdm.
 
 
     lv_pur = ( sy-tabix / lv_count ) * 100.
     lv_pur_text = lv_pur.
-    concatenate 'BRF Rules '(917) ':'  lv_pur_text '%' into lv_text separated by space.
-    perform progress_bar using lv_text.
+    CONCATENATE 'BRF Rules '(917) ':'  lv_pur_text '%' INTO lv_text SEPARATED BY space.
+    PERFORM progress_bar USING lv_text.
 
 * Default Views to icon successful
-    clear <dyn_wa>.
-    loop at gt_pp_main_setup assigning <main_setup>.
-      assign component <main_setup>-object_view of structure <dyn_wa> to <icon>.
-      if <icon> is assigned.
+    CLEAR <dyn_wa>.
+    LOOP AT gt_pp_main_setup ASSIGNING <main_setup>.
+      ASSIGN COMPONENT <main_setup>-object_view OF STRUCTURE <dyn_wa> TO <icon>.
+      IF <icon> IS ASSIGNED.
         <icon> = icon_green_light.
-        unassign <icon>.
-      endif.
-    endloop.
+        UNASSIGN <icon>.
+      ENDIF.
+    ENDLOOP.
 
 * BRF+ Logic
 * Prepare the data for BRF functions - pass to temp tables
-    perform prep_data using gs_mara.
+    PERFORM prep_data USING gs_mara.
 
 *    UNASSIGN <objects>.
 
 * For each Article process the BRF Functions
-    loop at gt_objects assigning <objects>.
-      clear:
+    LOOP AT gt_objects ASSIGNING <objects>.
+      CLEAR:
        <objects>-object.
 *      perform brf_logic  using <objects>-type
 *                               <objects>-mapping
@@ -1229,159 +1229,159 @@ form set_alv_data_new .
                                <objects>-stewardship
                          CHANGING <objects>-object.
 
-      if <objects>-object is not bound or  <objects>-object->mt_message is not initial.
+      IF <objects>-object IS NOT BOUND OR  <objects>-object->mt_message IS NOT INITIAL.
         gv_config_err = abap_true.
-        exit.
-      endif.
+        EXIT.
+      ENDIF.
 
-      if <results> is not assigned.
-        if <objects>-object is bound.
+      IF <results> IS NOT ASSIGNED.
+        IF <objects>-object IS BOUND.
           ro_data_empty  = <objects>-object->return_brf_result_structure( ).
-          if ro_data_empty is bound.
-            assign ro_data_empty->* to <results>.
-            refresh:
+          IF ro_data_empty IS BOUND.
+            ASSIGN ro_data_empty->* TO <results>.
+            REFRESH:
              <results>.
-          endif.
-        endif.
-      endif.
+          ENDIF.
+        ENDIF.
+      ENDIF.
 
-      if <objects>-object is bound.
+      IF <objects>-object IS BOUND.
         ro_data  = <objects>-object->return_brf_result( ).
-        if ro_data is bound.
-          assign ro_data->* to <results_pp1>.
-          if sy-subrc = 0 and <results_pp1> is not initial.
-            append lines of <results_pp1> to <results>.
-          endif.
-        endif.
-      endif.
+        IF ro_data IS BOUND.
+          ASSIGN ro_data->* TO <results_pp1>.
+          IF sy-subrc = 0 AND <results_pp1> IS NOT INITIAL.
+            APPEND LINES OF <results_pp1> TO <results>.
+          ENDIF.
+        ENDIF.
+      ENDIF.
 
       gs_instance-type   = <objects>-type.
       gs_instance-object = <objects>-object.
-      append gs_instance to gs_sdm_objects-sdm_instances.
-    endloop.
+      APPEND gs_instance TO gs_sdm_objects-sdm_instances.
+    ENDLOOP.
 
-    check gv_config_err = abap_false.
+    CHECK gv_config_err = abap_false.
 
-    if <results> is assigned.
-      sort <results>.
-      delete adjacent duplicates from <results>.
+    IF <results> IS ASSIGNED.
+      SORT <results>.
+      DELETE ADJACENT DUPLICATES FROM <results>.
 
-      if <results> is not initial.
-        loop at <results> assigning <result>.
+      IF <results> IS NOT INITIAL.
+        LOOP AT <results> ASSIGNING <result>.
 
-          perform message_filter using    <result>
-                                 changing lv_exit.
+          PERFORM message_filter USING    <result>
+                                 CHANGING lv_exit.
 
-          if lv_exit = abap_false.
+          IF lv_exit = abap_false.
 *          CHECK lv_exit = abap_false.
 
 * EXTRA_V1 contains table-field
-            assign component 'TYPE'     of structure <result> to <type>.
-            assign component 'EXTRA_V1' of structure <result> to <field>.
-            if <field> is assigned.
-              split <field> at '-' into lv_table lv_field.
-            endif.
+            ASSIGN COMPONENT 'TYPE'     OF STRUCTURE <result> TO <type>.
+            ASSIGN COMPONENT 'EXTRA_V1' OF STRUCTURE <result> TO <field>.
+            IF <field> IS ASSIGNED.
+              SPLIT <field> AT '-' INTO lv_table lv_field.
+            ENDIF.
 
-            loop at lt_general assigning <general> where field   = lv_field
-                                                     and tabname = lv_table.
+            LOOP AT lt_general ASSIGNING <general> WHERE field   = lv_field
+                                                     AND tabname = lv_table.
 
-              assign component <general>-object_view of structure <dyn_wa> to <icon>.
-              if sy-subrc = 0.
-                case <type>.
-                  when 'E'.
+              ASSIGN COMPONENT <general>-object_view OF STRUCTURE <dyn_wa> TO <icon>.
+              IF sy-subrc = 0.
+                CASE <type>.
+                  WHEN 'E'.
                     <icon> = icon_red_light.
-                  when 'W'.
-                    if <icon> ne icon_red_light.
+                  WHEN 'W'.
+                    IF <icon> NE icon_red_light.
                       <icon> = icon_yellow_light.
-                    endif.
-                  when others.
-                    if <icon> ne icon_red_light.
+                    ENDIF.
+                  WHEN OTHERS.
+                    IF <icon> NE icon_red_light.
                       <icon> = icon_green_light.
-                    endif.
-                endcase.
+                    ENDIF.
+                ENDCASE.
 
-              endif.
-            endloop.
-          else.
-            delete <results>." FROM <result>.
-          endif.
-        endloop.
-      endif.
-    endif.
+              ENDIF.
+            ENDLOOP.
+          ELSE.
+            DELETE <results>." FROM <result>.
+          ENDIF.
+        ENDLOOP.
+      ENDIF.
+    ENDIF.
 
 * Move MARA fields to general alv output
-    move-corresponding gs_mara to <dyn_wa>.
+    MOVE-CORRESPONDING gs_mara TO <dyn_wa>.
 * Ensure Default/Key fields are populated..
 
 *    loop at gt_default_fields assigning <general_default>.
-    loop at gt_alvtop_key_fields assigning <general_default>.
+    LOOP AT gt_alvtop_key_fields ASSIGNING <general_default>.
 
-      clear:
+      CLEAR:
        lv_field.
-      concatenate 'KEY_' <general_default>-field into lv_field.
-      assign component lv_field of structure <dyn_wa> to <field_alv>.
-      assign component <general_default>-field of structure gs_mara to <field>.
-      check sy-subrc = 0.
+      CONCATENATE 'KEY_' <general_default>-field INTO lv_field.
+      ASSIGN COMPONENT lv_field OF STRUCTURE <dyn_wa> TO <field_alv>.
+      ASSIGN COMPONENT <general_default>-field OF STRUCTURE gs_mara TO <field>.
+      CHECK sy-subrc = 0.
       <field_alv> = <field>.
-    endloop.
+    ENDLOOP.
 
-    clear:
+    CLEAR:
      gs_makt.
-    read table gt_makt into gs_makt with key matnr = gs_mara-matnr.
-    if sy-subrc = 0.
-      move-corresponding gs_makt to <dyn_wa>.
+    READ TABLE gt_makt INTO gs_makt WITH KEY matnr = gs_mara-matnr.
+    IF sy-subrc = 0.
+      MOVE-CORRESPONDING gs_makt TO <dyn_wa>.
 *    loop at gt_default_fields assigning <general_default>.
-    loop at gt_alvtop_key_fields assigning <general_default>.
-        clear:
+      LOOP AT gt_alvtop_key_fields ASSIGNING <general_default>.
+        CLEAR:
          lv_field.
-        concatenate 'KEY_' <general_default>-field into lv_field.
-        assign component lv_field of structure <dyn_wa> to <field_alv>.
-        assign component <general_default>-field of structure gs_makt to <field>.
-        check sy-subrc = 0.
+        CONCATENATE 'KEY_' <general_default>-field INTO lv_field.
+        ASSIGN COMPONENT lv_field OF STRUCTURE <dyn_wa> TO <field_alv>.
+        ASSIGN COMPONENT <general_default>-field OF STRUCTURE gs_makt TO <field>.
+        CHECK sy-subrc = 0.
         <field_alv> = <field>.
-      endloop.
-    endif.
+      ENDLOOP.
+    ENDIF.
 
 * MAW1
 
-    read table gt_view_tables assigning <view_table> with key table_line = 'MAW1'.
-    if sy-subrc = 0.
-      if gt_maw1_sdm is not initial.
-        loop at gt_maw1_sdm assigning <maw1>.
-          move-corresponding <maw1> to <dyn_wa>.
-        endloop.
-      endif.
-    endif.
+    READ TABLE gt_view_tables ASSIGNING <view_table> WITH KEY table_line = 'MAW1'.
+    IF sy-subrc = 0.
+      IF gt_maw1_sdm IS NOT INITIAL.
+        LOOP AT gt_maw1_sdm ASSIGNING <maw1>.
+          MOVE-CORRESPONDING <maw1> TO <dyn_wa>.
+        ENDLOOP.
+      ENDIF.
+    ENDIF.
 
 * MEAN
-    read table gt_view_tables assigning <view_table> with key table_line = 'MEAN'.
-    if sy-subrc = 0.
-      if gt_mean_sdm is not initial.
-        loop at gt_mean_sdm assigning <mean>.
-          move-corresponding <mean> to <dyn_wa>.
-        endloop.
-      endif.
-    endif.
+    READ TABLE gt_view_tables ASSIGNING <view_table> WITH KEY table_line = 'MEAN'.
+    IF sy-subrc = 0.
+      IF gt_mean_sdm IS NOT INITIAL.
+        LOOP AT gt_mean_sdm ASSIGNING <mean>.
+          MOVE-CORRESPONDING <mean> TO <dyn_wa>.
+        ENDLOOP.
+      ENDIF.
+    ENDIF.
 
 * EINE
-    read table gt_view_tables assigning <view_table> with key table_line = 'EINE'.
-    if sy-subrc = 0.
-      if gt_eine_sdm is not initial.
-        loop at gt_eine_sdm assigning <eine>.
-          move-corresponding <eine> to <dyn_wa>.
-        endloop.
-      endif.
-    endif.
+    READ TABLE gt_view_tables ASSIGNING <view_table> WITH KEY table_line = 'EINE'.
+    IF sy-subrc = 0.
+      IF gt_eine_sdm IS NOT INITIAL.
+        LOOP AT gt_eine_sdm ASSIGNING <eine>.
+          MOVE-CORRESPONDING <eine> TO <dyn_wa>.
+        ENDLOOP.
+      ENDIF.
+    ENDIF.
 
 * EINA
-    read table gt_view_tables assigning <view_table> with key table_line = 'EINA'.
-    if sy-subrc = 0.
-      if gt_eina_sdm is not initial.
-        loop at gt_eina_sdm assigning <eina>.
-          move-corresponding <eina> to <dyn_wa>.
-        endloop.
-      endif.
-    endif.
+    READ TABLE gt_view_tables ASSIGNING <view_table> WITH KEY table_line = 'EINA'.
+    IF sy-subrc = 0.
+      IF gt_eina_sdm IS NOT INITIAL.
+        LOOP AT gt_eina_sdm ASSIGNING <eina>.
+          MOVE-CORRESPONDING <eina> TO <dyn_wa>.
+        ENDLOOP.
+      ENDIF.
+    ENDIF.
 
 
 
@@ -1413,110 +1413,110 @@ ENHANCEMENT-POINT /gda/sdm_mm_art_ep6 SPOTS /gda/sdm_mm_art_es6 .
 
 
 
-    perform determine_output using gs_sdm_objects
-                             changing gt_sdm_articles.
+    PERFORM determine_output USING gs_sdm_objects
+                             CHANGING gt_sdm_articles.
 
-    clear gs_sdm_objects.
+    CLEAR gs_sdm_objects.
 
-    unassign:
+    UNASSIGN:
      <results>,
      <results_pp1>.
-  endloop.
+  ENDLOOP.
 
-  sort <dyn_table>.
-  sort gt_sdm_articles.
+  SORT <dyn_table>.
+  SORT gt_sdm_articles.
 
-  loop at gt_sdm_articles assigning <sdm_articles>.
-    unassign <results>.
+  LOOP AT gt_sdm_articles ASSIGNING <sdm_articles>.
+    UNASSIGN <results>.
 
-    loop at <sdm_articles>-sdm_instances assigning <instances>.
-      if <instances>-object is initial.
-        continue.
-      endif.
-      if <results> is not assigned.
+    LOOP AT <sdm_articles>-sdm_instances ASSIGNING <instances>.
+      IF <instances>-object IS INITIAL.
+        CONTINUE.
+      ENDIF.
+      IF <results> IS NOT ASSIGNED.
         ro_data_empty  = <instances>-object->return_brf_result_structure( ).
-        if ro_data_empty is bound.
-          assign ro_data_empty->* to <results>.
-          refresh:
+        IF ro_data_empty IS BOUND.
+          ASSIGN ro_data_empty->* TO <results>.
+          REFRESH:
            <results>.
-        else.
-          continue.
-        endif.
-      endif.
+        ELSE.
+          CONTINUE.
+        ENDIF.
+      ENDIF.
 
       ro_data        = <instances>-object->return_brf_result( ).
-      if ro_data is bound.
-        assign ro_data->* to <results_temp>.
-      endif.
+      IF ro_data IS BOUND.
+        ASSIGN ro_data->* TO <results_temp>.
+      ENDIF.
 
-      if <results_temp> is assigned  and <results_temp> is not initial.
-        append lines of <results_temp> to <results>.
-      endif.
-    endloop.
+      IF <results_temp> IS ASSIGNED  AND <results_temp> IS NOT INITIAL.
+        APPEND LINES OF <results_temp> TO <results>.
+      ENDIF.
+    ENDLOOP.
 
-    check <results> is assigned.
-    sort <results>.
-    delete adjacent duplicates from <results>.
+    CHECK <results> IS ASSIGNED.
+    SORT <results>.
+    DELETE ADJACENT DUPLICATES FROM <results>.
 
-    refresh lt_icons.
+    REFRESH lt_icons.
 
-    loop at <results> assigning <result>.
+    LOOP AT <results> ASSIGNING <result>.
 
-      perform message_filter using    <result>
-                             changing lv_exit.
+      PERFORM message_filter USING    <result>
+                             CHANGING lv_exit.
 
-      if lv_exit = abap_false.
+      IF lv_exit = abap_false.
 
-        assign component 'TYPE'     of structure <result> to <type>.
-        assign component 'EXTRA_V1' of structure <result> to <field>.
-        if <field> is assigned.
-          split <field> at '-' into lv_table lv_field.
+        ASSIGN COMPONENT 'TYPE'     OF STRUCTURE <result> TO <type>.
+        ASSIGN COMPONENT 'EXTRA_V1' OF STRUCTURE <result> TO <field>.
+        IF <field> IS ASSIGNED.
+          SPLIT <field> AT '-' INTO lv_table lv_field.
           ls_icons-field = lv_field.
-        endif.
+        ENDIF.
 * Get key object...
-        assign component 'EXTRA_V4' of structure <result> to <brf_key4>.
-        if <brf_key4> is assigned and <brf_key4> is not initial.
+        ASSIGN COMPONENT 'EXTRA_V4' OF STRUCTURE <result> TO <brf_key4>.
+        IF <brf_key4> IS ASSIGNED AND <brf_key4> IS NOT INITIAL.
           ls_icons-brf_key = <brf_key4>.
-        endif.
+        ENDIF.
 
-        if ls_icons-brf_key is initial.
-          assign component 'EXTRA_V5' of structure <result> to <brf_key5>.
-          if <brf_key5> is assigned  and <brf_key5> is not initial.
+        IF ls_icons-brf_key IS INITIAL.
+          ASSIGN COMPONENT 'EXTRA_V5' OF STRUCTURE <result> TO <brf_key5>.
+          IF <brf_key5> IS ASSIGNED  AND <brf_key5> IS NOT INITIAL.
             ls_icons-brf_key = <brf_key5>.
-          endif.
-        endif.
+          ENDIF.
+        ENDIF.
 
-        assign component 'EXTRA_V6' of structure <result> to <brf_key6>.
-        if <brf_key6> is assigned  and <brf_key6> is not initial.
-          clear: ls_icons-brf_key.
-          concatenate <brf_key5> '/' <brf_key6> into ls_icons-brf_key.
-        endif.
+        ASSIGN COMPONENT 'EXTRA_V6' OF STRUCTURE <result> TO <brf_key6>.
+        IF <brf_key6> IS ASSIGNED  AND <brf_key6> IS NOT INITIAL.
+          CLEAR: ls_icons-brf_key.
+          CONCATENATE <brf_key5> '/' <brf_key6> INTO ls_icons-brf_key.
+        ENDIF.
 
-        if ls_icons-brf_key is initial.
+        IF ls_icons-brf_key IS INITIAL.
           ls_icons-brf_key = <sdm_articles>-article.
-        endif.
+        ENDIF.
 
-        case <type>.
-          when 'E'.
+        CASE <type>.
+          WHEN 'E'.
             ls_icons-icon = icon_red_light.
-          when 'W'.
+          WHEN 'W'.
             ls_icons-icon = icon_yellow_light.
-          when others.
-        endcase.
+          WHEN OTHERS.
+        ENDCASE.
 
-        append ls_icons to lt_icons.
-        clear ls_icons.
-      else.
-        delete <results>.
-      endif.
-    endloop.
+        APPEND ls_icons TO lt_icons.
+        CLEAR ls_icons.
+      ELSE.
+        DELETE <results>.
+      ENDIF.
+    ENDLOOP.
     <sdm_articles>-icons[] = lt_icons[].
-    refresh:
+    REFRESH:
      lt_icons[].
-  endloop.
+  ENDLOOP.
 
-  perform progress_bar using text-019.
-endform.
+  PERFORM progress_bar USING text-019.
+ENDFORM.
 *&---------------------------------------------------------------------*
 *&      Form  PREP_DATA
 *&---------------------------------------------------------------------*
@@ -1525,417 +1525,417 @@ endform.
 *  -->  p1        text
 *  <--  p2        text
 *----------------------------------------------------------------------*
-form prep_data using x_mara type /gda/sdm_s_mara_01.
-  data:
+FORM prep_data USING x_mara TYPE /gda/sdm_s_mara_01.
+  DATA:
 *    lv_id       type thead-tdid,
 *    lv_name     type thead-tdname,
 *    lv_object   type thead-tdobject,
-    ls_marc_sdm like line of gt_marc_sdm,
-    ls_mard_sdm like line of gt_mard_sdm,
-    ls_mvke_sdm like line of gt_mvke_sdm,
-    ls_mbew_sdm like line of gt_mbew_sdm,
-    ls_wlk2_sdm like line of gt_wlk2_sdm,
-    ls_wlk1_sdm like line of gt_wlk1_sdm,
-    ls_mast_sdm like line of gt_mast_sdm,
-    ls_mlgn_sdm like line of gt_mlgn_sdm,
-    ls_mlgt_sdm like line of gt_mlgt_sdm,
-    ls_myms_sdm like line of gt_myms_sdm,
-    ls_maw1_sdm like line of gt_maw1_sdm,
-    ls_eord_sdm like line of gt_eord_sdm,
-    ls_mwli_sdm like line of gt_mwli_sdm,
-    ls_meinh_sdm like line of gt_meinh_sdm,
-    ls_malg_sdm like line of gt_malg_sdm,
-    ls_mean_sdm like line of gt_mean_sdm,
-    ls_eine_sdm  like line of gt_eine_sdm,
-    ls_eina_sdm  like line of gt_eina_sdm,
-    ls_konh_sdm like line of gt_konh_sdm.
+    ls_marc_sdm LIKE LINE OF gt_marc_sdm,
+    ls_mard_sdm LIKE LINE OF gt_mard_sdm,
+    ls_mvke_sdm LIKE LINE OF gt_mvke_sdm,
+    ls_mbew_sdm LIKE LINE OF gt_mbew_sdm,
+    ls_wlk2_sdm LIKE LINE OF gt_wlk2_sdm,
+    ls_wlk1_sdm LIKE LINE OF gt_wlk1_sdm,
+    ls_mast_sdm LIKE LINE OF gt_mast_sdm,
+    ls_mlgn_sdm LIKE LINE OF gt_mlgn_sdm,
+    ls_mlgt_sdm LIKE LINE OF gt_mlgt_sdm,
+    ls_myms_sdm LIKE LINE OF gt_myms_sdm,
+    ls_maw1_sdm LIKE LINE OF gt_maw1_sdm,
+    ls_eord_sdm LIKE LINE OF gt_eord_sdm,
+    ls_mwli_sdm LIKE LINE OF gt_mwli_sdm,
+    ls_meinh_sdm LIKE LINE OF gt_meinh_sdm,
+    ls_malg_sdm LIKE LINE OF gt_malg_sdm,
+    ls_mean_sdm LIKE LINE OF gt_mean_sdm,
+    ls_eine_sdm  LIKE LINE OF gt_eine_sdm,
+    ls_eina_sdm  LIKE LINE OF gt_eina_sdm,
+    ls_konh_sdm LIKE LINE OF gt_konh_sdm.
 *    ls_src_list type /gda/sdm_st_srclist.
 
-  field-symbols:
-    <makt>        like line of gt_makt,
-    <ttext>       like line of gt_ktex,
-    <marc>        like line of gt_marc,
-    <mard>        like line of gt_mard,
-    <mvke>        like line of gt_mvke,
-    <mbew>        like line of gt_mbew,
-    <mlgn>        like line of gt_mlgn,
-    <mlgt>        like line of gt_mlgt,
-    <mamt>        like line of gt_mamt,
-    <malg>        like line of gt_malg,
-    <marm>        like line of gt_marm,
-    <maw1>        like line of gt_maw1,
-    <eord>        like line of gt_eord,
-    <mean>        like line of gt_mean,
-    <eina>        like line of gt_eina,
-    <eina_sdm>    like line of gt_eina_sdm,
-    <eine>        like line of gt_eine,
-    <eine_sdm>    like line of gt_eine_sdm,
-    <marc_sdm>    like line of gt_marc_sdm,
-    <mvke_sdm>    like line of gt_mvke_sdm,
-    <konh>        like line of gt_konh,
-    <cond_header> like line of gt_cond_header,
-    <pricing>     like line of gt_pricing,
-    <wlk2>        like line of gt_wlk2,
-    <wlk1>        like line of gt_wlk1,
-    <mast>        like line of gt_mast,
-    <myms>        like line of gt_myms,
-    <mwli>        like line of gt_mwli,
-    <mg03>        like line of gt_mg03.
+  FIELD-SYMBOLS:
+    <makt>        LIKE LINE OF gt_makt,
+    <ttext>       LIKE LINE OF gt_ktex,
+    <marc>        LIKE LINE OF gt_marc,
+    <mard>        LIKE LINE OF gt_mard,
+    <mvke>        LIKE LINE OF gt_mvke,
+    <mbew>        LIKE LINE OF gt_mbew,
+    <mlgn>        LIKE LINE OF gt_mlgn,
+    <mlgt>        LIKE LINE OF gt_mlgt,
+    <mamt>        LIKE LINE OF gt_mamt,
+    <malg>        LIKE LINE OF gt_malg,
+    <marm>        LIKE LINE OF gt_marm,
+    <maw1>        LIKE LINE OF gt_maw1,
+    <eord>        LIKE LINE OF gt_eord,
+    <mean>        LIKE LINE OF gt_mean,
+    <eina>        LIKE LINE OF gt_eina,
+    <eina_sdm>    LIKE LINE OF gt_eina_sdm,
+    <eine>        LIKE LINE OF gt_eine,
+    <eine_sdm>    LIKE LINE OF gt_eine_sdm,
+    <marc_sdm>    LIKE LINE OF gt_marc_sdm,
+    <mvke_sdm>    LIKE LINE OF gt_mvke_sdm,
+    <konh>        LIKE LINE OF gt_konh,
+    <cond_header> LIKE LINE OF gt_cond_header,
+    <pricing>     LIKE LINE OF gt_pricing,
+    <wlk2>        LIKE LINE OF gt_wlk2,
+    <wlk1>        LIKE LINE OF gt_wlk1,
+    <mast>        LIKE LINE OF gt_mast,
+    <myms>        LIKE LINE OF gt_myms,
+    <mwli>        LIKE LINE OF gt_mwli,
+    <mg03>        LIKE LINE OF gt_mg03.
 
 * MAKT
-  loop at gt_makt assigning <makt> where matnr = x_mara-matnr.
-    append <makt> to gt_makt_sdm.
-  endloop.
+  LOOP AT gt_makt ASSIGNING <makt> WHERE matnr = x_mara-matnr.
+    APPEND <makt> TO gt_makt_sdm.
+  ENDLOOP.
 
-  read table gt_makt
-    into gs_makt_sdm
-    with key matnr = x_mara-matnr
+  READ TABLE gt_makt
+    INTO gs_makt_sdm
+    WITH KEY matnr = x_mara-matnr
              spras = sy-langu.
 
-  if sy-subrc = 0.
-    append initial line to gt_ktex assigning <ttext>.
+  IF sy-subrc = 0.
+    APPEND INITIAL LINE TO gt_ktex ASSIGNING <ttext>.
     <ttext>-maktx = gs_makt_sdm-maktx.
     <ttext>-spras = sy-langu.
-  endif.
+  ENDIF.
 
-  append x_mara to gt_mara_sdm.
+  APPEND x_mara TO gt_mara_sdm.
 * MARC
-  loop at gt_marc assigning <marc> where matnr = x_mara-matnr.
-    move-corresponding <marc> to ls_marc_sdm.
+  LOOP AT gt_marc ASSIGNING <marc> WHERE matnr = x_mara-matnr.
+    MOVE-CORRESPONDING <marc> TO ls_marc_sdm.
 
-    perform build_string_from_key using 'MARC'
+    PERFORM build_string_from_key USING 'MARC'
                                         ls_marc_sdm
-                                  changing ls_marc_sdm-sdm_tabkey.
+                                  CHANGING ls_marc_sdm-sdm_tabkey.
 
-    append ls_marc_sdm to gt_marc_sdm.
-    clear ls_marc_sdm-sdm_tabkey.
-  endloop.
+    APPEND ls_marc_sdm TO gt_marc_sdm.
+    CLEAR ls_marc_sdm-sdm_tabkey.
+  ENDLOOP.
 
 * MARD
-  loop at gt_mard assigning <mard> where matnr = x_mara-matnr.
-    move-corresponding <mard> to ls_mard_sdm.
-    perform build_string_from_key using 'MARD'
+  LOOP AT gt_mard ASSIGNING <mard> WHERE matnr = x_mara-matnr.
+    MOVE-CORRESPONDING <mard> TO ls_mard_sdm.
+    PERFORM build_string_from_key USING 'MARD'
                                         ls_mard_sdm
-                                  changing ls_mard_sdm-sdm_tabkey.
+                                  CHANGING ls_mard_sdm-sdm_tabkey.
 
-    append ls_mard_sdm to gt_mard_sdm.
-    clear ls_mard_sdm-sdm_tabkey.
-  endloop.
+    APPEND ls_mard_sdm TO gt_mard_sdm.
+    CLEAR ls_mard_sdm-sdm_tabkey.
+  ENDLOOP.
 
 * MVKE
-  loop at gt_mvke assigning <mvke> where matnr = x_mara-matnr.
-    move-corresponding <mvke> to ls_mvke_sdm.
-    perform build_string_from_key using 'MVKE'
+  LOOP AT gt_mvke ASSIGNING <mvke> WHERE matnr = x_mara-matnr.
+    MOVE-CORRESPONDING <mvke> TO ls_mvke_sdm.
+    PERFORM build_string_from_key USING 'MVKE'
                                         ls_mvke_sdm
-                                  changing ls_mvke_sdm-sdm_tabkey.
+                                  CHANGING ls_mvke_sdm-sdm_tabkey.
 
-    insert ls_mvke_sdm into table gt_mvke_sdm.
-  endloop.
+    INSERT ls_mvke_sdm INTO TABLE gt_mvke_sdm.
+  ENDLOOP.
 
 * MBEW
-  loop at gt_mbew assigning <mbew> where matnr = x_mara-matnr.
-    move-corresponding <mbew> to ls_mbew_sdm.
-    perform build_string_from_key using 'MBEW'
+  LOOP AT gt_mbew ASSIGNING <mbew> WHERE matnr = x_mara-matnr.
+    MOVE-CORRESPONDING <mbew> TO ls_mbew_sdm.
+    PERFORM build_string_from_key USING 'MBEW'
                                         ls_mbew_sdm
-                                  changing ls_mbew_sdm-sdm_tabkey.
+                                  CHANGING ls_mbew_sdm-sdm_tabkey.
 
-    append ls_mbew_sdm to gt_mbew_sdm.
-  endloop.
+    APPEND ls_mbew_sdm TO gt_mbew_sdm.
+  ENDLOOP.
 
 * MLGN
-  loop at gt_mlgn assigning <mlgn> where matnr = x_mara-matnr.
+  LOOP AT gt_mlgn ASSIGNING <mlgn> WHERE matnr = x_mara-matnr.
 
-    move-corresponding <mlgn> to ls_mlgn_sdm.
-    perform build_string_from_key using 'MLGN'
+    MOVE-CORRESPONDING <mlgn> TO ls_mlgn_sdm.
+    PERFORM build_string_from_key USING 'MLGN'
                                         ls_mlgn_sdm
-                                  changing ls_mlgn_sdm-sdm_tabkey.
+                                  CHANGING ls_mlgn_sdm-sdm_tabkey.
 
-    append ls_mlgn_sdm to gt_mlgn_sdm.
-  endloop.
+    APPEND ls_mlgn_sdm TO gt_mlgn_sdm.
+  ENDLOOP.
 
 * MLGT
-  loop at gt_mlgt assigning <mlgt> where matnr = x_mara-matnr.
-    move-corresponding <mlgt> to ls_mlgt_sdm.
-    perform build_string_from_key using 'MLGT'
+  LOOP AT gt_mlgt ASSIGNING <mlgt> WHERE matnr = x_mara-matnr.
+    MOVE-CORRESPONDING <mlgt> TO ls_mlgt_sdm.
+    PERFORM build_string_from_key USING 'MLGT'
                                         ls_mlgt_sdm
-                                  changing ls_mlgt_sdm-sdm_tabkey.
+                                  CHANGING ls_mlgt_sdm-sdm_tabkey.
 
-    append ls_mlgt_sdm to  gt_mlgt_sdm.
-  endloop.
+    APPEND ls_mlgt_sdm TO  gt_mlgt_sdm.
+  ENDLOOP.
 
 * MYMS
-  loop at gt_myms assigning <myms> where matnr = x_mara-matnr.
-    move-corresponding <myms> to ls_myms_sdm.
-    perform build_string_from_key using 'MYMS'
+  LOOP AT gt_myms ASSIGNING <myms> WHERE matnr = x_mara-matnr.
+    MOVE-CORRESPONDING <myms> TO ls_myms_sdm.
+    PERFORM build_string_from_key USING 'MYMS'
                                         ls_myms_sdm
-                                  changing ls_myms_sdm-sdm_tabkey.
+                                  CHANGING ls_myms_sdm-sdm_tabkey.
 
-    append ls_myms_sdm to  gt_myms_sdm.
-  endloop.
+    APPEND ls_myms_sdm TO  gt_myms_sdm.
+  ENDLOOP.
 
 * MWLI
-  loop at gt_mwli assigning <mwli> where matnr = x_mara-matnr.
+  LOOP AT gt_mwli ASSIGNING <mwli> WHERE matnr = x_mara-matnr.
 *    append <mwli> to  gt_mwli_sdm.
-    move-corresponding <mwli> to ls_mwli_sdm.
-    perform build_string_from_key using 'MWLI'
+    MOVE-CORRESPONDING <mwli> TO ls_mwli_sdm.
+    PERFORM build_string_from_key USING 'MWLI'
                                         ls_mwli_sdm
-                                  changing ls_mwli_sdm-sdm_tabkey.
+                                  CHANGING ls_mwli_sdm-sdm_tabkey.
 
-    append ls_mwli_sdm to  gt_mwli_sdm.
+    APPEND ls_mwli_sdm TO  gt_mwli_sdm.
 
-  endloop.
+  ENDLOOP.
 
 * MARM
-  loop at gt_marm assigning <marm> where matnr = x_mara-matnr.
-    move-corresponding <marm> to ls_meinh_sdm.
+  LOOP AT gt_marm ASSIGNING <marm> WHERE matnr = x_mara-matnr.
+    MOVE-CORRESPONDING <marm> TO ls_meinh_sdm.
     ls_meinh_sdm-ntgew = x_mara-ntgew.
-    append ls_meinh_sdm to gt_meinh_sdm.
-  endloop.
+    APPEND ls_meinh_sdm TO gt_meinh_sdm.
+  ENDLOOP.
 
 * MAMT
-  loop at gt_mamt assigning <mamt> where matnr = x_mara-matnr.
+  LOOP AT gt_mamt ASSIGNING <mamt> WHERE matnr = x_mara-matnr.
 *    MOVE-CORRESPONDING <mard> TO ls_mard_sdm.
-    perform build_string_from_key using 'MAMT'
+    PERFORM build_string_from_key USING 'MAMT'
                                         <mamt>
-                                  changing <mamt>-sdm_tabkey.
+                                  CHANGING <mamt>-sdm_tabkey.
 
 
-    append <mamt> to gt_mamt_sdm.
-  endloop.
+    APPEND <mamt> TO gt_mamt_sdm.
+  ENDLOOP.
 
 * MALG
-  loop at gt_malg assigning <malg> where matnr = x_mara-matnr.
+  LOOP AT gt_malg ASSIGNING <malg> WHERE matnr = x_mara-matnr.
 
-    move-corresponding <malg> to ls_malg_sdm.
-    perform build_string_from_key using 'MALG'
+    MOVE-CORRESPONDING <malg> TO ls_malg_sdm.
+    PERFORM build_string_from_key USING 'MALG'
                                         ls_malg_sdm
-                                  changing ls_malg_sdm-sdm_tabkey.
+                                  CHANGING ls_malg_sdm-sdm_tabkey.
 
-    append ls_malg_sdm to  gt_malg_sdm.
+    APPEND ls_malg_sdm TO  gt_malg_sdm.
 
 *    append <malg> to gt_malg_sdm.
-  endloop.
+  ENDLOOP.
 
 * MEIN
-  loop at gt_mean assigning <mean> where matnr = x_mara-matnr.
-    move-corresponding <mean> to ls_mean_sdm.
-    perform build_string_from_key using 'MEAN'
+  LOOP AT gt_mean ASSIGNING <mean> WHERE matnr = x_mara-matnr.
+    MOVE-CORRESPONDING <mean> TO ls_mean_sdm.
+    PERFORM build_string_from_key USING 'MEAN'
                                         ls_mean_sdm
-                                  changing ls_mean_sdm-sdm_tabkey.
+                                  CHANGING ls_mean_sdm-sdm_tabkey.
 
-    append ls_mean_sdm to  gt_mean_sdm.
+    APPEND ls_mean_sdm TO  gt_mean_sdm.
 
 
 *    append <mean> to gt_mean_sdm.
-  endloop.
+  ENDLOOP.
 
 * MAW1
-  loop at gt_maw1 assigning <maw1> where matnr = x_mara-matnr.
-    move-corresponding <maw1> to ls_maw1_sdm.
-    perform build_string_from_key using 'MAW1'
+  LOOP AT gt_maw1 ASSIGNING <maw1> WHERE matnr = x_mara-matnr.
+    MOVE-CORRESPONDING <maw1> TO ls_maw1_sdm.
+    PERFORM build_string_from_key USING 'MAW1'
                                         ls_maw1_sdm
-                                  changing ls_maw1_sdm-sdm_tabkey.
+                                  CHANGING ls_maw1_sdm-sdm_tabkey.
 
-    append ls_maw1_sdm to  gt_maw1_sdm.
+    APPEND ls_maw1_sdm TO  gt_maw1_sdm.
 
-  endloop.
+  ENDLOOP.
 
 * EORD
-  loop at gt_eord assigning <eord> where matnr = x_mara-matnr.
-    move-corresponding <eord> to ls_eord_sdm.
-    perform build_string_from_key using 'EORD'
+  LOOP AT gt_eord ASSIGNING <eord> WHERE matnr = x_mara-matnr.
+    MOVE-CORRESPONDING <eord> TO ls_eord_sdm.
+    PERFORM build_string_from_key USING 'EORD'
                                         ls_eord_sdm
-                                  changing ls_eord_sdm-sdm_tabkey.
+                                  CHANGING ls_eord_sdm-sdm_tabkey.
 
-    append ls_eord_sdm to  gt_eord_sdm.
+    APPEND ls_eord_sdm TO  gt_eord_sdm.
 
 
 *    append <eord> to gt_eord_sdm.
-  endloop.
+  ENDLOOP.
 
 * MBEW
-  loop at gt_mbew assigning <mbew> where matnr = x_mara-matnr.
+  LOOP AT gt_mbew ASSIGNING <mbew> WHERE matnr = x_mara-matnr.
 
-    move-corresponding <mbew> to ls_mbew_sdm.
-    perform build_string_from_key using 'MBEW'
+    MOVE-CORRESPONDING <mbew> TO ls_mbew_sdm.
+    PERFORM build_string_from_key USING 'MBEW'
                                         ls_mbew_sdm
-                                  changing ls_mbew_sdm-sdm_tabkey.
+                                  CHANGING ls_mbew_sdm-sdm_tabkey.
 
-    append ls_mbew_sdm to  gt_mbew_sdm.
+    APPEND ls_mbew_sdm TO  gt_mbew_sdm.
 
 *    append <mbew> to gt_mbew_sdm.
-  endloop.
+  ENDLOOP.
 
 * WLK2
-  loop at gt_wlk2 assigning <wlk2> where matnr = x_mara-matnr.
+  LOOP AT gt_wlk2 ASSIGNING <wlk2> WHERE matnr = x_mara-matnr.
 
-    move-corresponding <wlk2> to ls_wlk2_sdm.
-    perform build_string_from_key using 'WLK2'
+    MOVE-CORRESPONDING <wlk2> TO ls_wlk2_sdm.
+    PERFORM build_string_from_key USING 'WLK2'
                                         ls_wlk2_sdm
-                                  changing ls_wlk2_sdm-sdm_tabkey.
+                                  CHANGING ls_wlk2_sdm-sdm_tabkey.
 
-    append ls_wlk2_sdm to  gt_wlk2_sdm.
+    APPEND ls_wlk2_sdm TO  gt_wlk2_sdm.
 
 *    append <wlk2> to gt_wlk2_sdm.
-  endloop.
+  ENDLOOP.
 
 * WLK1
-  loop at gt_wlk1 assigning <wlk1> where artnr = x_mara-matnr.
+  LOOP AT gt_wlk1 ASSIGNING <wlk1> WHERE artnr = x_mara-matnr.
 
-    move-corresponding <wlk1> to ls_wlk1_sdm.
-    perform build_string_from_key using 'WLK1'
+    MOVE-CORRESPONDING <wlk1> TO ls_wlk1_sdm.
+    PERFORM build_string_from_key USING 'WLK1'
                                         ls_wlk1_sdm
-                                  changing ls_wlk1_sdm-sdm_tabkey.
+                                  CHANGING ls_wlk1_sdm-sdm_tabkey.
 
-    append ls_wlk1_sdm to  gt_wlk1_sdm.
+    APPEND ls_wlk1_sdm TO  gt_wlk1_sdm.
 
 *    append <wlk1> to gt_wlk1_sdm.
-  endloop.
+  ENDLOOP.
 
 * MAST
-  loop at gt_mast assigning <mast> where matnr = x_mara-matnr.
+  LOOP AT gt_mast ASSIGNING <mast> WHERE matnr = x_mara-matnr.
 
-    move-corresponding <mast> to ls_mast_sdm.
-    perform build_string_from_key using 'MAST'
+    MOVE-CORRESPONDING <mast> TO ls_mast_sdm.
+    PERFORM build_string_from_key USING 'MAST'
                                         ls_mast_sdm
-                                  changing ls_mast_sdm-sdm_tabkey.
+                                  CHANGING ls_mast_sdm-sdm_tabkey.
 
-    append ls_mast_sdm to  gt_mast_sdm.
+    APPEND ls_mast_sdm TO  gt_mast_sdm.
 
 *    append <mast> to gt_mast_sdm.
-  endloop.
+  ENDLOOP.
 
 * TAX
-  loop at gt_mg03 assigning <mg03> where matnr = x_mara-matnr.
-    move-corresponding <mg03>-mg03steuer to gs_mg03_sdm.
+  LOOP AT gt_mg03 ASSIGNING <mg03> WHERE matnr = x_mara-matnr.
+    MOVE-CORRESPONDING <mg03>-mg03steuer TO gs_mg03_sdm.
     gs_mg03_sdm-matnr = <mg03>-matnr.
-    append gs_mg03_sdm to gt_mg03_sdm.
+    APPEND gs_mg03_sdm TO gt_mg03_sdm.
 
-    move-corresponding <mg03>-mg03steuer to gs_mg03_sdm_brf.
-    append gs_mg03_sdm_brf to gt_mg03_sdm_brf.
+    MOVE-CORRESPONDING <mg03>-mg03steuer TO gs_mg03_sdm_brf.
+    APPEND gs_mg03_sdm_brf TO gt_mg03_sdm.
 
-    clear:
+    CLEAR:
       gs_mg03_sdm,
       gs_mg03_sdm_brf.
-  endloop.
+  ENDLOOP.
 
 * EINE AND EINA
-  read table gt_eina transporting no fields
-   with key matnr = x_mara-matnr binary search.
-  if sy-subrc = 0.
-    loop at gt_eina assigning <eina> from sy-tabix.
-      if <eina>-matnr <> x_mara-matnr.
-        exit.
-      else.
+  READ TABLE gt_eina TRANSPORTING NO FIELDS
+   WITH KEY matnr = x_mara-matnr BINARY SEARCH.
+  IF sy-subrc = 0.
+    LOOP AT gt_eina ASSIGNING <eina> FROM sy-tabix.
+      IF <eina>-matnr <> x_mara-matnr.
+        EXIT.
+      ELSE.
 *        append <eina> to gt_eina_sdm.
 
-        move-corresponding <eina> to ls_eina_sdm.
-        perform build_string_from_key using 'EINA'
+        MOVE-CORRESPONDING <eina> TO ls_eina_sdm.
+        PERFORM build_string_from_key USING 'EINA'
                                             ls_eina_sdm
-                                      changing ls_eina_sdm-sdm_tabkey.
+                                      CHANGING ls_eina_sdm-sdm_tabkey.
 
-        append ls_eina_sdm to  gt_eina_sdm.
+        APPEND ls_eina_sdm TO  gt_eina_sdm.
 
 
 * EINE
-        loop at gt_eine assigning <eine>
-          where mandt = sy-mandt and infnr = <eina>-infnr.
+        LOOP AT gt_eine ASSIGNING <eine>
+          WHERE mandt = sy-mandt AND infnr = <eina>-infnr.
 *          append <eine> to gt_eine_sdm.
-          move-corresponding <eine> to ls_eine_sdm.
-          perform build_string_from_key using 'EINE'
+          MOVE-CORRESPONDING <eine> TO ls_eine_sdm.
+          PERFORM build_string_from_key USING 'EINE'
                                               ls_eine_sdm
-                                        changing ls_eine_sdm-sdm_tabkey.
+                                        CHANGING ls_eine_sdm-sdm_tabkey.
 
-          append ls_eine_sdm to  gt_eine_sdm.
+          APPEND ls_eine_sdm TO  gt_eine_sdm.
 
-        endloop.
-      endif.
-    endloop.
-  endif.
+        ENDLOOP.
+      ENDIF.
+    ENDLOOP.
+  ENDIF.
 
 * KONH
-  read table gt_cond_header assigning <cond_header>
-   with key matnr = x_mara-matnr binary search.
-  if sy-subrc = 0.
-    loop at gt_konh assigning <konh> where knumh = <cond_header>-knumh.
-      move-corresponding <konh> to ls_konh_sdm.
-      perform build_string_from_key using 'KONH'
+  READ TABLE gt_cond_header ASSIGNING <cond_header>
+   WITH KEY matnr = x_mara-matnr BINARY SEARCH.
+  IF sy-subrc = 0.
+    LOOP AT gt_konh ASSIGNING <konh> WHERE knumh = <cond_header>-knumh.
+      MOVE-CORRESPONDING <konh> TO ls_konh_sdm.
+      PERFORM build_string_from_key USING 'KONH'
                                           ls_konh_sdm
-                                    changing ls_konh_sdm-sdm_tabkey.
+                                    CHANGING ls_konh_sdm-sdm_tabkey.
 
-      append ls_konh_sdm to  gt_konh_sdm.
+      APPEND ls_konh_sdm TO  gt_konh_sdm.
 
 *      append <konh> to gt_konh_sdm.
-    endloop.
-  endif.
+    ENDLOOP.
+  ENDIF.
 
 * Pricing
-  read table gt_pricing assigning <pricing>
-   with key matnr = x_mara-matnr. " BINARY SEARCH.
-  if sy-subrc = 0.
-    append <pricing> to gt_pricing_sdm.
-  endif.
+  READ TABLE gt_pricing ASSIGNING <pricing>
+   WITH KEY matnr = x_mara-matnr. " BINARY SEARCH.
+  IF sy-subrc = 0.
+    APPEND <pricing> TO gt_pricing_sdm.
+  ENDIF.
 
 * Tariff
-  if not gt_mvke_sdm is initial.
-    call function '/GDA/SDM_PP_BRF_TARIFF1'
-      exporting
+  IF NOT gt_mvke_sdm IS INITIAL.
+    CALL FUNCTION '/GDA/SDM_PP_BRF_TARIFF1'
+      EXPORTING
         x_matnr  = x_mara-matnr
         xt_mvke  = gt_mvke_sdm
-      importing
+      IMPORTING
         y_result = gt_tariff_sdm.
-  endif.
+  ENDIF.
 
 * populate stores
-  loop at gt_marc_sdm assigning <marc_sdm>.
-    select single werks from t001w
-                        into gs_rmmw1-fiwrk
-                      where werks = <marc_sdm>-werks
-                       and vlfkz = 'A'.
-    check sy-subrc = 0.
-    append gs_rmmw1 to gt_rmmw1_sdm.
-  endloop.
+  LOOP AT gt_marc_sdm ASSIGNING <marc_sdm>.
+    SELECT SINGLE werks FROM t001w
+                        INTO gs_rmmw1-fiwrk
+                      WHERE werks = <marc_sdm>-werks
+                       AND vlfkz = 'A'.
+    CHECK sy-subrc = 0.
+    APPEND gs_rmmw1 TO gt_rmmw1_sdm.
+  ENDLOOP.
 
 * populate DC
-  clear: gs_rmmw1.
-  loop at gt_marc_sdm assigning <marc_sdm>.
-    select single werks from t001w
-                        into gs_rmmw1-vzwrk
-                      where werks = <marc_sdm>-werks
-                        and vlfkz = 'B'.
-    check sy-subrc = 0.
-    append gs_rmmw1 to gt_rmmw1_sdm.
-  endloop.
+  CLEAR: gs_rmmw1.
+  LOOP AT gt_marc_sdm ASSIGNING <marc_sdm>.
+    SELECT SINGLE werks FROM t001w
+                        INTO gs_rmmw1-vzwrk
+                      WHERE werks = <marc_sdm>-werks
+                        AND vlfkz = 'B'.
+    CHECK sy-subrc = 0.
+    APPEND gs_rmmw1 TO gt_rmmw1_sdm.
+  ENDLOOP.
 
 * populate Sales org
-  clear: gs_rmmw1.
-  loop at gt_mvke_sdm assigning <mvke_sdm>.
+  CLEAR: gs_rmmw1.
+  LOOP AT gt_mvke_sdm ASSIGNING <mvke_sdm>.
     gs_rmmw1-vkorg = <mvke_sdm>-vkorg.
     gs_rmmw1-vtweg = <mvke_sdm>-vtweg.
-    collect gs_rmmw1 into gt_rmmw1_sdm.
-  endloop.
+    COLLECT gs_rmmw1 INTO gt_rmmw1_sdm.
+  ENDLOOP.
 
 * populate Vendor
-  clear: gs_rmmw1.
-  loop at gt_eina_sdm assigning <eina_sdm>.
-    read table gt_eine_sdm assigning <eine_sdm> with key infnr = <eina_sdm>-infnr.
+  CLEAR: gs_rmmw1.
+  LOOP AT gt_eina_sdm ASSIGNING <eina_sdm>.
+    READ TABLE gt_eine_sdm ASSIGNING <eine_sdm> WITH KEY infnr = <eina_sdm>-infnr.
     gs_rmmw1-lifnr = <eina_sdm>-lifnr.
-    if <eine_sdm> is assigned.
+    IF <eine_sdm> IS ASSIGNED.
       gs_rmmw1-ekorg = <eine_sdm>-ekorg.
-    endif.
-    append gs_rmmw1 to gt_rmmw1_sdm.
-  endloop.
+    ENDIF.
+    APPEND gs_rmmw1 TO gt_rmmw1_sdm.
+  ENDLOOP.
 
-  call function '/GDA/SDM_PP_BRF_SRC_LIST2'
-    exporting
+  CALL FUNCTION '/GDA/SDM_PP_BRF_SRC_LIST2'
+    EXPORTING
       x_matnr  = x_mara-matnr
-    importing
+    IMPORTING
       y_result = gt_src_list_sdm
-    tables
+    TABLES
       xt_eord  = gt_eord_sdm
       xt_rmmw1 = gt_rmmw1_sdm.
-  perform additional_data2 using x_mara. ##NEEDED.
-endform.                    " BRF_LOGIC
+  PERFORM additional_data2 USING x_mara. ##NEEDED.
+ENDFORM.                    " BRF_LOGIC
 
 *form set_data using p_type        type /gda/sdm_de_type
 *              changing xo_article type ref to /gda/sdm_cl_core. "/gda/sdm_cl_article.
@@ -2040,41 +2040,41 @@ endform.                    " BRF_LOGIC
 *  -->  p1        text
 *  <--  p2        text
 *----------------------------------------------------------------------*
-form set_up_relations .
-  data:
-    lt_relations       type standard table of struc_rel.
+FORM set_up_relations .
+  DATA:
+    lt_relations       TYPE STANDARD TABLE OF struc_rel.
 *    lt_relations_extra type standard table of struc_rel,
 *    lv_matnr           type mara-matnr.
 
-  field-symbols:
-    <matnr>          type any,
-    <linkage>        type any,
+  FIELD-SYMBOLS:
+    <matnr>          TYPE any,
+    <linkage>        TYPE any,
 *    <matnr_new>      type any,
-    <attyp>          type any,
-    <relations>      like line of gt_relations.
+    <attyp>          TYPE any,
+    <relations>      LIKE LINE OF gt_relations.
 *    <relations_copy> like line of lt_relations.
 
-  loop at <dyn_table> assigning <dyn_wa>.
-    assign component 'KEY_MATNR' of structure <dyn_wa> to <matnr>.
-    check sy-subrc = 0.
-    assign component 'KEY_ATTYP' of structure <dyn_wa> to <attyp>.
-    check sy-subrc = 0.
-    assign component 'LINKAGE' of structure <dyn_wa> to <linkage>.
+  LOOP AT <dyn_table> ASSIGNING <dyn_wa>.
+    ASSIGN COMPONENT 'KEY_MATNR' OF STRUCTURE <dyn_wa> TO <matnr>.
+    CHECK sy-subrc = 0.
+    ASSIGN COMPONENT 'KEY_ATTYP' OF STRUCTURE <dyn_wa> TO <attyp>.
+    CHECK sy-subrc = 0.
+    ASSIGN COMPONENT 'LINKAGE' OF STRUCTURE <dyn_wa> TO <linkage>.
 
-    check sy-subrc = 0.
-    read table gt_relations assigning <relations> with key matnr_rel = <matnr>.
-    if sy-subrc = 0.
+    CHECK sy-subrc = 0.
+    READ TABLE gt_relations ASSIGNING <relations> WITH KEY matnr_rel = <matnr>.
+    IF sy-subrc = 0.
       <linkage> = <relations>-matnr.
-    else.
-      if <attyp> = '11' or <attyp> =  '01' or <attyp> = '10'  or <attyp> = '12'.
+    ELSE.
+      IF <attyp> = '11' OR <attyp> =  '01' OR <attyp> = '10'  OR <attyp> = '12'.
         <linkage> = <matnr>.
-      endif.
-    endif.
-    check <relations> is assigned.
-    delete gt_relations where matnr     = <relations>-matnr
-                          and matnr_rel = <relations>-matnr_rel.
-  endloop.
-endform.
+      ENDIF.
+    ENDIF.
+    CHECK <relations> IS ASSIGNED.
+    DELETE gt_relations WHERE matnr     = <relations>-matnr
+                          AND matnr_rel = <relations>-matnr_rel.
+  ENDLOOP.
+ENDFORM.
 *&---------------------------------------------------------------------*
 *&      Form  FORMAT_FINAL
 *&---------------------------------------------------------------------*
@@ -2261,147 +2261,147 @@ endform.
 *
 *ENDFORM.                    " AT_SELECTION_SCREEN
 
-form create_hierarchy using x_matnr
+FORM create_hierarchy USING x_matnr
                             x_column
-                            xt_keys  type lvc_t_nkey.
+                            xt_keys  TYPE lvc_t_nkey.
 
-  data:
-    lv_folder_1      type lvc_nkey,
-    lv_folder_2      type lvc_nkey,
-    lv_leaf_1        type lvc_nkey,
-    lv_leaf_context  type lvc_nkey,
-    lv_key_context   type lvc_nkey,
-    lv_mess_id(6)    type c,
-    lv_field         type fieldname,
-    lv_table         type struc1,
-    lv_tabname       type tabname,
-    lv_context_added type boolean,
-    lv_image         type tv_image,
-    lv_image2        type tv_image,
-    ls_result        type /gda/sdm_s_val_results,
-    lv_key_attribute type string,
-    ro_data          type ref to data,
-    ro_data_empty    type ref to data.
+  DATA:
+    lv_folder_1      TYPE lvc_nkey,
+    lv_folder_2      TYPE lvc_nkey,
+    lv_leaf_1        TYPE lvc_nkey,
+    lv_leaf_context  TYPE lvc_nkey,
+    lv_key_context   TYPE lvc_nkey,
+    lv_mess_id(6)    TYPE c,
+    lv_field         TYPE fieldname,
+    lv_table         TYPE struc1,
+    lv_tabname       TYPE tabname,
+    lv_context_added TYPE boolean,
+    lv_image         TYPE tv_image,
+    lv_image2        TYPE tv_image,
+    ls_result        TYPE /gda/sdm_s_val_results,
+    lv_key_attribute TYPE string,
+    ro_data          TYPE REF TO data,
+    ro_data_empty    TYPE REF TO data.
 
-  field-symbols:
-    <sdm_object>      like line of gt_sdm_articles,
+  FIELD-SYMBOLS:
+    <sdm_object>      LIKE LINE OF gt_sdm_articles,
 *    <struc>           LIKE LINE OF gt_view_struc,
-    <main_output_02>  like line of gt_pp_output,
-    <instances>       like line of <sdm_object>-sdm_instances,
-    <results>         type standard table,
-    <results_temp>    type standard table,
-    <result>          type any,
-    <field>           type any,
+    <main_output_02>  LIKE LINE OF gt_pp_output,
+    <instances>       LIKE LINE OF <sdm_object>-sdm_instances,
+    <results>         TYPE STANDARD TABLE,
+    <results_temp>    TYPE STANDARD TABLE,
+    <result>          TYPE any,
+    <field>           TYPE any,
 *    <brf_key>         TYPE any,
-    <line_primary>    type any,
-    <line_02>         type any,
-    <key_field_main>  type any,
-    <key_field_attr>  type any,
-    <context_field>   type any,
-    <key_field>       type any,
-    <table_primary>   type any table,
-    <table_secondary> type any table.
+    <line_primary>    TYPE any,
+    <line_02>         TYPE any,
+    <key_field_main>  TYPE any,
+    <key_field_attr>  TYPE any,
+    <context_field>   TYPE any,
+    <key_field>       TYPE any,
+    <table_primary>   TYPE ANY TABLE,
+    <table_secondary> TYPE ANY TABLE.
 
-  read table gt_sdm_articles assigning <sdm_object> with key article = x_matnr.
+  READ TABLE gt_sdm_articles ASSIGNING <sdm_object> WITH KEY article = x_matnr.
 
 * Collate results tab
-  loop at <sdm_object>-sdm_instances assigning <instances>.
-    if <instances>-object is initial.
-      continue.
-    endif.
-    if <results> is not assigned.
+  LOOP AT <sdm_object>-sdm_instances ASSIGNING <instances>.
+    IF <instances>-object IS INITIAL.
+      CONTINUE.
+    ENDIF.
+    IF <results> IS NOT ASSIGNED.
       ro_data_empty  = <instances>-object->return_brf_result_structure( ).
-      assign ro_data_empty->* to <results>.
-      refresh:
+      ASSIGN ro_data_empty->* TO <results>.
+      REFRESH:
        <results>.
-    endif.
+    ENDIF.
 
     ro_data        = <instances>-object->return_brf_result( ).
-    assign ro_data->* to <results_temp>.
+    ASSIGN ro_data->* TO <results_temp>.
 
-    if <results_temp> is assigned  and <results_temp> is not initial.
-      append lines of <results_temp> to <results>.
-    endif.
-  endloop.
+    IF <results_temp> IS ASSIGNED  AND <results_temp> IS NOT INITIAL.
+      APPEND LINES OF <results_temp> TO <results>.
+    ENDIF.
+  ENDLOOP.
 
-  sort <results>.
-  delete adjacent duplicates from <results>.
+  SORT <results>.
+  DELETE ADJACENT DUPLICATES FROM <results>.
 
 * Create folder - 'BRF Errors All'
-  perform add_folder using "LV_MESS_ID
+  PERFORM add_folder USING "LV_MESS_ID
                            ''
                            text-007
                            '1'
-                    changing lv_folder_1.
+                    CHANGING lv_folder_1.
 
-  append lv_folder_1 to xt_keys.
+  APPEND lv_folder_1 TO xt_keys.
 
 
-  loop at <results> assigning <result>.
+  LOOP AT <results> ASSIGNING <result>.
 *  Determine if error is related to the selected view
 
-    clear:
+    CLEAR:
      lv_table,
      lv_field.
 
-    read table gt_pp_main_setup assigning <main_setup> with key object_view = x_column.
+    READ TABLE gt_pp_main_setup ASSIGNING <main_setup> WITH KEY object_view = x_column.
 
 * EXTRA_V1 contains table-field
-    assign component 'EXTRA_V1' of structure <result> to <field>.
-    if <field> is assigned.
-      split <field> at '-' into lv_table-table lv_field.
-      read table <main_setup>-tabstruc  with key fieldname = lv_field
-                                                 tabname = lv_table-table transporting no fields.
-      if sy-subrc <> 0.
-        continue.
-      endif.
-    endif.
+    ASSIGN COMPONENT 'EXTRA_V1' OF STRUCTURE <result> TO <field>.
+    IF <field> IS ASSIGNED.
+      SPLIT <field> AT '-' INTO lv_table-table lv_field.
+      READ TABLE <main_setup>-tabstruc  WITH KEY fieldname = lv_field
+                                                 tabname = lv_table-table TRANSPORTING NO FIELDS.
+      IF sy-subrc <> 0.
+        CONTINUE.
+      ENDIF.
+    ENDIF.
 
-    move-corresponding <result> to ls_result.
+    MOVE-CORRESPONDING <result> TO ls_result.
 
     lv_mess_id = ls_result-number.
 
 * Add BRF+ result to 'BRF Errors All' folder
-    perform add_id using lv_folder_1
+    PERFORM add_id USING lv_folder_1
                          ls_result
-                changing lv_leaf_1.
-  endloop.
+                CHANGING lv_leaf_1.
+  ENDLOOP.
 
 * Create folder - 'Context'
-  perform add_folder using ''
+  PERFORM add_folder USING ''
                            text-008
                            '1'
-                  changing lv_folder_1.
+                  CHANGING lv_folder_1.
 
-  loop at <main_setup>-sequence assigning <main_output> where seq = '1'.
+  LOOP AT <main_setup>-sequence ASSIGNING <main_output> WHERE seq = '1'.
     lv_tabname = '<SDM_OBJECT>-&&&&'.
-    replace all occurrences of '&&&&' in lv_tabname with <main_output>-tabname.
+    REPLACE ALL OCCURRENCES OF '&&&&' IN lv_tabname WITH <main_output>-tabname.
 
-    assign (lv_tabname) to <table_primary>.
+    ASSIGN (lv_tabname) TO <table_primary>.
 * Loop through primary table
 * Extract fields from primary table that are specified in config
-    check <table_primary> is assigned.
-    loop at <table_primary> assigning <line_primary>.
+    CHECK <table_primary> IS ASSIGNED.
+    LOOP AT <table_primary> ASSIGNING <line_primary>.
 * Get key for this table entry...
-      assign component <main_output>-node_level  of structure <line_primary> to <key_field_main>.
+      ASSIGN COMPONENT <main_output>-node_level  OF STRUCTURE <line_primary> TO <key_field_main>.
 
 * Special Case!
-      if <main_output>-node_level = 'VKORG'.
-        assign component 'VTWEG' of structure <line_primary> to <key_field_attr>.
-        if <key_field_attr> is assigned.
+      IF <main_output>-node_level = 'VKORG'.
+        ASSIGN COMPONENT 'VTWEG' OF STRUCTURE <line_primary> TO <key_field_attr>.
+        IF <key_field_attr> IS ASSIGNED.
           lv_key_attribute = <key_field_attr>.
-        endif.
-      endif.
+        ENDIF.
+      ENDIF.
 
-      if <key_field_main> is assigned and sy-subrc = 0.
+      IF <key_field_main> IS ASSIGNED AND sy-subrc = 0.
 * Add entry to : Create folder - 'Context'
-        clear:
+        CLEAR:
          lv_image,
          lv_image2.
 
 * Determine if this context folder contains an error, if it does then mark with an error icon..
-        loop at <results> assigning <result>.
-          perform determine_icon using x_matnr
+        LOOP AT <results> ASSIGNING <result>.
+          PERFORM determine_icon USING x_matnr
                                        <main_output>-node_level
                                        <key_field_main>
                                        lv_key_attribute
@@ -2409,70 +2409,70 @@ form create_hierarchy using x_matnr
 *                                       ' '
                                        <result>
                                        <main_setup>
-                                  changing lv_image
+                                  CHANGING lv_image
                                            lv_image2.
 
-          if lv_image = icon_failure.
-            exit.
-          endif.
-        endloop.
+          IF lv_image = icon_failure.
+            EXIT.
+          ENDIF.
+        ENDLOOP.
 
-        perform add_context_key using lv_folder_1
+        PERFORM add_context_key USING lv_folder_1
                                       <key_field_main>
                                       lv_key_attribute
                                       <main_output>-node_level
                                       <main_output>-tabname
                                       lv_image
                                       lv_image2
-                             changing lv_key_context.
+                             CHANGING lv_key_context.
 
 * Create Folder - 'BRF Errors'
-        if lv_image = icon_failure.
-          perform add_folder using lv_key_context
+        IF lv_image = icon_failure.
+          PERFORM add_folder USING lv_key_context
                                    text-009
                                    '1'
-                          changing lv_folder_2.
+                          CHANGING lv_folder_2.
 
 * Now add the relevant errors..START
-          loop at <results> assigning <result>.
+          LOOP AT <results> ASSIGNING <result>.
 
-            perform add_context_errors using x_matnr
+            PERFORM add_context_errors USING x_matnr
                                              <key_field_main>
                                              lv_key_attribute
                                              lv_folder_2
                                              ' '
                                              <result>
                                              <main_setup>
-                                    changing lv_mess_id
+                                    CHANGING lv_mess_id
                                              lv_leaf_1.
 
-          endloop.
-        endif.
-      endif.
+          ENDLOOP.
+        ENDIF.
+      ENDIF.
 
 * Include Context fields for main table on ALV Tree
-      loop at <main_setup>-tabstruc assigning <tabstruc>.
-        if <tabstruc>-fieldname = 'MESSAGE'.
-          continue.
-        endif.
+      LOOP AT <main_setup>-tabstruc ASSIGNING <tabstruc>.
+        IF <tabstruc>-fieldname = 'MESSAGE'.
+          CONTINUE.
+        ENDIF.
 
-        unassign:
+        UNASSIGN:
          <context_field>,
          <key_field>.
 
-        if <tabstruc>-fieldname cs 'KEY_'.
-          continue.
-        else.
-          assign component <tabstruc>-fieldname  of structure <line_primary> to <context_field>.
-        endif.
+        IF <tabstruc>-fieldname CS 'KEY_'.
+          CONTINUE.
+        ELSE.
+          ASSIGN COMPONENT <tabstruc>-fieldname  OF STRUCTURE <line_primary> TO <context_field>.
+        ENDIF.
 
 * is the context field found in the Primary table?
 * Yes - then do logic
 * No  - then find in seconday tables
-        if <context_field> is assigned.
+        IF <context_field> IS ASSIGNED.
 
-          perform add_context_value
-             using "LV_MESS_ID
+          PERFORM add_context_value
+             USING "LV_MESS_ID
                    lv_key_context
                    <context_field>
                    <tabstruc>-fieldname
@@ -2481,370 +2481,370 @@ form create_hierarchy using x_matnr
                    lv_key_attribute
                    <sdm_object>
 *                   LV_SHOW_ICON
-          changing lv_leaf_context.
+          CHANGING lv_leaf_context.
 * Assume the value exists in a secondary table..
-        else.
+        ELSE.
 
           lv_context_added = abap_false.
 
-          loop at <main_setup>-sequence assigning <main_output_02> where seq = '2'.
-            if lv_context_added = abap_true.
-              continue.
-            endif.
+          LOOP AT <main_setup>-sequence ASSIGNING <main_output_02> WHERE seq = '2'.
+            IF lv_context_added = abap_true.
+              CONTINUE.
+            ENDIF.
 
-            unassign:
+            UNASSIGN:
              <context_field>,
              <table_secondary>.
 
-            if <main_output_02> is assigned.
+            IF <main_output_02> IS ASSIGNED.
               lv_tabname = '<SDM_OBJECT>-&&&&'.
-              replace all occurrences of '&&&&' in lv_tabname with <main_output_02>-tabname.
-              assign (lv_tabname) to <table_secondary>.
+              REPLACE ALL OCCURRENCES OF '&&&&' IN lv_tabname WITH <main_output_02>-tabname.
+              ASSIGN (lv_tabname) TO <table_secondary>.
 
-              check <table_secondary> is assigned.
-              loop at <table_secondary> assigning <line_02>.
-                unassign <context_field>.
-                assign component <main_output>-node_level of structure <line_02> to <context_field>.
+              CHECK <table_secondary> IS ASSIGNED.
+              LOOP AT <table_secondary> ASSIGNING <line_02>.
+                UNASSIGN <context_field>.
+                ASSIGN COMPONENT <main_output>-node_level OF STRUCTURE <line_02> TO <context_field>.
 
-                check <context_field> is assigned.
-                check <key_field_main> eq <context_field>.
+                CHECK <context_field> IS ASSIGNED.
+                CHECK <key_field_main> EQ <context_field>.
 
-                assign component <main_output>-node_level  of structure <line_02> to <key_field>.
-                if <key_field> is assigned and <key_field> <> <key_field_main>.
-                  continue.
-                endif.
+                ASSIGN COMPONENT <main_output>-node_level  OF STRUCTURE <line_02> TO <key_field>.
+                IF <key_field> IS ASSIGNED AND <key_field> <> <key_field_main>.
+                  CONTINUE.
+                ENDIF.
 
-                if <tabstruc>-fieldname cs 'KEY_'.
+                IF <tabstruc>-fieldname CS 'KEY_'.
 *                    ASSIGN COMPONENT <TABSTRUC>-FIELDNAME+4  OF STRUCTURE <LINE_02> TO <VALUE_02>.
-                else.
-                  unassign <context_field>. "RR 17.01.2019
-                  assign component <tabstruc>-fieldname  of structure <line_02> to <context_field>.
-                endif.
+                ELSE.
+                  UNASSIGN <context_field>. "RR 17.01.2019
+                  ASSIGN COMPONENT <tabstruc>-fieldname  OF STRUCTURE <line_02> TO <context_field>.
+                ENDIF.
 
-                if <context_field> is assigned.
+                IF <context_field> IS ASSIGNED.
 
-                  perform add_context_value using lv_key_context
+                  PERFORM add_context_value USING lv_key_context
                                                   <context_field>
                                                   <tabstruc>-fieldname
                                                   <tabstruc>-tabname
                                                   <key_field>
                                                   lv_key_attribute
                                                   <sdm_object>
-                                         changing lv_leaf_context.
+                                         CHANGING lv_leaf_context.
                   lv_context_added = abap_true.
-                  continue.
-                endif.
-              endloop.
-            endif.
-          endloop.
-        endif.
-      endloop.
-    endloop.
-  endloop.
-endform.                    " CREATE_HIERARCHY
+                  CONTINUE.
+                ENDIF.
+              ENDLOOP.
+            ENDIF.
+          ENDLOOP.
+        ENDIF.
+      ENDLOOP.
+    ENDLOOP.
+  ENDLOOP.
+ENDFORM.                    " CREATE_HIERARCHY
 
-form add_context_errors using p_matnr
+FORM add_context_errors USING p_matnr
                               p_value_01
                               p_value_02
                               p_header_subkey
                               p_no_leaf
                               p_result
-                              p_main_setup type /gda/sdm_s_main
-                     changing p_mess_id
+                              p_main_setup TYPE /gda/sdm_s_main
+                     CHANGING p_mess_id
                               p_id_key.
 
-  data:
-    lv_field           type fieldname,
-    lv_table           type struc1,
-    ls_result          type /gda/sdm_s_val_results,
-    lv_mess_id_last(6) type c.
+  DATA:
+    lv_field           TYPE fieldname,
+    lv_table           TYPE struc1,
+    ls_result          TYPE /gda/sdm_s_val_results,
+    lv_mess_id_last(6) TYPE c.
 
-  field-symbols:
-    <field>    type any,
-    <brf_key>  type any,
-    <brf_key6> type any.
+  FIELD-SYMBOLS:
+    <field>    TYPE any,
+    <brf_key>  TYPE any,
+    <brf_key6> TYPE any.
 
 * EXTRA_V1 contains table-field
-  assign component 'EXTRA_V1' of structure p_result to <field>.
-  if <field> is assigned.
-    split <field> at '-' into lv_table-table lv_field.
-    read table p_main_setup-tabstruc with key fieldname = lv_field
-                                              tabname   = lv_table-table transporting no fields.
-    if sy-subrc <> 0.
+  ASSIGN COMPONENT 'EXTRA_V1' OF STRUCTURE p_result TO <field>.
+  IF <field> IS ASSIGNED.
+    SPLIT <field> AT '-' INTO lv_table-table lv_field.
+    READ TABLE p_main_setup-tabstruc WITH KEY fieldname = lv_field
+                                              tabname   = lv_table-table TRANSPORTING NO FIELDS.
+    IF sy-subrc <> 0.
 *        CONTINUE.
-      exit.
-    endif.
-  endif.
+      EXIT.
+    ENDIF.
+  ENDIF.
 *
-  assign component 'EXTRA_V5' of structure p_result to <brf_key>.
-  if <brf_key> = space.
-    assign component 'EXTRA_V4' of structure p_result to <brf_key>.
-  endif.
+  ASSIGN COMPONENT 'EXTRA_V5' OF STRUCTURE p_result TO <brf_key>.
+  IF <brf_key> = space.
+    ASSIGN COMPONENT 'EXTRA_V4' OF STRUCTURE p_result TO <brf_key>.
+  ENDIF.
 
-  assign component 'EXTRA_V6' of structure p_result to <brf_key6>.
+  ASSIGN COMPONENT 'EXTRA_V6' OF STRUCTURE p_result TO <brf_key6>.
 
 
 *  IF lv_table = 'MARA'.
-  if <brf_key> is initial.
+  IF <brf_key> IS INITIAL.
     <brf_key> = p_matnr.
-  endif.
+  ENDIF.
 
-  if p_value_01 = <brf_key> and p_value_02 = <brf_key6>.
+  IF p_value_01 = <brf_key> AND p_value_02 = <brf_key6>.
 
-    move-corresponding p_result to ls_result.
+    MOVE-CORRESPONDING p_result TO ls_result.
 
     p_mess_id = ls_result-number.
 
-    if p_no_leaf = space.
-      if p_mess_id <> lv_mess_id_last.
+    IF p_no_leaf = space.
+      IF p_mess_id <> lv_mess_id_last.
         lv_mess_id_last = p_mess_id.
 
-        perform add_id using p_header_subkey
+        PERFORM add_id USING p_header_subkey
                              ls_result
-                    changing p_id_key.
+                    CHANGING p_id_key.
 
-      endif.
-    endif.
-  endif.
-endform.                    " ADD_CONTEXT_ERRORS
+      ENDIF.
+    ENDIF.
+  ENDIF.
+ENDFORM.                    " ADD_CONTEXT_ERRORS
 
-form add_context_key using p_relat_key type lvc_nkey
-                           p_value     type any     "Key Field
-                           p_value2    type any     "Key Field Attribute
-                           p_name      type any
-                           p_tabname   type any
+FORM add_context_key USING p_relat_key TYPE lvc_nkey
+                           p_value     TYPE any     "Key Field
+                           p_value2    TYPE any     "Key Field Attribute
+                           p_name      TYPE any
+                           p_tabname   TYPE any
                            p_image
                            p_image2
-                  changing p_node_key  type lvc_nkey.
+                  CHANGING p_node_key  TYPE lvc_nkey.
 
-  data:
-    lv_node_text   type lvc_value,
-    lv_value       type string,
-    lv_value2      type string,
-    lv_ddtext      type dd04t-ddtext,
-    ls_node_layout type lvc_s_layn,
-    lt_item_layout type lvc_t_layi,
-    ls_item_layout type lvc_s_layi,
-    lv_rollname    type dd03l-rollname.
+  DATA:
+    lv_node_text   TYPE lvc_value,
+    lv_value       TYPE string,
+    lv_value2      TYPE string,
+    lv_ddtext      TYPE dd04t-ddtext,
+    ls_node_layout TYPE lvc_s_layn,
+    lt_item_layout TYPE lvc_t_layi,
+    ls_item_layout TYPE lvc_s_layi,
+    lv_rollname    TYPE dd03l-rollname.
 
   lv_value  = p_value.
   lv_value2 = p_value2.
 
 * get rollname..
-  select single rollname from dd03l
-                        into lv_rollname
-                        where tabname   = p_tabname
-                          and fieldname = p_name.
-  if sy-subrc <> 0.
+  SELECT SINGLE rollname FROM dd03l
+                        INTO lv_rollname
+                        WHERE tabname   = p_tabname
+                          AND fieldname = p_name.
+  IF sy-subrc <> 0.
     lv_rollname = p_name.
-  endif.
+  ENDIF.
 
-  select single ddtext from dd04t
-                        into lv_ddtext
-                        where rollname   = lv_rollname
-                          and ddlanguage = sy-langu.
-  if sy-subrc <> 0.
+  SELECT SINGLE ddtext FROM dd04t
+                        INTO lv_ddtext
+                        WHERE rollname   = lv_rollname
+                          AND ddlanguage = sy-langu.
+  IF sy-subrc <> 0.
     lv_ddtext = p_name.
-  endif.
+  ENDIF.
 
-  if p_value2 is initial.
-    concatenate lv_ddtext ' : ' lv_value into lv_node_text.
-  else.
-    concatenate lv_ddtext ' : ' lv_value '/' lv_value2 into lv_node_text.
-  endif.
+  IF p_value2 IS INITIAL.
+    CONCATENATE lv_ddtext ' : ' lv_value INTO lv_node_text.
+  ELSE.
+    CONCATENATE lv_ddtext ' : ' lv_value '/' lv_value2 INTO lv_node_text.
+  ENDIF.
   ls_node_layout-n_image   = p_image.
   ls_node_layout-exp_image = p_image.
 
 * Test
-  if p_image2 is not initial.
+  IF p_image2 IS NOT INITIAL.
     ls_item_layout-t_image = p_image2. "ICON_DISTRIBUTION.
     ls_item_layout-fieldname = go_tree->c_hierarchy_column_name.
 
-    append ls_item_layout to lt_item_layout.
-  endif.
+    APPEND ls_item_layout TO lt_item_layout.
+  ENDIF.
 * Test
-  call method go_tree->add_node
-    exporting
+  CALL METHOD go_tree->add_node
+    EXPORTING
       i_relat_node_key = p_relat_key
       i_relationship   = cl_gui_column_tree=>relat_last_child
       i_node_text      = lv_node_text
       is_node_layout   = ls_node_layout
       it_item_layout   = lt_item_layout
-    importing
+    IMPORTING
       e_new_node_key   = p_node_key.
 
-endform.                    " ADD_ID
+ENDFORM.                    " ADD_ID
 
-form add_context_value using p_relat_key    type lvc_nkey
-                             p_value        type any
-                             p_name         type any
-                             p_table        type any
-                             p_keyfield     type any
-                             p_keyattr      type any
-                             p_object       type /gda/sdm_s_article
-                    changing p_leaf_context type lvc_nkey.
+FORM add_context_value USING p_relat_key    TYPE lvc_nkey
+                             p_value        TYPE any
+                             p_name         TYPE any
+                             p_table        TYPE any
+                             p_keyfield     TYPE any
+                             p_keyattr      TYPE any
+                             p_object       TYPE /gda/sdm_s_article
+                    CHANGING p_leaf_context TYPE lvc_nkey.
 
-  data:
-    lv_node_text type lvc_value,
-    lv_value     type char30, "string,
-    lv_layout    type lvc_s_layn,
-    lv_ddtext    type dd04t-ddtext,
+  DATA:
+    lv_node_text TYPE lvc_value,
+    lv_value     TYPE char30, "string,
+    lv_layout    TYPE lvc_s_layn,
+    lv_ddtext    TYPE dd04t-ddtext,
 *    lt_item_layout TYPE lvc_t_layi,
 *    ls_item_layout TYPE lvc_s_layi,
-    lv_line      type /gda/sdm_s_val_results,
-    lv_key_combo type string.
+    lv_line      TYPE /gda/sdm_s_val_results,
+    lv_key_combo TYPE string.
 
-  field-symbols:
-     <icons> like line of p_object-icons.
+  FIELD-SYMBOLS:
+     <icons> LIKE LINE OF p_object-icons.
 
   lv_value = p_value.
 
-  select single ddtext from dd03m
-                        into lv_ddtext
-                        where tabname    = p_table
-                          and fieldname  = p_name
-                          and ddlanguage = sy-langu.
+  SELECT SINGLE ddtext FROM dd03m
+                        INTO lv_ddtext
+                        WHERE tabname    = p_table
+                          AND fieldname  = p_name
+                          AND ddlanguage = sy-langu.
 
-  if sy-subrc = 0.
+  IF sy-subrc = 0.
     lv_node_text = lv_ddtext.
-  else.
+  ELSE.
     lv_node_text = p_name.
-  endif.
+  ENDIF.
 
   lv_line-extra_v5 = lv_value.
 
-  read table p_object-icons assigning <icons>  with key field   = p_name
+  READ TABLE p_object-icons ASSIGNING <icons>  WITH KEY field   = p_name
                                      brf_key = p_keyfield.
-  if sy-subrc = 0.
+  IF sy-subrc = 0.
     lv_layout-n_image = <icons>-icon.
-  else.
-    concatenate p_keyfield '/' p_keyattr into lv_key_combo.
-    read table p_object-icons assigning <icons>  with key field   = p_name
+  ELSE.
+    CONCATENATE p_keyfield '/' p_keyattr INTO lv_key_combo.
+    READ TABLE p_object-icons ASSIGNING <icons>  WITH KEY field   = p_name
                                        brf_key = lv_key_combo.
-    if sy-subrc = 0.
+    IF sy-subrc = 0.
       lv_layout-n_image = <icons>-icon.
-    endif.
-  endif.
+    ENDIF.
+  ENDIF.
 
-  call method go_tree->add_node
-    exporting
+  CALL METHOD go_tree->add_node
+    EXPORTING
       i_relat_node_key = p_relat_key
       i_relationship   = cl_gui_column_tree=>relat_last_child
       i_node_text      = lv_node_text
       is_node_layout   = lv_layout
 *     it_item_layout   = lt_item_layout
       is_outtab_line   = lv_line
-    importing
+    IMPORTING
       e_new_node_key   = p_leaf_context.
 
-endform.                    " ADD_ID
+ENDFORM.                    " ADD_ID
 
-form add_folder  using p_relat_key type lvc_nkey
-                       p_text      type lvc_value
-                       p_type      type c
-              changing p_node_key  type lvc_nkey.
+FORM add_folder  USING p_relat_key TYPE lvc_nkey
+                       p_text      TYPE lvc_value
+                       p_type      TYPE c
+              CHANGING p_node_key  TYPE lvc_nkey.
 
-  data:
-    lv_node_text type lvc_value,
-    ls_result    type /gda/sdm_s_val_results,
-    lv_rel       type int4.
+  DATA:
+    lv_node_text TYPE lvc_value,
+    ls_result    TYPE /gda/sdm_s_val_results,
+    lv_rel       TYPE int4.
 
   lv_node_text = p_text.
 
-  case p_type.
-    when '1'.
+  CASE p_type.
+    WHEN '1'.
       lv_rel = cl_gui_column_tree=>relat_last_child.
-    when '2'.
+    WHEN '2'.
       lv_rel = cl_gui_column_tree=>relat_last_sibling.
-    when others.
+    WHEN OTHERS.
       lv_rel = cl_gui_column_tree=>relat_last_child.
-  endcase.
+  ENDCASE.
 
 
-  call method go_tree->add_node
-    exporting
+  CALL METHOD go_tree->add_node
+    EXPORTING
       i_relat_node_key = p_relat_key
       i_relationship   = lv_rel "CL_GUI_COLUMN_TREE=>RELAT_LAST_CHILD
       i_node_text      = lv_node_text
       is_outtab_line   = ls_result
 *     is_node_layout   = ls_node_layout
-    importing
+    IMPORTING
       e_new_node_key   = p_node_key.
 
-endform.                    " ADD_ID
+ENDFORM.                    " ADD_ID
 
-form add_id  using    p_relat_key type lvc_nkey
-                      p_result    type /gda/sdm_s_val_results "ZCA_BRF_VAL_RETURN_GUI
-            changing  p_node_key  type lvc_nkey.
+FORM add_id  USING    p_relat_key TYPE lvc_nkey
+                      p_result    TYPE /gda/sdm_s_val_results "ZCA_BRF_VAL_RETURN_GUI
+            CHANGING  p_node_key  TYPE lvc_nkey.
 
-  data:
-   l_node_text type lvc_value.
+  DATA:
+   l_node_text TYPE lvc_value.
 
   l_node_text = p_result-number.
 
-  call method go_tree->add_node
-    exporting
+  CALL METHOD go_tree->add_node
+    EXPORTING
       i_relat_node_key = p_relat_key
       i_relationship   = cl_gui_column_tree=>relat_last_child
       i_node_text      = l_node_text
       is_outtab_line   = p_result
-    importing
+    IMPORTING
       e_new_node_key   = p_node_key.
 
-endform.                    " ADD_ID
+ENDFORM.                    " ADD_ID
 
 
-form set_display_top2.
-  data:
+FORM set_display_top2.
+  DATA:
 *   lo_sort  TYPE REF TO cl_salv_sorts,
-    ls_txt_l  type scrtext_l,
-    ls_txt_m  type scrtext_m,
-    ls_txt_s  type scrtext_s,
+    ls_txt_l  TYPE scrtext_l,
+    ls_txt_m  TYPE scrtext_m,
+    ls_txt_s  TYPE scrtext_s,
 *    ls_col    TYPE lvc_fname,
-    ls_layout type lvc_s_layo.
+    ls_layout TYPE lvc_s_layo.
 
 
-  field-symbols:
-    <parameter>  type any,
-    <view_setup> like line of gt_pp_main_setup.
+  FIELD-SYMBOLS:
+    <parameter>  TYPE any,
+    <view_setup> LIKE LINE OF gt_pp_main_setup.
 
 * Create Instance
-  try.
-      create object go_alv_top
-        exporting
+  TRY.
+      CREATE OBJECT go_alv_top
+        EXPORTING
           i_parent = go_parent1.
 
-    catch cx_salv_msg into gx_root.
+    CATCH cx_salv_msg INTO gx_root.
       gv_message = gx_root->get_text( ).
-  endtry.
+  ENDTRY.
 
-  if gv_message is not initial.
-    message e000 with gv_message.
-  endif.
+  IF gv_message IS NOT INITIAL.
+    MESSAGE e000 WITH gv_message.
+  ENDIF.
 
-  read table gt_pp_main_setup assigning <main_setup> with key object_view = 'DEFAULT'.
+  READ TABLE gt_pp_main_setup ASSIGNING <main_setup> WITH KEY object_view = 'DEFAULT'.
 
-  if <main_setup> is assigned.
-    loop at <main_setup>-tabstruc assigning <tabstruc>.
-      if <tabstruc>-fieldname = 'MESSAGE'.
-        continue.
-      endif.
+  IF <main_setup> IS ASSIGNED.
+    LOOP AT <main_setup>-tabstruc ASSIGNING <tabstruc>.
+      IF <tabstruc>-fieldname = 'MESSAGE'.
+        CONTINUE.
+      ENDIF.
 *      TRY.
 *          go_column_top ?= go_columns_top->get_column( <tabstruc>-fieldname ).
 *        CATCH cx_salv_not_found.
 *      ENDTRY.
 *
-      if <tabstruc>-key = abap_true.
+      IF <tabstruc>-key = abap_true.
 *        TRY.
 *            go_column_top->set_key( value  = if_salv_c_bool_sap=>true ).
 *          CATCH cx_salv_data_error .
 *        ENDTRY.
-      endif.
+      ENDIF.
 
-      read table gt_pp_main_setup assigning <view_setup> with key object_view = <tabstruc>-fieldname.
-      if sy-subrc = 0.
-        assign (<view_setup>-object_view_o) to <parameter>.
-        if <parameter> = abap_true.
+      READ TABLE gt_pp_main_setup ASSIGNING <view_setup> WITH KEY object_view = <tabstruc>-fieldname.
+      IF sy-subrc = 0.
+        ASSIGN (<view_setup>-object_view_o) TO <parameter>.
+        IF <parameter> = abap_true.
           ls_txt_l  = <view_setup>-object_view_d.
           ls_txt_m  = <view_setup>-object_view_d.
           ls_txt_s  = <view_setup>-object_view_d.
@@ -2852,120 +2852,120 @@ form set_display_top2.
           <tabstruc>-scrtext_l = ls_txt_l.
           <tabstruc>-scrtext_m = ls_txt_m.
           <tabstruc>-scrtext_s = ls_txt_s.
-        endif.
-      endif.
-      if <tabstruc>-fieldname cs 'MATNR'.
+        ENDIF.
+      ENDIF.
+      IF <tabstruc>-fieldname CS 'MATNR'.
         <tabstruc>-hotspot = abap_true.
-      endif.
-    endloop.
-  endif.
+      ENDIF.
+    ENDLOOP.
+  ENDIF.
 
   ls_layout-cwidth_opt = abap_true.
 
-  create object go_handler_top.
-  set handler go_handler_top->on_hotspot_click    for go_alv_top.
-  set handler go_handler_top->handle_context_menu for go_alv_top.
-  set handler go_handler_top->handle_user_command for go_alv_top.
-  set handler go_handler_top->toolbar             for go_alv_top.
+  CREATE OBJECT go_handler_top.
+  SET HANDLER go_handler_top->on_hotspot_click    FOR go_alv_top.
+  SET HANDLER go_handler_top->handle_context_menu FOR go_alv_top.
+  SET HANDLER go_handler_top->handle_user_command FOR go_alv_top.
+  SET HANDLER go_handler_top->toolbar             FOR go_alv_top.
 
 * Display Table
-  call method go_alv_top->set_table_for_first_display
-    exporting
+  CALL METHOD go_alv_top->set_table_for_first_display
+    EXPORTING
       is_layout       = ls_layout
-    changing
+    CHANGING
       it_fieldcatalog = <main_setup>-tabstruc[]
       it_outtab       = <dyn_table>[]. "<dyn_table_final>[].
 
 
-endform.
+ENDFORM.
 
-form determine_icon using p_matnr
+FORM determine_icon USING p_matnr
                           p_node_level
                           p_value_01
 *                          p_header_subkey
                           p_value_02
 *                          p_no_leaf
                           p_result
-                          p_main_setup type /gda/sdm_s_main
-                 changing p_image
+                          p_main_setup TYPE /gda/sdm_s_main
+                 CHANGING p_image
                           p_image2.
 
-  data:
-    lv_field type fieldname,
-    lv_table type struc1.
+  DATA:
+    lv_field TYPE fieldname,
+    lv_table TYPE struc1.
 *    ls_result          TYPE /gda/sdm_s_val_results,
 *    lv_mess_id_last(6) TYPE c.
 
-  field-symbols:
-    <field>    type any,
-    <brf_key>  type any,
-    <brf_key6> type any.
+  FIELD-SYMBOLS:
+    <field>    TYPE any,
+    <brf_key>  TYPE any,
+    <brf_key6> TYPE any.
 
 * EXTRA_V1 contains table-field
-  assign component 'EXTRA_V1' of structure p_result to <field>.
+  ASSIGN COMPONENT 'EXTRA_V1' OF STRUCTURE p_result TO <field>.
 *  IF <field>  EQ '/GDA/SDM_TARIFF-LAND1'.
 *    BREAK-POINT.
 *  endif.
-  if <field> is assigned.
-    split <field> at '-' into lv_table-table lv_field.
-    read table p_main_setup-tabstruc with key fieldname = lv_field
-                                              tabname   = lv_table-table transporting no fields.
+  IF <field> IS ASSIGNED.
+    SPLIT <field> AT '-' INTO lv_table-table lv_field.
+    READ TABLE p_main_setup-tabstruc WITH KEY fieldname = lv_field
+                                              tabname   = lv_table-table TRANSPORTING NO FIELDS.
 *    IF sy-subrc <> 0.
 *      EXIT.
-  endif.
+  ENDIF.
 *  ENDIF.
 *
 
-  if sy-subrc = 0.
-    assign component 'EXTRA_V5' of structure p_result to <brf_key>.
-    if <brf_key> = space.
-      assign component 'EXTRA_V4' of structure p_result to <brf_key>.
-    endif.
+  IF sy-subrc = 0.
+    ASSIGN COMPONENT 'EXTRA_V5' OF STRUCTURE p_result TO <brf_key>.
+    IF <brf_key> = space.
+      ASSIGN COMPONENT 'EXTRA_V4' OF STRUCTURE p_result TO <brf_key>.
+    ENDIF.
 
 * Additional key field data
-    assign component 'EXTRA_V6' of structure p_result to <brf_key6>.
-    if <brf_key6> is assigned and <brf_key6> is not initial.
+    ASSIGN COMPONENT 'EXTRA_V6' OF STRUCTURE p_result TO <brf_key6>.
+    IF <brf_key6> IS ASSIGNED AND <brf_key6> IS NOT INITIAL.
 
-    endif.
+    ENDIF.
 
 *  IF lv_table = 'MARA'.
-    if <brf_key> is initial.
+    IF <brf_key> IS INITIAL.
       <brf_key> = p_matnr.
-    endif.
+    ENDIF.
 
-    if p_value_02 is initial.
-      if p_value_01 = <brf_key>.
+    IF p_value_02 IS INITIAL.
+      IF p_value_01 = <brf_key>.
         p_image = icon_failure.
-      else.
+      ELSE.
         p_image = icon_positive.
-      endif.
-    else.
-      if p_value_01 = <brf_key> and p_value_02 = <brf_key6>.
+      ENDIF.
+    ELSE.
+      IF p_value_01 = <brf_key> AND p_value_02 = <brf_key6>.
         p_image = icon_failure.
-      else.
+      ELSE.
         p_image = icon_positive.
-      endif.
+      ENDIF.
 
-    endif.
-  endif.
+    ENDIF.
+  ENDIF.
 
 * Special condition! - Consider an exit for this..
-  if p_node_level = 'WERKS'.
-    data:
-      ls_t001w type t001w.
+  IF p_node_level = 'WERKS'.
+    DATA:
+      ls_t001w TYPE t001w.
 
-    select single * from t001w
-                        into ls_t001w
-                      where werks = p_value_01.
+    SELECT SINGLE * FROM t001w
+                        INTO ls_t001w
+                      WHERE werks = p_value_01.
 *                       AND vlfkz = 'A'.
 
-    if ls_t001w-vlfkz = 'A'.
+    IF ls_t001w-vlfkz = 'A'.
       p_image2 = icon_store_location. "ICON_DISTRIBUTION
-    else.
+    ELSE.
       p_image2 = icon_distribution. "ICON_DISTRIBUTION
-    endif.
-  endif.
-endform.                    " ADD_CONTEXT_ERRORS
+    ENDIF.
+  ENDIF.
+ENDFORM.                    " ADD_CONTEXT_ERRORS
 *&---------------------------------------------------------------------*
 *&      Form  DETERMINE_OUTPUT
 *&---------------------------------------------------------------------*
@@ -3308,19 +3308,19 @@ endform.                    " ADD_CONTEXT_ERRORS
 *  -->  p1        text
 *  <--  p2        text
 *----------------------------------------------------------------------*
-form determine_selection .
-  if ( s_infnr is not initial or s_ekorg is not initial or s_lifnr is not initial )." AND s_matnr IS INITIAL.
+FORM determine_selection .
+  IF ( s_infnr IS NOT INITIAL OR s_ekorg IS NOT INITIAL OR s_lifnr IS NOT INITIAL )." AND s_matnr IS INITIAL.
     gv_eina_first = abap_true.
-  endif.
+  ENDIF.
 
-  if ( s_vdatu is not initial or s_bdatu  is not initial ).
+  IF ( s_vdatu IS NOT INITIAL OR s_bdatu  IS NOT INITIAL ).
     gv_eord_first = abap_true.
-  endif.
+  ENDIF.
 
-  if s_vkorg is not initial or s_vtweg is not initial.
+  IF s_vkorg IS NOT INITIAL OR s_vtweg IS NOT INITIAL.
     gv_mvke_first = abap_true.
-  endif.
-endform.
+  ENDIF.
+ENDFORM.
 *&---------------------------------------------------------------------*
 *&      Form  MATERIAL_STRUCTURED
 *&---------------------------------------------------------------------*
@@ -3329,19 +3329,19 @@ endform.
 *  -->  p1        text
 *  <--  p2        text
 *----------------------------------------------------------------------*
-form material_structured .
-  data:
-    lt_mara_variants type standard table of /gda/sdm_s_mara_01,
-    lt_mast          type standard table of mast,
-    lt_stpo          type standard table of stpo,
-    lt_relations     type standard table of struc_rel,
-    lt_mara          type standard table of /gda/sdm_s_mara_01.
+FORM material_structured .
+  DATA:
+    lt_mara_variants TYPE STANDARD TABLE OF /gda/sdm_s_mara_01,
+    lt_mast          TYPE STANDARD TABLE OF mast,
+    lt_stpo          TYPE STANDARD TABLE OF stpo,
+    lt_relations     TYPE STANDARD TABLE OF struc_rel,
+    lt_mara          TYPE STANDARD TABLE OF /gda/sdm_s_mara_01.
 
-  field-symbols:
-    <relations1>    like line of gt_relations,
-    <relations2>    like line of lt_relations,
-    <mara>          like line of gt_mara,
-    <mara_variants> like line of lt_mara_variants.
+  FIELD-SYMBOLS:
+    <relations1>    LIKE LINE OF gt_relations,
+    <relations2>    LIKE LINE OF lt_relations,
+    <mara>          LIKE LINE OF gt_mara,
+    <mara_variants> LIKE LINE OF lt_mara_variants.
 
 *  RANGES: r_attyp FOR mara-attyp.
 *
@@ -3385,99 +3385,99 @@ form material_structured .
 *  r_attyp-low    = '22'.
 *  APPEND  r_attyp.
 
-  select * from mara
-           into corresponding fields of table gt_mara
-           where matnr in s_matnr
-             and ersda in s_ersda
-             and ernam in s_ernam
-             and laeda in s_laeda
-             and aenam in s_aenam
-             and mtart in s_mtart
-             and matkl in s_matkl
-             and mstae in s_mstae
-             and attyp in s_attyps.
+  SELECT * FROM mara
+           INTO CORRESPONDING FIELDS OF TABLE gt_mara
+           WHERE matnr IN s_matnr
+             AND ersda IN s_ersda
+             AND ernam IN s_ernam
+             AND laeda IN s_laeda
+             AND aenam IN s_aenam
+             AND mtart IN s_mtart
+             AND matkl IN s_matkl
+             AND mstae IN s_mstae
+             AND attyp IN s_attyps.
 
 * Cater for Structured Articles.
-  if p_struc = abap_true.
-    refresh:
+  IF p_struc = abap_true.
+    REFRESH:
      lt_mara_variants.
 
 * Strip out any items which are not top level!
-    delete gt_mara where attyp = '00'.
+    DELETE gt_mara WHERE attyp = '00'.
 
-    loop at gt_mara assigning <mara_struc>. " WHERE attyp <> '00'.
+    LOOP AT gt_mara ASSIGNING <mara_struc>. " WHERE attyp <> '00'.
 
-      case <mara_struc>-attyp.
+      CASE <mara_struc>-attyp.
 * Generics & Variants:
-        when '01'.
-          select * from mara
-                   into corresponding fields of table lt_mara_variants
-                   where satnr eq <mara_struc>-matnr.
+        WHEN '01'.
+          SELECT * FROM mara
+                   INTO CORRESPONDING FIELDS OF TABLE lt_mara_variants
+                   WHERE satnr EQ <mara_struc>-matnr.
 
-          loop at lt_mara_variants assigning <mara_variants>.
+          LOOP AT lt_mara_variants ASSIGNING <mara_variants>.
             gs_relations-matnr     = <mara_struc>-matnr.
             gs_relations-matnr_rel = <mara_variants>-matnr.
-            append gs_relations to gt_relations.
-            clear   gs_relations.
-          endloop.
+            APPEND gs_relations TO gt_relations.
+            CLEAR   gs_relations.
+          ENDLOOP.
 
-          append lines of lt_mara_variants to gt_mara.
+          APPEND LINES OF lt_mara_variants TO gt_mara.
 
 * Pre-Pack, Sales Sets, Display Articles etc
-        when others.
+        WHEN OTHERS.
 
-          select matnr stlnr from mast
-                             into corresponding fields of table lt_mast
-                             where matnr = <mara_struc>-matnr.
+          SELECT matnr stlnr FROM mast
+                             INTO CORRESPONDING FIELDS OF TABLE lt_mast
+                             WHERE matnr = <mara_struc>-matnr.
 
-          if lt_mast is not initial.
-            select idnrk from stpo
-                         into corresponding fields of table lt_stpo
-                         for all entries in lt_mast
-                         where stlnr =  lt_mast-stlnr.
+          IF lt_mast IS NOT INITIAL.
+            SELECT idnrk FROM stpo
+                         INTO CORRESPONDING FIELDS OF TABLE lt_stpo
+                         FOR ALL ENTRIES IN lt_mast
+                         WHERE stlnr =  lt_mast-stlnr.
 * Now get these entries in the MARA struc
-            if lt_stpo is not initial.
-              select * from mara
-                       into corresponding fields of table lt_mara_variants
-                       for all entries in lt_stpo
-                       where matnr eq lt_stpo-idnrk.
+            IF lt_stpo IS NOT INITIAL.
+              SELECT * FROM mara
+                       INTO CORRESPONDING FIELDS OF TABLE lt_mara_variants
+                       FOR ALL ENTRIES IN lt_stpo
+                       WHERE matnr EQ lt_stpo-idnrk.
 
-              loop at lt_mara_variants assigning <mara_variants>.
+              LOOP AT lt_mara_variants ASSIGNING <mara_variants>.
                 gs_relations-matnr     = <mara_struc>-matnr.
                 gs_relations-matnr_rel = <mara_variants>-matnr.
-                append gs_relations to gt_relations.
-                clear   gs_relations.
-              endloop.
+                APPEND gs_relations TO gt_relations.
+                CLEAR   gs_relations.
+              ENDLOOP.
 
-              append lines of lt_mara_variants to gt_mara.
-            endif.
+              APPEND LINES OF lt_mara_variants TO gt_mara.
+            ENDIF.
 
-          endif.
-      endcase.
+          ENDIF.
+      ENDCASE.
 
-    endloop.
+    ENDLOOP.
 
 * GS_RELATIONS
 *    APPEND LINES OF GT_MARA_VARIANTS TO GT_MARA.
-    sort gt_mara.
-    delete adjacent duplicates from gt_mara.
+    SORT gt_mara.
+    DELETE ADJACENT DUPLICATES FROM gt_mara.
 
     lt_relations[] = gt_relations[].
 
-    loop at gt_relations assigning <relations1>.
-      loop at lt_relations assigning <relations2> where matnr <> <relations1>-matnr
-                                                    and matnr_rel = <relations1>-matnr_rel.
-        read table gt_mara assigning <mara> with key matnr = <relations1>-matnr_rel.
-        append <mara> to lt_mara.
-        exit.
+    LOOP AT gt_relations ASSIGNING <relations1>.
+      LOOP AT lt_relations ASSIGNING <relations2> WHERE matnr <> <relations1>-matnr
+                                                    AND matnr_rel = <relations1>-matnr_rel.
+        READ TABLE gt_mara ASSIGNING <mara> WITH KEY matnr = <relations1>-matnr_rel.
+        APPEND <mara> TO lt_mara.
+        EXIT.
 * this entry should be added back
-      endloop.
-    endloop.
-    sort lt_mara.
-    delete adjacent duplicates from lt_mara.
-    append lines of lt_mara to gt_mara.
-  endif.
-endform.
+      ENDLOOP.
+    ENDLOOP.
+    SORT lt_mara.
+    DELETE ADJACENT DUPLICATES FROM lt_mara.
+    APPEND LINES OF lt_mara TO gt_mara.
+  ENDIF.
+ENDFORM.
 *&---------------------------------------------------------------------*
 *&      Form  MATERIAL
 *&---------------------------------------------------------------------*
@@ -3486,85 +3486,85 @@ endform.
 *  -->  p1        text
 *  <--  p2        text
 *----------------------------------------------------------------------*
-form material .
+FORM material .
 *  types: begin of s_matnr,
 *           matnr type mara-matnr,
 *         end of s_matnr.
 
-  data:
+  DATA:
 *    lt_matnr    type standard table of s_matnr,
 *    ls_matnr    type s_matnr,
-    lt_matnr    type matnr_tty,
+    lt_matnr    TYPE matnr_tty,
 *    ls_matnr    type matnr,
-    lv_function type string.
+    lv_function TYPE string.
 
-  field-symbols:
-    <eina> like line of gt_eina,
-    <eord> like line of gt_eord,
-    <mvke> like line of gt_mvke.
+  FIELD-SYMBOLS:
+    <eina> LIKE LINE OF gt_eina,
+    <eord> LIKE LINE OF gt_eord,
+    <mvke> LIKE LINE OF gt_mvke.
 
-  if sy-saprl >= gc_sap_version.
+  IF sy-saprl >= gc_sap_version.
     lv_function = '/GDA/SDM_MM_MARA_GET_NEW'.
-  else.
+  ELSE.
     lv_function = '/GDA/SDM_MM_MARA_GET_OLD'.
-  endif.
+  ENDIF.
 
-  if gv_eina_first = abap_true.
+  IF gv_eina_first = abap_true.
 * Note -- Possibly include a join on material to ensure we have an article..
-    select * from eina into corresponding fields of table gt_eina
-               where matnr      in s_matnr
-               and   matkl      in s_matkl
-               and   lifnr      in s_lifnr
-               and   infnr      in s_infnr.
-    if sy-subrc = 0.
-      loop at gt_eina assigning <eina>.
+    SELECT * FROM eina INTO CORRESPONDING FIELDS OF TABLE gt_eina
+               WHERE matnr      IN s_matnr
+               AND   matkl      IN s_matkl
+               AND   lifnr      IN s_lifnr
+               AND   infnr      IN s_infnr.
+    IF sy-subrc = 0.
+      LOOP AT gt_eina ASSIGNING <eina>.
 *        ls_matnr-matnr = <eina>-matnr.
 *        collect ls_matnr into lt_matnr.
-        collect <eina>-matnr into lt_matnr.
-      endloop.
-    endif.
-  endif.
+        COLLECT <eina>-matnr INTO lt_matnr.
+      ENDLOOP.
+    ENDIF.
+  ENDIF.
 
-  if gv_eord_first = abap_true.
-    select * from eord into corresponding fields of table gt_eord
-             where matnr      in s_matnr
-               and werks      in s_werks
-               and lifnr      in s_lifnr
-               and vdatu      in s_vdatu
-               and bdatu      in s_bdatu.
-    if sy-subrc = 0.
-      loop at gt_eord assigning <eord>.
+  IF gv_eord_first = abap_true.
+    SELECT * FROM eord INTO CORRESPONDING FIELDS OF TABLE gt_eord
+             WHERE matnr      IN s_matnr
+               AND werks      IN s_werks
+               AND lifnr      IN s_lifnr
+               AND vdatu      IN s_vdatu
+               AND bdatu      IN s_bdatu.
+    IF sy-subrc = 0.
+      LOOP AT gt_eord ASSIGNING <eord>.
 *        ls_matnr-matnr = <eord>-matnr.
 *        collect ls_matnr into lt_matnr.
-        collect <eord>-matnr into lt_matnr.
-      endloop.
-    endif.
-  endif.
+        COLLECT <eord>-matnr INTO lt_matnr.
+      ENDLOOP.
+    ENDIF.
+  ENDIF.
 
-  if gv_mvke_first = abap_true.
-    select * from mvke into corresponding fields of table gt_mvke
-             where matnr      in s_matnr
-               and vkorg      in s_vkorg
-               and vtweg      in s_vtweg.
-    if sy-subrc = 0.
-      loop at gt_mvke assigning <mvke>.
+  IF gv_mvke_first = abap_true.
+    SELECT * FROM mvke INTO CORRESPONDING FIELDS OF TABLE gt_mvke
+             WHERE matnr      IN s_matnr
+               AND vkorg      IN s_vkorg
+               AND vtweg      IN s_vtweg.
+    IF sy-subrc = 0.
+      LOOP AT gt_mvke ASSIGNING <mvke>.
 *        ls_matnr-matnr = <mvke>-matnr.
 *        collect ls_matnr into lt_matnr.
-        collect <mvke>-matnr into lt_matnr.
-      endloop.
-    endif.
-  endif.
+        COLLECT <mvke>-matnr INTO lt_matnr.
+      ENDLOOP.
+    ENDIF.
+  ENDIF.
 
 
-  if gv_eina_first = abap_true or gv_eord_first = abap_true or gv_mvke_first = abap_true.
-    if lt_matnr is not initial.
-      call function '/GDA/SDM_MM_MARA_GET_OLD2' "lv_function
-        exporting
+  IF gv_eina_first = abap_true OR gv_eord_first = abap_true OR gv_mvke_first = abap_true.
+    IF lt_matnr IS NOT INITIAL.
+      CALL FUNCTION '/GDA/SDM_MM_MARA_GET_OLD2' "lv_function
+        EXPORTING
           x_max_rows   = p_max
           xt_materials = lt_matnr
-        importing
+        IMPORTING
           xt_mara      = gt_mara[]
-        tables
+        TABLES
           xt_matnr     = s_matnr
           xt_ersda     = s_ersda
           xt_ernam     = s_ernam
@@ -3577,15 +3577,15 @@ form material .
           xt_attyp     = s_attyp
           xt_werks     = s_werks
           xt_mmsta     = s_mmsta.
-    endif.
+    ENDIF.
 
-  else.
-    call function '/GDA/SDM_MM_MARA_GET_OLD2' "lv_function
-      exporting
+  ELSE.
+    CALL FUNCTION '/GDA/SDM_MM_MARA_GET_OLD2' "lv_function
+      EXPORTING
         x_max_rows = p_max
-      importing
+      IMPORTING
         xt_mara    = gt_mara[]
-      tables
+      TABLES
         xt_matnr   = s_matnr
         xt_ersda   = s_ersda
         xt_ernam   = s_ernam
@@ -3598,8 +3598,8 @@ form material .
         xt_attyp   = s_attyp
         xt_werks   = s_werks
         xt_mmsta   = s_mmsta.
-  endif.
-endform.
+  ENDIF.
+ENDFORM.
 *&---------------------------------------------------------------------*
 *&      Form  MASS_DOWNLOAD
 *&---------------------------------------------------------------------*
@@ -3608,402 +3608,402 @@ endform.
 *  -->  p1        text
 *  <--  p2        text
 *----------------------------------------------------------------------*
-form mass_download.
-  data:
-    lv_template type sy-repid.
+FORM mass_download.
+  DATA:
+    lv_template TYPE sy-repid.
 
-  perform process_spreadsheet.
+  PERFORM process_spreadsheet.
 
   lv_template = sy-repid+9(25).
-  export lv_template to memory id 'TEMPLATE'.
+  EXPORT lv_template TO MEMORY ID 'TEMPLATE'.
 
-  perform create_sapdoc.
+  PERFORM create_sapdoc.
 
-endform.
+ENDFORM.
 
-form pop_main.
-
-* Header
-  write range_item-name to gs_tab left-justified.
-  append gs_tab to gt_tab.
-
-  loop at <dyn_table> assigning <dyn_wa>.
-    concatenate '<dyn_wa>-' range_item-name into name.
-    assign (name) to <cell>.
-    check sy-subrc = 0.
-    write <cell> to gs_tab left-justified.
-    append gs_tab to gt_tab.
-  endloop.
-
-endform.
-
-form pop_main_details.
-  data:
-    ro_data       type ref to data,
-    ro_data_empty type ref to data.
-
-  field-symbols:
-    <articles>     like line of gt_sdm_articles,
-    <instances>    like line of <articles>-sdm_instances,
-    <results>      type standard table,
-    <results_temp> type standard table,
-    <result>       type any.
+FORM pop_main.
 
 * Header
-  write range_item-name to gs_tab left-justified.
-  append gs_tab to gt_tab.
+  WRITE range_item-name TO gs_tab LEFT-JUSTIFIED.
+  APPEND gs_tab TO gt_tab.
 
-  loop at gt_sdm_articles assigning <articles>.
+  LOOP AT <dyn_table> ASSIGNING <dyn_wa>.
+    CONCATENATE '<dyn_wa>-' range_item-name INTO name.
+    ASSIGN (name) TO <cell>.
+    CHECK sy-subrc = 0.
+    WRITE <cell> TO gs_tab LEFT-JUSTIFIED.
+    APPEND gs_tab TO gt_tab.
+  ENDLOOP.
+
+ENDFORM.
+
+FORM pop_main_details.
+  DATA:
+    ro_data       TYPE REF TO data,
+    ro_data_empty TYPE REF TO data.
+
+  FIELD-SYMBOLS:
+    <articles>     LIKE LINE OF gt_sdm_articles,
+    <instances>    LIKE LINE OF <articles>-sdm_instances,
+    <results>      TYPE STANDARD TABLE,
+    <results_temp> TYPE STANDARD TABLE,
+    <result>       TYPE any.
+
+* Header
+  WRITE range_item-name TO gs_tab LEFT-JUSTIFIED.
+  APPEND gs_tab TO gt_tab.
+
+  LOOP AT gt_sdm_articles ASSIGNING <articles>.
 
 * Test changes
-    unassign <results>.
+    UNASSIGN <results>.
 
-    loop at <articles>-sdm_instances assigning <instances>.
-      if <instances>-object is initial.
-        continue.
-      endif.
-      if <results> is not assigned.
+    LOOP AT <articles>-sdm_instances ASSIGNING <instances>.
+      IF <instances>-object IS INITIAL.
+        CONTINUE.
+      ENDIF.
+      IF <results> IS NOT ASSIGNED.
         ro_data_empty  = <instances>-object->return_brf_result_structure( ).
-        assign ro_data_empty->* to <results>.
-        refresh:
+        ASSIGN ro_data_empty->* TO <results>.
+        REFRESH:
          <results>.
-      endif.
+      ENDIF.
 
       ro_data        = <instances>-object->return_brf_result( ).
-      assign ro_data->* to <results_temp>.
+      ASSIGN ro_data->* TO <results_temp>.
 
-      if <results_temp> is assigned  and <results_temp> is not initial.
-        append lines of <results_temp> to <results>.
-      endif.
-    endloop.
+      IF <results_temp> IS ASSIGNED  AND <results_temp> IS NOT INITIAL.
+        APPEND LINES OF <results_temp> TO <results>.
+      ENDIF.
+    ENDLOOP.
 
-    sort <results>.
-    delete adjacent duplicates from <results>.
+    SORT <results>.
+    DELETE ADJACENT DUPLICATES FROM <results>.
 
-    loop at <results> assigning <result>.
-      if range_item-name = 'MATNR'.
+    LOOP AT <results> ASSIGNING <result>.
+      IF range_item-name = 'MATNR'.
         name = '<articles>-article'.
-      else.
-        concatenate '<result>-' range_item-name into name.
-      endif.
+      ELSE.
+        CONCATENATE '<result>-' range_item-name INTO name.
+      ENDIF.
 
-      assign (name) to <cell>.
+      ASSIGN (name) TO <cell>.
 
-      check sy-subrc = 0.
+      CHECK sy-subrc = 0.
 
-      write <cell> to gs_tab left-justified.
+      WRITE <cell> TO gs_tab LEFT-JUSTIFIED.
 
-      append gs_tab to gt_tab.
-    endloop.
+      APPEND gs_tab TO gt_tab.
+    ENDLOOP.
 
-  endloop.
-endform.
+  ENDLOOP.
+ENDFORM.
 
-form pop_context_details.
-  data:
-    ro_data       type ref to data,
-    ro_data_empty type ref to data.
+FORM pop_context_details.
+  DATA:
+    ro_data       TYPE REF TO data,
+    ro_data_empty TYPE REF TO data.
 
-  field-symbols:
-    <articles>     like line of gt_sdm_articles,
-    <instances>    like line of <articles>-sdm_instances,
-    <results>      type standard table,
-    <results_temp> type standard table.
+  FIELD-SYMBOLS:
+    <articles>     LIKE LINE OF gt_sdm_articles,
+    <instances>    LIKE LINE OF <articles>-sdm_instances,
+    <results>      TYPE STANDARD TABLE,
+    <results_temp> TYPE STANDARD TABLE.
 *    <result>       type any.
 
 * Header
-  write range_item-name to gs_tab left-justified.
-  append gs_tab to gt_tab.
+  WRITE range_item-name TO gs_tab LEFT-JUSTIFIED.
+  APPEND gs_tab TO gt_tab.
 
-  loop at gt_sdm_articles assigning <articles>.
+  LOOP AT gt_sdm_articles ASSIGNING <articles>.
 
-    unassign <results>.
+    UNASSIGN <results>.
 
-    loop at <articles>-sdm_instances assigning <instances>.
-      if <instances>-object is initial.
-        continue.
-      endif.
-      if <results> is not assigned.
+    LOOP AT <articles>-sdm_instances ASSIGNING <instances>.
+      IF <instances>-object IS INITIAL.
+        CONTINUE.
+      ENDIF.
+      IF <results> IS NOT ASSIGNED.
         ro_data_empty  = <instances>-object->return_brf_result_structure( ).
-        assign ro_data_empty->* to <results>.
-        refresh:
+        ASSIGN ro_data_empty->* TO <results>.
+        REFRESH:
          <results>.
-      endif.
+      ENDIF.
 
       ro_data        = <instances>-object->return_brf_result( ).
-      assign ro_data->* to <results_temp>.
+      ASSIGN ro_data->* TO <results_temp>.
 
-      if <results_temp> is assigned  and <results_temp> is not initial.
-        append lines of <results_temp> to <results>.
-      endif.
-    endloop.
+      IF <results_temp> IS ASSIGNED  AND <results_temp> IS NOT INITIAL.
+        APPEND LINES OF <results_temp> TO <results>.
+      ENDIF.
+    ENDLOOP.
 
-    sort <results>.
-    delete adjacent duplicates from <results>.
-  endloop.
-endform.
+    SORT <results>.
+    DELETE ADJACENT DUPLICATES FROM <results>.
+  ENDLOOP.
+ENDFORM.
 
-form pop_calcs_details.
-  data:
-    ro_data           type ref to data,
-    ro_data_empty     type ref to data,
-    ro_download_table type ref to data,
-    ls_calcs1         type /gda/sdm_s_calcs_message,
-    ls_calcs2         type /gda/sdm_s_calcs_mtart,
-    ls_calcs3         type /gda/sdm_s_calcs_mstae,
-    ls_calcs4         type /gda/sdm_s_calcs_matkl,
-    ls_calcs5         type /gda/sdm_s_calcs_attyp,
-    ls_wgbez60        type wgbez60,
-    lv_mtstb          type t141t-mtstb,
-    lv_mtbez          type t134t-mtbez,
-    lv_ddtext         type dd07v-ddtext.
+FORM pop_calcs_details.
+  DATA:
+    ro_data           TYPE REF TO data,
+    ro_data_empty     TYPE REF TO data,
+    ro_download_table TYPE REF TO data,
+    ls_calcs1         TYPE /gda/sdm_s_calcs_message,
+    ls_calcs2         TYPE /gda/sdm_s_calcs_mtart,
+    ls_calcs3         TYPE /gda/sdm_s_calcs_mstae,
+    ls_calcs4         TYPE /gda/sdm_s_calcs_matkl,
+    ls_calcs5         TYPE /gda/sdm_s_calcs_attyp,
+    ls_wgbez60        TYPE wgbez60,
+    lv_mtstb          TYPE t141t-mtstb,
+    lv_mtbez          TYPE t134t-mtbez,
+    lv_ddtext         TYPE dd07v-ddtext.
 
-  field-symbols:
-    <articles>       like line of gt_sdm_articles,
-    <instances>      like line of <articles>-sdm_instances,
-    <results>        type standard table,
-    <results_temp>   type standard table,
-    <result>         type any,
+  FIELD-SYMBOLS:
+    <articles>       LIKE LINE OF gt_sdm_articles,
+    <instances>      LIKE LINE OF <articles>-sdm_instances,
+    <results>        TYPE STANDARD TABLE,
+    <results_temp>   TYPE STANDARD TABLE,
+    <result>         TYPE any,
 *    <type>           type any,
-    <id>             type any,
-    <number>         type any,
+    <id>             TYPE any,
+    <number>         TYPE any,
 *    <message>        type any,
-    <calcs1>         like line of gt_calcs1,
-    <calcs2>         like line of gt_calcs2,
-    <calcs3>         like line of gt_calcs3,
-    <calcs4>         like line of gt_calcs4,
-    <calcs5>         like line of gt_calcs5,
-    <field>          type any,
-    <table_download> type any table.
+    <calcs1>         LIKE LINE OF gt_calcs1,
+    <calcs2>         LIKE LINE OF gt_calcs2,
+    <calcs3>         LIKE LINE OF gt_calcs3,
+    <calcs4>         LIKE LINE OF gt_calcs4,
+    <calcs5>         LIKE LINE OF gt_calcs5,
+    <field>          TYPE any,
+    <table_download> TYPE ANY TABLE.
 
 * Header
-  write range_item-name to gs_tab left-justified.
-  append gs_tab to gt_tab.
+  WRITE range_item-name TO gs_tab LEFT-JUSTIFIED.
+  APPEND gs_tab TO gt_tab.
 
-  if gt_calcs1 is initial.
-    loop at gt_sdm_articles assigning <articles>.
+  IF gt_calcs1 IS INITIAL.
+    LOOP AT gt_sdm_articles ASSIGNING <articles>.
 
-      unassign <results>.
+      UNASSIGN <results>.
 
-      loop at <articles>-sdm_instances assigning <instances>.
-        if <instances>-object is initial.
-          continue.
-        endif.
-        if <results> is not assigned.
+      LOOP AT <articles>-sdm_instances ASSIGNING <instances>.
+        IF <instances>-object IS INITIAL.
+          CONTINUE.
+        ENDIF.
+        IF <results> IS NOT ASSIGNED.
           ro_data_empty  = <instances>-object->return_brf_result_structure( ).
-          assign ro_data_empty->* to <results>.
-          refresh:
+          ASSIGN ro_data_empty->* TO <results>.
+          REFRESH:
            <results>.
-        endif.
+        ENDIF.
 
         ro_data        = <instances>-object->return_brf_result( ).
-        assign ro_data->* to <results_temp>.
+        ASSIGN ro_data->* TO <results_temp>.
 
-        if <results_temp> is assigned  and <results_temp> is not initial.
-          append lines of <results_temp> to <results>.
-        endif.
-      endloop.
+        IF <results_temp> IS ASSIGNED  AND <results_temp> IS NOT INITIAL.
+          APPEND LINES OF <results_temp> TO <results>.
+        ENDIF.
+      ENDLOOP.
 
-      sort <results>.
-      delete adjacent duplicates from <results>.
+      SORT <results>.
+      DELETE ADJACENT DUPLICATES FROM <results>.
 
-      loop at <results> assigning <result>.
-        assign component 'ID'      of structure <result> to <id>.
-        assign component 'NUMBER'  of structure <result> to <number>.
+      LOOP AT <results> ASSIGNING <result>.
+        ASSIGN COMPONENT 'ID'      OF STRUCTURE <result> TO <id>.
+        ASSIGN COMPONENT 'NUMBER'  OF STRUCTURE <result> TO <number>.
 
-        select single text from t100
-                           into ls_calcs1-message
-                      where sprsl = sy-langu
-                        and arbgb = <id>
-                        and msgnr = <number>.
-        if sy-subrc = 0.
-          concatenate <number> '-' ls_calcs1-message into ls_calcs1-message.
+        SELECT SINGLE text FROM t100
+                           INTO ls_calcs1-message
+                      WHERE sprsl = sy-langu
+                        AND arbgb = <id>
+                        AND msgnr = <number>.
+        IF sy-subrc = 0.
+          CONCATENATE <number> '-' ls_calcs1-message INTO ls_calcs1-message.
           ls_calcs1-count1  = '1'.
-          collect ls_calcs1 into gt_calcs1.
-          clear ls_calcs1.
-        endif.
-      endloop.
-    endloop.
+          COLLECT ls_calcs1 INTO gt_calcs1.
+          CLEAR ls_calcs1.
+        ENDIF.
+      ENDLOOP.
+    ENDLOOP.
 
-    sort gt_calcs1 by count1 descending.
-  endif.
+    SORT gt_calcs1 BY count1 DESCENDING.
+  ENDIF.
 
-  create data ro_download_table like <dyn_table>.
+  CREATE DATA ro_download_table LIKE <dyn_table>.
 
-  assign ro_download_table->* to <table_download>.
+  ASSIGN ro_download_table->* TO <table_download>.
   <table_download>[] = <dyn_table>[].
 
 *  ASSIGN <dyn_table> TO <table_download>.
 *  SORT <table_download> BY ('KEY_MTART').
 
-  if gt_calcs2 is initial.
-    sort <table_download> by ('KEY_MTART').
-    loop at <table_download> assigning <dyn_wa>.
-      assign component 'KEY_MTART' of structure <dyn_wa> to <field>.
+  IF gt_calcs2 IS INITIAL.
+    SORT <table_download> BY ('KEY_MTART').
+    LOOP AT <table_download> ASSIGNING <dyn_wa>.
+      ASSIGN COMPONENT 'KEY_MTART' OF STRUCTURE <dyn_wa> TO <field>.
       ls_calcs2-count2  = '1'.
-      if <field> is not initial.
-        select single mtbez from t134t
-                           into lv_mtbez
-                      where spras = sy-langu
-                        and mtart = <field>.
-        if sy-subrc = 0.
-          concatenate <field> '-' lv_mtbez into ls_calcs2-key_mtart.
-        endif.
-      else.
+      IF <field> IS NOT INITIAL.
+        SELECT SINGLE mtbez FROM t134t
+                           INTO lv_mtbez
+                      WHERE spras = sy-langu
+                        AND mtart = <field>.
+        IF sy-subrc = 0.
+          CONCATENATE <field> '-' lv_mtbez INTO ls_calcs2-key_mtart.
+        ENDIF.
+      ELSE.
         ls_calcs2-key_mtart = <field>.
-      endif.
-      collect ls_calcs2 into gt_calcs2.
-      clear ls_calcs2.
-    endloop.
-    sort gt_calcs2 by count2 descending.
-  endif.
+      ENDIF.
+      COLLECT ls_calcs2 INTO gt_calcs2.
+      CLEAR ls_calcs2.
+    ENDLOOP.
+    SORT gt_calcs2 BY count2 DESCENDING.
+  ENDIF.
 
-  if gt_calcs3 is initial.
-    sort <table_download> by ('MSTAE').
-    loop at <table_download> assigning <dyn_wa>.
-      assign component 'MSTAE' of structure <dyn_wa> to <field>.
+  IF gt_calcs3 IS INITIAL.
+    SORT <table_download> BY ('MSTAE').
+    LOOP AT <table_download> ASSIGNING <dyn_wa>.
+      ASSIGN COMPONENT 'MSTAE' OF STRUCTURE <dyn_wa> TO <field>.
       ls_calcs3-count3  = '1'.
 
-      if <field> is not initial.
-        select single mtstb from t141t
-                           into lv_mtstb
-                      where spras = sy-langu
-                        and mmsta = <field>.
-        if sy-subrc = 0.
-          concatenate <field> '-' lv_mtstb into ls_calcs3-mstae.
-        endif.
-      else.
+      IF <field> IS NOT INITIAL.
+        SELECT SINGLE mtstb FROM t141t
+                           INTO lv_mtstb
+                      WHERE spras = sy-langu
+                        AND mmsta = <field>.
+        IF sy-subrc = 0.
+          CONCATENATE <field> '-' lv_mtstb INTO ls_calcs3-mstae.
+        ENDIF.
+      ELSE.
         ls_calcs3-mstae = text-944.
-      endif.
-      collect ls_calcs3 into gt_calcs3.
-      clear ls_calcs3.
-    endloop.
-    sort gt_calcs3 by count3 descending.
-  endif.
+      ENDIF.
+      COLLECT ls_calcs3 INTO gt_calcs3.
+      CLEAR ls_calcs3.
+    ENDLOOP.
+    SORT gt_calcs3 BY count3 DESCENDING.
+  ENDIF.
 
-  if gt_calcs4 is initial.
-    sort <table_download> by ('KEY_MATKL').
-    loop at <table_download> assigning <dyn_wa>.
-      assign component 'KEY_MATKL' of structure <dyn_wa> to <field>.
+  IF gt_calcs4 IS INITIAL.
+    SORT <table_download> BY ('KEY_MATKL').
+    LOOP AT <table_download> ASSIGNING <dyn_wa>.
+      ASSIGN COMPONENT 'KEY_MATKL' OF STRUCTURE <dyn_wa> TO <field>.
       ls_calcs4-count4  = '1'.
       ls_calcs4-key_matkl  = <field>.
-      collect ls_calcs4 into gt_calcs4.
-      clear ls_calcs4.
-    endloop.
+      COLLECT ls_calcs4 INTO gt_calcs4.
+      CLEAR ls_calcs4.
+    ENDLOOP.
 
-    loop at gt_calcs4 assigning <calcs4>.
-      select single wgbez from t023t into ls_wgbez60
-           where spras = sy-langu
-             and matkl = <calcs4>-key_matkl.
-      check sy-subrc = 0.
-      if <calcs4>-key_matkl is initial.
+    LOOP AT gt_calcs4 ASSIGNING <calcs4>.
+      SELECT SINGLE wgbez FROM t023t INTO ls_wgbez60
+           WHERE spras = sy-langu
+             AND matkl = <calcs4>-key_matkl.
+      CHECK sy-subrc = 0.
+      IF <calcs4>-key_matkl IS INITIAL.
         <calcs4>-key_matkl = text-944.
-      endif.
-      concatenate <calcs4>-key_matkl '-' ls_wgbez60 into <calcs4>-key_matkl.
-    endloop.
+      ENDIF.
+      CONCATENATE <calcs4>-key_matkl '-' ls_wgbez60 INTO <calcs4>-key_matkl.
+    ENDLOOP.
 
-    sort gt_calcs4 by count4 descending.
-  endif.
+    SORT gt_calcs4 BY count4 DESCENDING.
+  ENDIF.
 
-  if gt_calcs5 is initial.
+  IF gt_calcs5 IS INITIAL.
 
-    sort <table_download> by ('KEY_ATTYP').
-    loop at <table_download> assigning <dyn_wa>.
-      assign component 'KEY_ATTYP' of structure <dyn_wa> to <field>.
+    SORT <table_download> BY ('KEY_ATTYP').
+    LOOP AT <table_download> ASSIGNING <dyn_wa>.
+      ASSIGN COMPONENT 'KEY_ATTYP' OF STRUCTURE <dyn_wa> TO <field>.
       ls_calcs5-count5  = '1'.
 
-      if <field> is not initial.
-        select single ddtext from dd07v
-                           into lv_ddtext
-                      where domname    = 'ATTYP'
-                        and ddlanguage = sy-langu
-                        and domvalue_l = <field>.
-        if sy-subrc = 0.
-          concatenate <field> '-' lv_ddtext into ls_calcs5-key_attyp.
-        endif.
-      else.
+      IF <field> IS NOT INITIAL.
+        SELECT SINGLE ddtext FROM dd07v
+                           INTO lv_ddtext
+                      WHERE domname    = 'ATTYP'
+                        AND ddlanguage = sy-langu
+                        AND domvalue_l = <field>.
+        IF sy-subrc = 0.
+          CONCATENATE <field> '-' lv_ddtext INTO ls_calcs5-key_attyp.
+        ENDIF.
+      ELSE.
         ls_calcs5-key_attyp = <field>.
-      endif.
+      ENDIF.
 
-      collect ls_calcs5 into gt_calcs5.
-      clear ls_calcs5.
-    endloop.
+      COLLECT ls_calcs5 INTO gt_calcs5.
+      CLEAR ls_calcs5.
+    ENDLOOP.
 
-    sort gt_calcs5 by count5 descending.
-  endif.
+    SORT gt_calcs5 BY count5 DESCENDING.
+  ENDIF.
 
 
-  if range_item-name = 'MESSAGE' or range_item-name = 'COUNT1'.
-    loop at gt_calcs1 assigning <calcs1>.
-      concatenate '<calcs1>-' range_item-name into name.
-      assign (name) to <cell>.
-      check sy-subrc = 0.
-      write <cell> to gs_tab left-justified.
-      if range_item-name cs 'COUNT1'.
-        replace all occurrences of '.' in gs_tab with '' .
-        replace all occurrences of ',' in gs_tab with '' .
-      endif..
-      append gs_tab to gt_tab.
-    endloop.
-  endif.
+  IF range_item-name = 'MESSAGE' OR range_item-name = 'COUNT1'.
+    LOOP AT gt_calcs1 ASSIGNING <calcs1>.
+      CONCATENATE '<calcs1>-' range_item-name INTO name.
+      ASSIGN (name) TO <cell>.
+      CHECK sy-subrc = 0.
+      WRITE <cell> TO gs_tab LEFT-JUSTIFIED.
+      IF range_item-name CS 'COUNT1'.
+        REPLACE ALL OCCURRENCES OF '.' IN gs_tab WITH '' .
+        REPLACE ALL OCCURRENCES OF ',' IN gs_tab WITH '' .
+      ENDIF..
+      APPEND gs_tab TO gt_tab.
+    ENDLOOP.
+  ENDIF.
 
-  if range_item-name = 'KEY_MTART' or range_item-name = 'COUNT2'.
-    loop at gt_calcs2 assigning <calcs2>.
-      concatenate '<calcs2>-' range_item-name into name.
-      assign (name) to <cell>.
-      check sy-subrc = 0.
-      write <cell> to gs_tab left-justified.
-      if range_item-name cs 'COUNT2'.
-        replace all occurrences of '.' in gs_tab with '' .
-        replace all occurrences of ',' in gs_tab with '' .
-      endif..
-      append gs_tab to gt_tab.
-    endloop.
-  endif.
+  IF range_item-name = 'KEY_MTART' OR range_item-name = 'COUNT2'.
+    LOOP AT gt_calcs2 ASSIGNING <calcs2>.
+      CONCATENATE '<calcs2>-' range_item-name INTO name.
+      ASSIGN (name) TO <cell>.
+      CHECK sy-subrc = 0.
+      WRITE <cell> TO gs_tab LEFT-JUSTIFIED.
+      IF range_item-name CS 'COUNT2'.
+        REPLACE ALL OCCURRENCES OF '.' IN gs_tab WITH '' .
+        REPLACE ALL OCCURRENCES OF ',' IN gs_tab WITH '' .
+      ENDIF..
+      APPEND gs_tab TO gt_tab.
+    ENDLOOP.
+  ENDIF.
 
-  if range_item-name = 'MSTAE' or range_item-name = 'COUNT3'.
-    loop at gt_calcs3 assigning <calcs3>.
-      concatenate '<calcs3>-' range_item-name into name.
-      assign (name) to <cell>.
-      check sy-subrc = 0.
-      write <cell> to gs_tab left-justified.
-      if range_item-name cs 'COUNT3'.
-        replace all occurrences of '.' in gs_tab with '' .
-        replace all occurrences of ',' in gs_tab with '' .
-      endif.
-      append gs_tab to gt_tab.
-    endloop.
-  endif.
+  IF range_item-name = 'MSTAE' OR range_item-name = 'COUNT3'.
+    LOOP AT gt_calcs3 ASSIGNING <calcs3>.
+      CONCATENATE '<calcs3>-' range_item-name INTO name.
+      ASSIGN (name) TO <cell>.
+      CHECK sy-subrc = 0.
+      WRITE <cell> TO gs_tab LEFT-JUSTIFIED.
+      IF range_item-name CS 'COUNT3'.
+        REPLACE ALL OCCURRENCES OF '.' IN gs_tab WITH '' .
+        REPLACE ALL OCCURRENCES OF ',' IN gs_tab WITH '' .
+      ENDIF.
+      APPEND gs_tab TO gt_tab.
+    ENDLOOP.
+  ENDIF.
 
-  if range_item-name = 'KEY_MATKL' or range_item-name = 'COUNT4'.
-    loop at gt_calcs4 assigning <calcs4>.
-      concatenate '<calcs4>-' range_item-name into name.
-      assign (name) to <cell>.
-      check sy-subrc = 0.
-      write <cell> to gs_tab left-justified.
-      if range_item-name cs 'COUNT4'.
-        replace all occurrences of '.' in gs_tab with '' .
-        replace all occurrences of ',' in gs_tab with '' .
-      endif.
-      append gs_tab to gt_tab.
-    endloop.
-  endif.
+  IF range_item-name = 'KEY_MATKL' OR range_item-name = 'COUNT4'.
+    LOOP AT gt_calcs4 ASSIGNING <calcs4>.
+      CONCATENATE '<calcs4>-' range_item-name INTO name.
+      ASSIGN (name) TO <cell>.
+      CHECK sy-subrc = 0.
+      WRITE <cell> TO gs_tab LEFT-JUSTIFIED.
+      IF range_item-name CS 'COUNT4'.
+        REPLACE ALL OCCURRENCES OF '.' IN gs_tab WITH '' .
+        REPLACE ALL OCCURRENCES OF ',' IN gs_tab WITH '' .
+      ENDIF.
+      APPEND gs_tab TO gt_tab.
+    ENDLOOP.
+  ENDIF.
 
-  if range_item-name = 'KEY_ATTYP' or range_item-name = 'COUNT5'.
-    loop at gt_calcs5 assigning <calcs5>.
-      concatenate '<calcs5>-' range_item-name into name.
-      assign (name) to <cell>.
-      check sy-subrc = 0.
-      write <cell> to gs_tab left-justified.
-      if range_item-name cs 'COUNT5'.
-        replace all occurrences of '.' in gs_tab with '' .
-        replace all occurrences of ',' in gs_tab with '' .
-      endif..
-      append gs_tab to gt_tab.
-    endloop.
-  endif.
+  IF range_item-name = 'KEY_ATTYP' OR range_item-name = 'COUNT5'.
+    LOOP AT gt_calcs5 ASSIGNING <calcs5>.
+      CONCATENATE '<calcs5>-' range_item-name INTO name.
+      ASSIGN (name) TO <cell>.
+      CHECK sy-subrc = 0.
+      WRITE <cell> TO gs_tab LEFT-JUSTIFIED.
+      IF range_item-name CS 'COUNT5'.
+        REPLACE ALL OCCURRENCES OF '.' IN gs_tab WITH '' .
+        REPLACE ALL OCCURRENCES OF ',' IN gs_tab WITH '' .
+      ENDIF..
+      APPEND gs_tab TO gt_tab.
+    ENDLOOP.
+  ENDIF.
 
-endform.
+ENDFORM.
 
 
 *&---------------------------------------------------------------------*
@@ -4014,17 +4014,17 @@ endform.
 *  -->  p1        text
 *  <--  p2        text
 *----------------------------------------------------------------------*
-form process_spreadsheet .
+FORM process_spreadsheet .
 *-----Populate main sheet
-  perform pop_main_sheet.
+  PERFORM pop_main_sheet.
 *-----Populate main sheet
-  perform pop_details_sheet.
+  PERFORM pop_details_sheet.
 *-----Populate context sheet
-  perform pop_context_sheet.
+  PERFORM pop_context_sheet.
 *-----Populate Calcs sheet
-  perform pop_calcs_sheet.
+  PERFORM pop_calcs_sheet.
 
-endform.
+ENDFORM.
 *&---------------------------------------------------------------------*
 *&      Form  POP_MAIN_SHEET
 *&---------------------------------------------------------------------*
@@ -4033,115 +4033,115 @@ endform.
 *  -->  p1        text
 *  <--  p2        text
 *----------------------------------------------------------------------*
-form pop_main_sheet.
-  data:
-    fldcat   type slis_t_fieldcat_alv with header line,
-    lt_views type standard table of /gda/sdm_setup3.
+FORM pop_main_sheet.
+  DATA:
+    fldcat   TYPE slis_t_fieldcat_alv WITH HEADER LINE,
+    lt_views TYPE STANDARD TABLE OF /gda/sdm_setup3.
 
-  field-symbols:
-    <fieldsymbol> like line of <main_setup>-tabstruc[],
-    <fieldname>   type any,
-    <views>       like line of lt_views.
+  FIELD-SYMBOLS:
+    <fieldsymbol> LIKE LINE OF <main_setup>-tabstruc[],
+    <fieldname>   TYPE any,
+    <views>       LIKE LINE OF lt_views.
 
 *-----Main - 1st sheet
-  move 'DATA' to v_sheet.
+  MOVE 'DATA' TO v_sheet.
 
 *------Starting row
-  move '1' to v_row.
+  MOVE '1' TO v_row.
 
 *-----Starting column
-  move '0' to v_col.
+  MOVE '0' TO v_col.
 
-  loop at <main_setup>-tabstruc assigning <fieldsymbol>.
+  LOOP AT <main_setup>-tabstruc ASSIGNING <fieldsymbol>.
 
-    move-corresponding <fieldsymbol> to fldcat.
-    append fldcat.
-    clear fldcat.
-    assign component 'FIELDNAME' of structure <fieldsymbol> to <fieldname>.
-    if <fieldname> = 'LINKAGE'.
+    MOVE-CORRESPONDING <fieldsymbol> TO fldcat.
+    APPEND fldcat.
+    CLEAR fldcat.
+    ASSIGN COMPONENT 'FIELDNAME' OF STRUCTURE <fieldsymbol> TO <fieldname>.
+    IF <fieldname> = 'LINKAGE'.
 * Display All Views in Spreedsheet and hide ones not populated.
-      exit.
-    endif.
-  endloop.
+      EXIT.
+    ENDIF.
+  ENDLOOP.
 
-  select * from /gda/sdm_setup3 into table lt_views
-           where object_type = <main_setup>-object_type
-            and  object_view <> 'DEFAULT'
-            order by ord.
+  SELECT * FROM /gda/sdm_setup3 INTO TABLE lt_views
+           WHERE object_type = <main_setup>-object_type
+            AND  object_view <> 'DEFAULT'
+            ORDER BY ord.
 
 
-  loop at lt_views assigning <views>.
+  LOOP AT lt_views ASSIGNING <views>.
     fldcat-fieldname = <views>-object_view.
-    append fldcat.
-    clear fldcat.
-  endloop.
+    APPEND fldcat.
+    CLEAR fldcat.
+  ENDLOOP.
 
-  loop at lt_views assigning <views>.
-    read table <main_setup>-tabstruc with key fieldname = <views>-object_view transporting no fields.
-    check sy-subrc <> 0.
+  LOOP AT lt_views ASSIGNING <views>.
+    READ TABLE <main_setup>-tabstruc WITH KEY fieldname = <views>-object_view TRANSPORTING NO FIELDS.
+    CHECK sy-subrc <> 0.
     hide_columns-sheet = 'DATA'.
     hide_columns-index = <views>-ord + 11.
     hide_columns-view  = <views>-object_view.
-    append hide_columns.
-    clear hide_columns.
-  endloop.
+    APPEND hide_columns.
+    CLEAR hide_columns.
+  ENDLOOP.
 
   fieldcat[] = fldcat[].
 
-  perform load_fieldcat.
+  PERFORM load_fieldcat.
 
-endform.
+ENDFORM.
 
-form pop_details_sheet .
+FORM pop_details_sheet .
 
-  perform build_partial_cat using space
+  PERFORM build_partial_cat USING space
                                   space
                                   '/GDA/SDM_S_VAL_RESULTS_KEY'
                                   space.
 
 
 *-----Main - 2nd sheet
-  move 'DETAILS' to v_sheet.
+  MOVE 'DETAILS' TO v_sheet.
 
 *------Starting row
-  move '1' to v_row.
+  MOVE '1' TO v_row.
 
 *-----Starting column
-  move '0' to v_col.
+  MOVE '0' TO v_col.
 
   fieldcat[] = gt_fldcat[].
 
-  perform load_fieldcat.
+  PERFORM load_fieldcat.
 
-endform.
+ENDFORM.
 
-form build_partial_cat using prog_name
+FORM build_partial_cat USING prog_name
                              tabname
                              struct
                              include.
 
-  refresh gt_fldcat.
-  clear gt_fldcat.
+  REFRESH gt_fldcat.
+  CLEAR gt_fldcat.
 
-  call function 'REUSE_ALV_FIELDCATALOG_MERGE'
-    exporting
+  CALL FUNCTION 'REUSE_ALV_FIELDCATALOG_MERGE'
+    EXPORTING
       i_program_name         = prog_name
       i_internal_tabname     = tabname
       i_structure_name       = struct
       i_inclname             = include
       i_client_never_display = 'X'
-    changing
+    CHANGING
       ct_fieldcat            = gt_fldcat[]
-    exceptions
+    EXCEPTIONS
       inconsistent_interface = 1
       program_error          = 2
-      others                 = 3.
-  if sy-subrc <> 0.
-    message id sy-msgid type sy-msgty number sy-msgno
-            with sy-msgv1 sy-msgv2 sy-msgv3 sy-msgv4.
-  endif.
+      OTHERS                 = 3.
+  IF sy-subrc <> 0.
+    MESSAGE ID sy-msgid TYPE sy-msgty NUMBER sy-msgno
+            WITH sy-msgv1 sy-msgv2 sy-msgv3 sy-msgv4.
+  ENDIF.
 
-endform.                    " BUILD_PARTIAL_CAT
+ENDFORM.                    " BUILD_PARTIAL_CAT
 
 *FORM progress_bar USING p_progress_message.
 *
@@ -4152,55 +4152,55 @@ endform.                    " BUILD_PARTIAL_CAT
 *
 *ENDFORM.
 
-form pop_context_sheet.
-  data:
-   fldcat type slis_t_fieldcat_alv with header line.
+FORM pop_context_sheet.
+  DATA:
+   fldcat TYPE slis_t_fieldcat_alv WITH HEADER LINE.
 
-  field-symbols:
-   <fieldsymbol> like line of <main_setup>-tabstruc[].
+  FIELD-SYMBOLS:
+   <fieldsymbol> LIKE LINE OF <main_setup>-tabstruc[].
 
 *-----Context - 3nd sheet
-  move 'CONTEXT' to v_sheet.
+  MOVE 'CONTEXT' TO v_sheet.
 
 *------Starting row
-  move '1' to v_row.
+  MOVE '1' TO v_row.
 
 *-----Starting column
-  move '0' to v_col.
+  MOVE '0' TO v_col.
 
-  loop at <main_setup>-tabstruc assigning <fieldsymbol>.
-    move-corresponding <fieldsymbol> to fldcat.
-    append fldcat.
-    clear fldcat.
-  endloop.
+  LOOP AT <main_setup>-tabstruc ASSIGNING <fieldsymbol>.
+    MOVE-CORRESPONDING <fieldsymbol> TO fldcat.
+    APPEND fldcat.
+    CLEAR fldcat.
+  ENDLOOP.
 
   fieldcat[] = fldcat[].
 
-  perform load_fieldcat.
+  PERFORM load_fieldcat.
 
-endform.
+ENDFORM.
 
-form pop_calcs_sheet.
+FORM pop_calcs_sheet.
 
 *-----Context - 3nd sheet
-  move 'CALCS' to v_sheet.
+  MOVE 'CALCS' TO v_sheet.
 
 *------Starting row
-  move '1' to v_row.
+  MOVE '1' TO v_row.
 
 *-----Starting column
-  move '0' to v_col.
+  MOVE '0' TO v_col.
 
-  perform build_partial_cat using space
+  PERFORM build_partial_cat USING space
                                   space
                                   '/GDA/SDM_S_CALCS'
                                   space.
 
   fieldcat[] = gt_fldcat[].
 
-  perform load_fieldcat.
+  PERFORM load_fieldcat.
 
-endform.
+ENDFORM.
 *&---------------------------------------------------------------------*
 *&      Form  ADDITIONAL_DATA2
 *&---------------------------------------------------------------------*
@@ -4209,10 +4209,10 @@ endform.
 *  -->  p1        text
 *  <--  p2        text
 *----------------------------------------------------------------------*
-form additional_data2 using x_mara type /gda/sdm_s_mara_01. ##NEEDED.
+FORM additional_data2 USING x_mara TYPE /gda/sdm_s_mara_01. ##NEEDED.
 
 * Enhance4-here
-endform.
+ENDFORM.
 *&---------------------------------------------------------------------*
 *&      Form  MESSAGE_FILTER
 *&---------------------------------------------------------------------*
@@ -4263,38 +4263,38 @@ endform.
 *  -->  p1        text
 *  <--  p2        text
 *----------------------------------------------------------------------*
-form screen_output_art_rsr.
-  data:
+FORM screen_output_art_rsr.
+  DATA:
     lv_active.
 
 
-  case ok_code.
-    when 'STRUC'.
-      if p_struc = abap_true.
+  CASE ok_code.
+    WHEN 'STRUC'.
+      IF p_struc = abap_true.
         lv_active = 1.
-      else.
+      ELSE.
         lv_active = 0.
-      endif.
-      loop at screen.
-        if screen-group1 = 'SC1'.
+      ENDIF.
+      LOOP AT SCREEN.
+        IF screen-group1 = 'SC1'.
           screen-active = lv_active.
-          modify screen.
-        endif.
-      endloop.
-    when others.
-      if p_struc = abap_true.
+          MODIFY SCREEN.
+        ENDIF.
+      ENDLOOP.
+    WHEN OTHERS.
+      IF p_struc = abap_true.
         lv_active = 1.
-      else.
+      ELSE.
         lv_active = 0.
-      endif.
-      loop at screen.
-        if screen-group1 = 'SC1'.
+      ENDIF.
+      LOOP AT SCREEN.
+        IF screen-group1 = 'SC1'.
           screen-active = lv_active.
-          modify screen.
-        endif.
-      endloop.
-  endcase.
-endform.
+          MODIFY SCREEN.
+        ENDIF.
+      ENDLOOP.
+  ENDCASE.
+ENDFORM.
 *&---------------------------------------------------------------------*
 *&      Form  INIT_ART_RSR
 *&---------------------------------------------------------------------*
@@ -4303,44 +4303,44 @@ endform.
 *  -->  p1        text
 *  <--  p2        text
 *----------------------------------------------------------------------*
-form init_art_rsr .
+FORM init_art_rsr .
   s_attyps-sign   = 'I'.
   s_attyps-option = 'EQ'.
   s_attyps-low    = '00'.
-  append  s_attyps.
+  APPEND  s_attyps.
 
   s_attyps-sign   = 'I'.
   s_attyps-option = 'EQ'.
   s_attyps-low    = '01'.
-  append  s_attyps.
+  APPEND  s_attyps.
 
   s_attyps-sign   = 'I'.
   s_attyps-option = 'EQ'.
   s_attyps-low    = '02'.
-  append  s_attyps.
+  APPEND  s_attyps.
 
   s_attyps-sign   = 'I'.
   s_attyps-option = 'EQ'.
   s_attyps-low    = '10'.
-  append  s_attyps.
+  APPEND  s_attyps.
 
   s_attyps-sign   = 'I'.
   s_attyps-option = 'EQ'.
   s_attyps-low    = '11'.
-  append  s_attyps.
+  APPEND  s_attyps.
 
   s_attyps-sign   = 'I'.
   s_attyps-option = 'EQ'.
   s_attyps-low    = '12'.
-  append  s_attyps.
+  APPEND  s_attyps.
 
   s_attyps-sign   = 'I'.
   s_attyps-option = 'EQ'.
   s_attyps-low    = '21'.
-  append  s_attyps.
+  APPEND  s_attyps.
 
   s_attyps-sign   = 'I'.
   s_attyps-option = 'EQ'.
   s_attyps-low    = '22'.
-  append  s_attyps.
-endform.
+  APPEND  s_attyps.
+ENDFORM.
