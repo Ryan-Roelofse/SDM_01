@@ -8,10 +8,3 @@ if <main_output>-tabname = '/GDA/SDM_S_MARC_01' AND <main_output_02>-tabname = '
 and <SECONDARY>-FIELDNAME = 'LGORT'.
 CONTINUE.
 endif.
-
-
-*if <main_output>-tabname = '/GDA/SDM_S_MLGN_01' AND <main_output_02>-tabname = '/GDA/SDM_S_MLGT_01'
-*and <SECONDARY>-FIELDNAME = 'LGTYP'.
-*  BREAK-POINT.
-*CONTINUE.
-*endif.

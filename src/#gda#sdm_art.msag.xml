@@ -1025,7 +1025,7 @@
      <SPRSL>E</SPRSL>
      <ARBGB>/GDA/SDM_ART</ARBGB>
      <MSGNR>615</MSGNR>
-     <TEXT>SDM Article (MRP): Planning material cannot be blank</TEXT>
+     <TEXT>SDM Article (MRP): Planning material must be blank</TEXT>
     </T100>
     <T100>
      <SPRSL>E</SPRSL>

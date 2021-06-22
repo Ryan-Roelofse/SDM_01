@@ -137,6 +137,7 @@ FORM sdm_logic .
 
       gs_instance-type   = <objects>-type.
       gs_instance-object = <objects>-object.
+
       APPEND gs_instance TO gs_sdm_objects-sdm_instances.
     ENDLOOP.
 
@@ -204,7 +205,7 @@ FORM sdm_logic .
     gs_sdm_objects-marc[]   = gt_marc_sdm[].
     gs_sdm_objects-mard[]   = gt_mard_sdm[].
     gs_sdm_objects-mbew[]   = gt_mbew_sdm[].
-*    gs_sdm_objects-meinh[]  = gt_meinh_sdm[].
+    gs_sdm_objects-meinh[]  = gt_meinh_sdm[].
 *    gs_sdm_objects-mfhm[]   = gt_mfhm_sdm[].
     gs_sdm_objects-mlgn[]   = gt_mlgn_sdm[].
     gs_sdm_objects-mlgt[]   = gt_mlgt_sdm[].

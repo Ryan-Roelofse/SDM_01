@@ -104,7 +104,7 @@ CLASS /GDA/SDM_CL_SPR_01 IMPLEMENTATION.
       is_headdata          TYPE bapie1mathead,
       lt_clientdata        TYPE bapie1marart_tab,
       lt_clientdatax       TYPE bapie1marartx_tab,
-      is_plantdata         type BAPIE1MARCRT,
+      is_plantdata         TYPE bapie1marcrt,
       it_plantdata         TYPE bapie1marcrt_tab,
       it_plantdatax        TYPE bapie1marcrtx_tab,
       it_salesdata         TYPE bapie1mvkert_tab,
@@ -144,12 +144,15 @@ CLASS /GDA/SDM_CL_SPR_01 IMPLEMENTATION.
     CASE me->ps_mapping-bapi_structure.
       WHEN 'BAPIE1MARART'.
         is_headdata-basic_view = abap_true.
+        is_headdata-function   = '0004'.
 
         APPEND INITIAL LINE TO lt_clientdata  ASSIGNING FIELD-SYMBOL(<lfs_clientdata>).
+        <lfs_clientdata>-material = is_headdata-material.
         ASSIGN COMPONENT me->ps_mapping-bapi_fieldname OF STRUCTURE <lfs_clientdata> TO <update_field>.
         <update_field>        = me->pv_update_value.
 
         APPEND INITIAL LINE TO lt_clientdatax ASSIGNING FIELD-SYMBOL(<lfs_clientdatax>).
+        <lfs_clientdatax>-material = is_headdata-material.
         ASSIGN COMPONENT me->ps_mapping-bapi_fieldname OF STRUCTURE <lfs_clientdatax> TO <update_fieldx>.
         <update_fieldx>        = abap_true.
       WHEN 'BAPIE1MAKTRT'.
@@ -158,9 +161,9 @@ CLASS /GDA/SDM_CL_SPR_01 IMPLEMENTATION.
         APPEND INITIAL LINE TO it_mat_desc  ASSIGNING FIELD-SYMBOL(<lfs_mat_desc>).
         ASSIGN COMPONENT me->ps_mapping-bapi_fieldname OF STRUCTURE <lfs_mat_desc> TO <update_field>.
         <update_field>        = me->pv_update_value.
+        <lfs_mat_desc>-material = is_headdata-material.
         <lfs_mat_desc>-langu     = sy-langu.
         <lfs_mat_desc>-langu_iso = sy-langu.
-
       WHEN 'BAPIE1MARCRT'.
 
         DATA:
@@ -196,22 +199,44 @@ CLASS /GDA/SDM_CL_SPR_01 IMPLEMENTATION.
 
         ENDIF.
       WHEN OTHERS.
+        DATA(lv_check) = 'X'.
     ENDCASE.
 
-    CALL FUNCTION 'BAPI_MATERIAL_MAINTAINDATA_RT'
-      EXPORTING
-        headdata    = is_headdata
-      IMPORTING
-        return      = ls_return
-      TABLES
-        clientdata  = lt_clientdata
-        clientdatax = lt_clientdatax.
+    IF lv_check NE 'X'.
+      CALL FUNCTION 'BAPI_MATERIAL_MAINTAINDATA_RT'
+        EXPORTING
+          headdata            = is_headdata
+        IMPORTING
+          return              = ls_return
+        TABLES
+          clientdata          = lt_clientdata
+          clientdatax         = lt_clientdatax
+          materialdescription = it_mat_desc.
 
-    IF sy-subrc = 0.
-      CALL FUNCTION 'BAPI_TRANSACTION_COMMIT'.
-    ENDIF.
+      IF sy-subrc = 0.
+        CALL FUNCTION 'BAPI_TRANSACTION_COMMIT'.
+      ENDIF.
+    ELSE.
 
+      DATA:
+            is_headdata1          TYPE bapimathead,
+            is_clientdata         TYPE bapi_mara,
+            is_clientdatax        TYPE bapi_marax,
+            is_plantdata1         TYPE bapi_marc,
+            is_plantdatax         TYPE bapi_marcx,
+            is_salesdata          TYPE bapi_mvke,
+            is_salesdatax         TYPE bapi_mvkex,
+            is_warehousedata      TYPE bapi_mlgn,
+            is_warehousedatax     TYPE bapi_mlgnx,
+            is_valuationdata      TYPE bapi_mbew,
+            is_valuationdatax     TYPE bapi_mbewx,
+            is_mat_desc1          TYPE bapi_makt,
+            it_mat_desc1          TYPE t_bapi_makt,
+            it_taxclass1          TYPE t_bapi_mlan,
+            it_extensionin        TYPE t_bapiparex,
+            it_extensioninx       TYPE t_bapiparexx.
 
+      CASE me->ps_mapping-bapi_structure.
 *      when 'BAPI_MAKT'.
 *        is_headdata-basic_view = abap_true.
 *
@@ -293,41 +318,41 @@ CLASS /GDA/SDM_CL_SPR_01 IMPLEMENTATION.
 *          <update_fieldx>        = abap_true.
 *        endif.
 *
-*      when 'BAPI_MBEW'.
-*
-*        is_headdata-account_view = abap_true.
-*
-*        read table keys assigning <key> with key  fieldname = 'BWKEY'.
-*        if sy-subrc = 0.
-*          is_valuationdata-val_area  = <key>-value.
-*          is_valuationdatax-val_area = <key>-value.
-*          read table keys assigning <key> with key  fieldname = 'BWTAR'.
-*          if sy-subrc = 0.
-*            is_valuationdata-val_type  = <key>-value.
-*            is_valuationdatax-val_type = <key>-value.
-*
-*            assign component me->ps_mapping-bapi_fieldname of structure is_valuationdata to <update_field>.
-*            <update_field>        = me->pv_update_value.
-*
-*            assign component me->ps_mapping-bapi_fieldname of structure is_valuationdatax to <update_fieldx>.
-*            <update_fieldx>        = abap_true.
-*
-*          else.
-*            me->pv_message-type       = 'E'.
-*            me->pv_message-id         = '/GDA/SDM_SPRINT'.
-*            me->pv_message-number     = '012'.
-*            me->pv_message-message_v1 = me->pv_exception_details-tabname.
-*            me->pv_message-message_v2 = me->pv_exception_details-field.
-*            return.
-*          endif.
-*        else.
-*          me->pv_message-type       = 'E'.
-*          me->pv_message-id         = '/GDA/SDM_SPRINT'.
-*          me->pv_message-number     = '012'.
-*          me->pv_message-message_v1 = me->pv_exception_details-tabname.
-*          me->pv_message-message_v2 = me->pv_exception_details-field.
-*          return.
-*        endif.
+        WHEN 'BAPI_MBEW'.
+
+          is_headdata1-account_view = abap_true.
+
+          READ TABLE keys ASSIGNING <key> WITH KEY  fieldname = 'BWKEY'.
+          IF sy-subrc = 0.
+            is_valuationdata-val_area  = <key>-value.
+            is_valuationdatax-val_area = <key>-value.
+            READ TABLE keys ASSIGNING <key> WITH KEY  fieldname = 'BWTAR'.
+            IF sy-subrc = 0.
+              is_valuationdata-val_type  = <key>-value.
+              is_valuationdatax-val_type = <key>-value.
+
+              ASSIGN COMPONENT me->ps_mapping-bapi_fieldname OF STRUCTURE is_valuationdata TO <update_field>.
+              <update_field>        = me->pv_update_value.
+
+              ASSIGN COMPONENT me->ps_mapping-bapi_fieldname OF STRUCTURE is_valuationdatax TO <update_fieldx>.
+              <update_fieldx>        = abap_true.
+
+            ELSE.
+              me->pv_message-type       = 'E'.
+              me->pv_message-id         = '/GDA/SDM_SPRINT'.
+              me->pv_message-number     = '012'.
+              me->pv_message-message_v1 = me->pv_exception_details-tabname.
+              me->pv_message-message_v2 = me->pv_exception_details-field.
+              RETURN.
+            ENDIF.
+          ELSE.
+            me->pv_message-type       = 'E'.
+            me->pv_message-id         = '/GDA/SDM_SPRINT'.
+            me->pv_message-number     = '012'.
+            me->pv_message-message_v1 = me->pv_exception_details-tabname.
+            me->pv_message-message_v2 = me->pv_exception_details-field.
+            RETURN.
+          ENDIF.
 *
 *
 **    it_mat_desc
@@ -338,39 +363,41 @@ CLASS /GDA/SDM_CL_SPR_01 IMPLEMENTATION.
 *        me->pv_message-message_v1 = sap_table.
 *        return.
 *
-*    endcase.
+      ENDCASE.
 *
-** Save Material Master Data
-*    call function 'BAPI_MATERIAL_SAVEDATA'
-*      exporting
-*        headdata            = is_headdata
-*        clientdata          = is_clientdata
-*        clientdatax         = is_clientdatax
-*        plantdata           = is_plantdata
-*        plantdatax          = is_plantdatax
-*        salesdata           = is_salesdata
-*        salesdatax          = is_salesdatax
-*        valuationdata       = is_valuationdata
-*        valuationdatax      = is_valuationdatax
-*      importing
-*        return              = cs_messages
-*      tables
-*        materialdescription = it_mat_desc
-*        taxclassifications  = it_taxclass
-*        extensionin         = it_extensionin
-*        extensioninx        = it_extensioninx.
-
-
-    IF ls_return-type = 'S'.
-      DATA:
-       commit_message TYPE bapiret2.
-
-      CALL FUNCTION 'BAPI_TRANSACTION_COMMIT'
+* Save Material Master Data
+      CLEAR cs_messages.
+      CALL FUNCTION 'BAPI_MATERIAL_SAVEDATA'
         EXPORTING
-          wait   = abap_true
+          headdata            = is_headdata1
+          clientdata          = is_clientdata
+          clientdatax         = is_clientdatax
+          plantdata           = is_plantdata1
+          plantdatax          = is_plantdatax
+          salesdata           = is_salesdata
+          salesdatax          = is_salesdatax
+          valuationdata       = is_valuationdata
+          valuationdatax      = is_valuationdatax
         IMPORTING
-          return = commit_message.
+          return              = cs_messages
+        TABLES
+          materialdescription = it_mat_desc1
+          taxclassifications  = it_taxclass1
+          extensionin         = it_extensionin
+          extensioninx        = it_extensioninx.
 
+
+      IF ls_return-type = 'S'.
+        DATA:
+         commit_message TYPE bapiret2.
+
+        CALL FUNCTION 'BAPI_TRANSACTION_COMMIT'
+          EXPORTING
+            wait   = abap_true
+          IMPORTING
+            return = commit_message.
+
+      ENDIF.
     ENDIF.
 
     MOVE-CORRESPONDING ls_return TO me->pv_message.
