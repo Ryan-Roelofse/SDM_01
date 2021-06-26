@@ -81,24 +81,6 @@ CLASS /GDA/SDM_CL_SPR_01 IMPLEMENTATION.
 
   METHOD /gda/sdm_if_spr_update~update_data_bapi.
 *CALL METHOD SUPER->/GDA/SDM_IF_SPR_UPDATE~UPDATE_DATA_BAPI
-*    .
-
-*    data:
-*      is_headdata          type bapimathead,
-*      is_clientdata        type bapi_mara,
-*      is_clientdatax       type bapi_marax,
-*      is_plantdata         type bapi_marc,
-*      is_plantdatax        type bapi_marcx,
-*      is_salesdata         type bapi_mvke,
-*      is_salesdatax        type bapi_mvkex,
-*      is_valuationdata  type bapi_mbew,
-*      is_valuationdatax type bapi_mbewx,
-*      is_mat_desc          type bapi_makt,
-*      it_mat_desc          type t_bapi_makt,
-*      it_taxclass          type t_bapi_mlan,
-*      it_extensionin       type t_bapiparex,
-*      it_extensioninx      type t_bapiparexx,
-*      cs_messages          type bapiret2.
 
     DATA:
       is_headdata          TYPE bapie1mathead,
@@ -116,7 +98,9 @@ CLASS /GDA/SDM_CL_SPR_01 IMPLEMENTATION.
 *      it_extensionin       TYPE t_bapiparex,
 *      it_extensioninx      TYPE t_bapiparexx,
       ls_return            TYPE bapireturn1,
-      cs_messages          TYPE bapiret2.
+      cs_messages          TYPE bapiret2,
+      lt_unitofmeasure     TYPE bapie1marmrt_tab,
+      lt_unitofmeasurex    TYPE bapie1marmrtx_tab.
 
     FIELD-SYMBOLS:
        <update_field>  TYPE any,
@@ -155,6 +139,17 @@ CLASS /GDA/SDM_CL_SPR_01 IMPLEMENTATION.
         <lfs_clientdatax>-material = is_headdata-material.
         ASSIGN COMPONENT me->ps_mapping-bapi_fieldname OF STRUCTURE <lfs_clientdatax> TO <update_fieldx>.
         <update_fieldx>        = abap_true.
+
+        CALL FUNCTION 'CONVERSION_EXIT_CUNIT_INPUT'
+          EXPORTING
+            input          = <update_field>
+            language       = sy-langu
+          IMPORTING
+            output         = <update_field>
+          EXCEPTIONS
+            unit_not_found = 1
+            OTHERS         = 2.
+
       WHEN 'BAPIE1MAKTRT'.
         is_headdata-basic_view = abap_true.
 
@@ -165,13 +160,11 @@ CLASS /GDA/SDM_CL_SPR_01 IMPLEMENTATION.
         <lfs_mat_desc>-langu     = sy-langu.
         <lfs_mat_desc>-langu_iso = sy-langu.
       WHEN 'BAPIE1MARCRT'.
-
         DATA:
           view TYPE t130f-pstat,
           name TYPE t130f-fname.
 
         CONCATENATE  sap_table '-' me->ps_mapping-sdm_fieldname INTO name.
-
 * Determine which view to update...
         SELECT SINGLE pstat FROM t130f
                         INTO view
@@ -188,7 +181,6 @@ CLASS /GDA/SDM_CL_SPR_01 IMPLEMENTATION.
 *          is_plantdatax-plant = <key>-value.
 *          ASSIGN COMPONENT me->ps_mapping-bapi_fieldname OF STRUCTURE is_plantdatax TO <update_fieldx>.
 *          <update_fieldx>        = abap_true.
-
         ELSE.
           me->pv_message-type       = 'E'.
           me->pv_message-id         = '/GDA/SDM_SPRINT'.
@@ -196,8 +188,21 @@ CLASS /GDA/SDM_CL_SPR_01 IMPLEMENTATION.
           me->pv_message-message_v1 = me->pv_exception_details-tabname.
           me->pv_message-message_v2 = me->pv_exception_details-field.
           RETURN.
-
         ENDIF.
+      WHEN 'BAPIE1MARMRT'.
+        is_headdata-basic_view = abap_true.
+        is_headdata-function   = '0004'.
+
+        APPEND INITIAL LINE TO lt_unitofmeasure  ASSIGNING FIELD-SYMBOL(<lfs_unitofmeasure>).
+        <lfs_clientdata>-material = is_headdata-material.
+        ASSIGN COMPONENT me->ps_mapping-bapi_fieldname OF STRUCTURE <lfs_unitofmeasure> TO <update_field>.
+        <update_field>        = me->pv_update_value.
+
+        APPEND INITIAL LINE TO lt_unitofmeasurex ASSIGNING FIELD-SYMBOL(<lfs_unitofmeasurex>).
+        <lfs_clientdatax>-material = is_headdata-material.
+        ASSIGN COMPONENT me->ps_mapping-bapi_fieldname OF STRUCTURE <lfs_unitofmeasurex> TO <update_fieldx>.
+        <update_fieldx>        = abap_true.
+
       WHEN OTHERS.
         DATA(lv_check) = 'X'.
     ENDCASE.
@@ -211,7 +216,9 @@ CLASS /GDA/SDM_CL_SPR_01 IMPLEMENTATION.
         TABLES
           clientdata          = lt_clientdata
           clientdatax         = lt_clientdatax
-          materialdescription = it_mat_desc.
+          materialdescription = it_mat_desc
+          unitsofmeasure      = lt_unitofmeasure
+          unitsofmeasurex     = lt_unitofmeasurex.
 
       IF sy-subrc = 0.
         CALL FUNCTION 'BAPI_TRANSACTION_COMMIT'.
@@ -237,87 +244,83 @@ CLASS /GDA/SDM_CL_SPR_01 IMPLEMENTATION.
             it_extensioninx       TYPE t_bapiparexx.
 
       CASE me->ps_mapping-bapi_structure.
-*      when 'BAPI_MAKT'.
-*        is_headdata-basic_view = abap_true.
-*
-*        assign component me->ps_mapping-bapi_fieldname of structure is_mat_desc to <update_field>.
-*        <update_field>        = me->pv_update_value.
-*        is_mat_desc-langu     = sy-langu.
-*        is_mat_desc-langu_iso = sy-langu.
-*        append is_mat_desc to it_mat_desc.
-*      when 'BAPI_MARA'.
-*        is_headdata-basic_view = abap_true.
-*
-*        assign component me->ps_mapping-bapi_fieldname of structure is_clientdata to <update_field>.
-*        <update_field>        = me->pv_update_value.
-*
-*        assign component me->ps_mapping-bapi_fieldname of structure is_clientdatax to <update_fieldx>.
-*        <update_fieldx>        = abap_true.
-*
-*      when 'BAPI_MARC'.
-*
-*        data:
-*          view type t130f-pstat,
-*          name type t130f-fname.
-*
-*        concatenate  sap_table '-' me->ps_mapping-sdm_fieldname into name.
-*
-** Determine which view to update...
-*        select single pstat from t130f
-*                        into view
-*                         where fname = name.
-*        if view = 'D'.
-*          is_headdata-mrp_view     = abap_true.
-*        else.
-*          is_headdata-storage_view = abap_true.
-*        endif.
-*
-*        read table keys assigning <key> with key  fieldname = 'WERKS'.
-*        if sy-subrc = 0.
-*          is_plantdata-plant = <key>-value.
-*          assign component me->ps_mapping-bapi_fieldname of structure is_plantdata to <update_field>.
-*          <update_field>        = me->pv_update_value.
-*
-*          is_plantdatax-plant = <key>-value.
-*          assign component me->ps_mapping-bapi_fieldname of structure is_plantdatax to <update_fieldx>.
-*          <update_fieldx>        = abap_true.
-*
-*        else.
-*          me->pv_message-type       = 'E'.
-*          me->pv_message-id         = '/GDA/SDM_SPRINT'.
-*          me->pv_message-number     = '012'.
-*          me->pv_message-message_v1 = me->pv_exception_details-tabname.
-*          me->pv_message-message_v2 = me->pv_exception_details-field.
-*          return.
-*
-*        endif.
-*
-*      when 'BAPI_MVKE'.
-*
-*        is_headdata-sales_view = abap_true.
-*
-*        read table keys assigning <key> with key  fieldname = 'VKORG'.
-*        if sy-subrc = 0.
-*          is_salesdata-sales_org = <key>-value.
-*          assign component me->ps_mapping-bapi_fieldname of structure is_salesdata to <update_field>.
-*          <update_field>        = me->pv_update_value.
-*
-*          is_salesdatax-sales_org = <key>-value.
-*          assign component me->ps_mapping-bapi_fieldname of structure is_salesdatax to <update_fieldx>.
-*          <update_fieldx>        = abap_true.
-*        endif.
-*
-*        read table keys assigning <key> with key  fieldname = 'VTWEG'.
-*        if sy-subrc = 0.
-*          is_salesdata-distr_chan = <key>-value.
-*          assign component me->ps_mapping-bapi_fieldname of structure is_plantdata to <update_field>.
-*          <update_field>        = me->pv_update_value.
-*
-*          is_salesdatax-distr_chan = <key>-value.
-*          assign component me->ps_mapping-bapi_fieldname of structure is_plantdatax to <update_fieldx>.
-*          <update_fieldx>        = abap_true.
-*        endif.
-*
+        WHEN 'BAPI_MAKT'.
+          is_headdata1-basic_view = abap_true.
+
+          ASSIGN COMPONENT me->ps_mapping-bapi_fieldname OF STRUCTURE is_mat_desc1 TO <update_field>.
+          <update_field>        = me->pv_update_value.
+          is_mat_desc1-langu     = sy-langu.
+          is_mat_desc1-langu_iso = sy-langu.
+          APPEND is_mat_desc1 TO it_mat_desc1.
+        WHEN 'BAPI_MARA'.
+          is_headdata-basic_view = abap_true.
+
+          ASSIGN COMPONENT me->ps_mapping-bapi_fieldname OF STRUCTURE is_clientdata TO <update_field>.
+          <update_field>        = me->pv_update_value.
+
+          ASSIGN COMPONENT me->ps_mapping-bapi_fieldname OF STRUCTURE is_clientdatax TO <update_fieldx>.
+          <update_fieldx>        = abap_true.
+
+        WHEN 'BAPI_MARC'.
+
+          CONCATENATE  sap_table '-' me->ps_mapping-sdm_fieldname INTO name.
+
+* Determine which view to update...
+          SELECT SINGLE pstat FROM t130f
+                          INTO view
+                           WHERE fname = name.
+          IF view = 'D'.
+            is_headdata1-mrp_view     = abap_true.
+          ELSE.
+            is_headdata1-storage_view = abap_true.
+          ENDIF.
+
+          READ TABLE keys ASSIGNING <key> WITH KEY  fieldname = 'WERKS'.
+          IF sy-subrc = 0.
+            is_plantdata-plant = <key>-value.
+            ASSIGN COMPONENT me->ps_mapping-bapi_fieldname OF STRUCTURE is_plantdata TO <update_field>.
+            <update_field>        = me->pv_update_value.
+
+            is_plantdatax-plant = <key>-value.
+            ASSIGN COMPONENT me->ps_mapping-bapi_fieldname OF STRUCTURE is_plantdatax TO <update_fieldx>.
+            <update_fieldx>        = abap_true.
+
+          ELSE.
+            me->pv_message-type       = 'E'.
+            me->pv_message-id         = '/GDA/SDM_SPRINT'.
+            me->pv_message-number     = '012'.
+            me->pv_message-message_v1 = me->pv_exception_details-tabname.
+            me->pv_message-message_v2 = me->pv_exception_details-field.
+            RETURN.
+
+          ENDIF.
+
+        WHEN 'BAPI_MVKE'.
+
+          is_headdata1-sales_view = abap_true.
+
+          READ TABLE keys ASSIGNING <key> WITH KEY  fieldname = 'VKORG'.
+          IF sy-subrc = 0.
+            is_salesdata-sales_org = <key>-value.
+            ASSIGN COMPONENT me->ps_mapping-bapi_fieldname OF STRUCTURE is_salesdata TO <update_field>.
+            <update_field>        = me->pv_update_value.
+
+            is_salesdatax-sales_org = <key>-value.
+            ASSIGN COMPONENT me->ps_mapping-bapi_fieldname OF STRUCTURE is_salesdatax TO <update_fieldx>.
+            <update_fieldx>        = abap_true.
+          ENDIF.
+
+          READ TABLE keys ASSIGNING <key> WITH KEY  fieldname = 'VTWEG'.
+          IF sy-subrc = 0.
+            is_salesdata-distr_chan = <key>-value.
+            ASSIGN COMPONENT me->ps_mapping-bapi_fieldname OF STRUCTURE is_plantdata TO <update_field>.
+            <update_field>        = me->pv_update_value.
+
+            is_salesdatax-distr_chan = <key>-value.
+            ASSIGN COMPONENT me->ps_mapping-bapi_fieldname OF STRUCTURE is_plantdatax TO <update_fieldx>.
+            <update_fieldx>        = abap_true.
+          ENDIF.
+
         WHEN 'BAPI_MBEW'.
 
           is_headdata1-account_view = abap_true.

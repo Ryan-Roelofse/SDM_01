@@ -1013,7 +1013,7 @@
      <SPRSL>E</SPRSL>
      <ARBGB>/GDA/SDM_ART</ARBGB>
      <MSGNR>613</MSGNR>
-     <TEXT>SDM Article (Basic Data): Gross Weight must be blank</TEXT>
+     <TEXT>SDM Article (Basic Data): Gross Weight cannot be blank</TEXT>
     </T100>
     <T100>
      <SPRSL>E</SPRSL>

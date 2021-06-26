@@ -2111,7 +2111,7 @@ CLASS /GDA/SDM_CL_ART_SELECTIONS IMPLEMENTATION.
             if sy-subrc = 0.
               move-corresponding ls_mpop to ls_mpop_sdm.
 *              ls_mpop_sdm-sdm_tabkey = <ls_mapr>-sdm_tabkey.
-              ls_mpop_sdm-sdm_tabkey = /gda/cl_sdm_data_model_main=>build_string_from_key( i_tabname  = 'MARC'
+              ls_mpop_sdm-sdm_tabkey = /gda/cl_sdm_data_model_main=>build_string_from_key( i_tabname  = 'MAPR' "'MARC'
                                                                            i_contents = ls_mpop_sdm ).
 
               insert ls_mpop_sdm into table me->mt_mpop_spec.

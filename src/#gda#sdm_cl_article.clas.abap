@@ -221,33 +221,24 @@ CLASS /GDA/SDM_CL_ARTICLE IMPLEMENTATION.
 
 
   method call_brf.
+   data:
+    sdm_gui_messages_val type standard table of ty_rept_output,
+    sdm_gui_message_val  type ty_rept_output,
+    sdm_gui_messages_der type standard table of ty_report_output_der,
+    sdm_gui_message_der  type ty_report_output_der,
+    message              type string,
+    sdm_messages         type ref to data,
+    sdm_messages_empty   type ref to data.
 
-    data:
-*      lt_sdm_gui_out       type standard table of /gda/sdm_s_val_results_key,
-      lt_sdm_gui_out       type standard table of ty_rept_output,
-*      ls_sdm_gui_out       type /gda/sdm_s_val_results_key,
-      ls_sdm_gui_out       type ty_rept_output,
-      lt_report_output_der type standard table of ty_report_output_der,
-      ls_report_output_der type ty_report_output_der,
-      lv_message           type string,
-      ls_brf_exc_rep_line  type /gda/sdm_exceptions_alv,
-      er_data              type ref to data,
-      er_data_empty        type ref to data.
-
-    field-symbols:
-      <results>             type standard table,
-      <val_results>         like line of me->mt_validation_results,
-      <der_results>         like line of me->mt_derivation_results,
-      <table>               type any table,
-      <any>                 type any,
-      <attributes_instance> like line of me->mt_brf_attributes_instance,
-      <matnr>               type any,
-      <mara>                type /gda/sdm_s_mara_01,
-      <makt>                type /gda/sdm_s_makt_01,
-      <makt_tab>            type /gda/sdm_t_makt_01,
-      <tab>                 type any,
-      <value>               type any,
-      <name>                type any.
+   field-symbols:
+    <brf_results_val>     like line of me->mt_validation_results,
+    <attributes_instance> like line of me->mt_brf_attributes_instance,
+    <mara>                type /gda/sdm_s_mara_01,
+    <makt>                type /gda/sdm_s_makt_01,
+    <makt_tab>            type /gda/sdm_t_makt_01,
+    <table>               type any table,
+    <brf_results>         type standard table,
+    <brf_result>          type any.
 
     try.
         call method super->call_brf.
@@ -259,23 +250,19 @@ CLASS /GDA/SDM_CL_ARTICLE IMPLEMENTATION.
 
 * For Reporting - Return BRF results with Master Data
     if me->mv_source = me->mc_rep.
-
       if me->mv_type = me->mc_validation.
-        create data er_data       like lt_sdm_gui_out.
-        create data er_data_empty like lt_sdm_gui_out.
+        create data sdm_messages       like sdm_gui_messages_val.
+        create data sdm_messages_empty like sdm_gui_messages_val.
       elseif me->mv_type = me->mc_derivation.
-        create data er_data       like lt_report_output_der.
-        create data er_data_empty like lt_report_output_der.
+        create data sdm_messages       like sdm_gui_messages_der.
+        create data sdm_messages_empty like sdm_gui_messages_der.
       else. " Most likely Post Processing
-        create data er_data       like lt_sdm_gui_out.
-        create data er_data_empty like lt_sdm_gui_out.
+        create data sdm_messages       like sdm_gui_messages_val.
+        create data sdm_messages_empty like sdm_gui_messages_val.
       endif.
-
-      assign er_data->*           to <table>.
-
+      assign sdm_messages->*           to <table>.
 * Derivation
       if me->mv_type = me->mc_derivation.
-
         read table me->mt_brf_attributes_instance assigning <attributes_instance> with key name = '/GDA/SDM_S_MARA_01'
                                                                                            type = me->mv_type.
         if sy-subrc = 0.
@@ -295,58 +282,25 @@ CLASS /GDA/SDM_CL_ARTICLE IMPLEMENTATION.
           assign <attributes_instance>-lr_data->* to <mara>.
         endif.
 
-        assign me->mo_brf_result->* to <results>.
+        assign me->mo_brf_result->* to <brf_results>.
 
-        loop at <results> assigning <any>.
 
-*          assign component 'VALUE' of structure <any> to <value>.
-*          if <value> = 'Config'.
-*            assign component 'TABLE' of structure <any> to <tab>.
-*
-*            replace '_01' with '' into  <tab>.
-*            condense <tab> no-gaps.
-*
-*            if <tab> cs 'T/GDA/SDM_S_'.
-*              replace 'T/GDA/SDM_S_' with 'W' into  <tab>.
-*              condense <tab> no-gaps.
-*            elseif <tab> cs 'T/GDA/SDM_T_'.
-*              replace 'T/GDA/SDM_T_' with 'W' into  <tab>.
-*              condense <tab> no-gaps.
-*            elseif <tab> cs '/GDA/SDM_S_'.
-*              replace '/GDA/SDM_S_' with '' into  <tab>.
-*              condense <tab> no-gaps.
-*            elseif <tab> cs 'T/GDA/SDM_T_'.
-*              replace '/GDA/SDM_T_' with '' into  <tab>.
-*              condense <tab> no-gaps.
-*            endif.
-*
-*            assign component 'SCREEN_NAME' of structure <any> to <name>.
-*
-*            if <name> cs 'T/GDA/SDM_S_'.
-*              replace 'T/GDA/SDM_S_' with '/GDA/SDM_S_' into  <name>.
-*              condense <name> no-gaps.
-*            elseif <name> cs '/GDA/SDM_T_'.
-*              replace 'T/GDA/SDM_T_' with 'T/GDA/SDM_T_' into  <name>.
-*              condense <name> no-gaps.
-*            endif.
-*
-*          endif.
-
-          move-corresponding <any> to ls_report_output_der.
+        loop at <brf_results> assigning <brf_result>.
+          move-corresponding <brf_result> to sdm_gui_message_der.
           if <mara> is assigned.
-            ls_report_output_der-matnr = <mara>-matnr.
+            sdm_gui_message_der-matnr = <mara>-matnr.
           endif.
 
 * Special Conditions for screen fields names that are not standard
-          if ls_report_output_der-table = 'MEINH'.
-            ls_report_output_der-table = 'SMEINH'.
+          if sdm_gui_message_der-table = 'MEINH'.
+            sdm_gui_message_der-table = 'SMEINH'.
           endif.
 
-          ls_report_output_der-sdm_type           = me->mv_type.
-          ls_report_output_der-sdm_description    = me->mv_sdm_description.
+          sdm_gui_message_der-sdm_type           = me->mv_type.
+          sdm_gui_message_der-sdm_description    = me->mv_sdm_description.
 
-          collect ls_report_output_der into <table>.
-          clear ls_report_output_der.
+          collect sdm_gui_message_der into <table>.
+          clear sdm_gui_message_der.
         endloop.
 
 * Validations and others
@@ -372,110 +326,73 @@ CLASS /GDA/SDM_CL_ARTICLE IMPLEMENTATION.
             endif.
           endif.
         endif.
-        assign me->mo_brf_result->* to <results>.
+        assign me->mo_brf_result->* to <brf_results>.
 
-        loop at <results> assigning <val_results>.
-
-          if <val_results>-id = space.
-            continue.
-          endif.
+        loop at <brf_results> assigning <brf_results_val>.
 
           if me->mv_errors_only = abap_true.
-            if <val_results>-type na 'EAX'.
+            if <brf_results_val>-type na 'EAX'.
               continue.
             endif.
           endif.
 
-          message id <val_results>-id
-                type <val_results>-type
-              number <val_results>-number
-                with <val_results>-message_v1 <val_results>-message_v2
-                     <val_results>-message_v3 <val_results>-message_v4
-                into lv_message.
+          if <brf_results_val>-id = space or <brf_results_val>-sdm_tabkey cs '*'.
+            continue.
+          endif.
+
+          message id <brf_results_val>-id
+                type <brf_results_val>-type
+              number <brf_results_val>-number
+                with <brf_results_val>-message_v1 <brf_results_val>-message_v2
+                     <brf_results_val>-message_v3 <brf_results_val>-message_v4
+                into message.
 
 * Populate key fields for ARTICLE...
-          ls_sdm_gui_out-sdm_type        = me->mv_type.
-          ls_sdm_gui_out-sdm_description = me->mv_sdm_description.
+          sdm_gui_message_val-sdm_type        = me->mv_type.
+          sdm_gui_message_val-sdm_description = me->mv_sdm_description.
 
           if <mara> is assigned.
-            ls_sdm_gui_out-matnr = <mara>-matnr.
-            ls_sdm_gui_out-mtart = <mara>-mtart.
-            ls_sdm_gui_out-matkl = <mara>-matkl.
-            ls_sdm_gui_out-mstae = <mara>-mstae.
+            sdm_gui_message_val-matnr = <mara>-matnr.
+            sdm_gui_message_val-mtart = <mara>-mtart.
+            sdm_gui_message_val-matkl = <mara>-matkl.
+            sdm_gui_message_val-mstae = <mara>-mstae.
           endif.
 
           if <makt> is assigned.
-            ls_sdm_gui_out-maktx = <makt>-maktx.
+            sdm_gui_message_val-maktx = <makt>-maktx.
           endif.
+          sdm_gui_message_val-message        = message.
+          sdm_gui_message_val-id             = <brf_results_val>-id.
+          sdm_gui_message_val-number         = <brf_results_val>-number.
+          sdm_gui_message_val-type           = <brf_results_val>-type.
+          sdm_gui_message_val-extra_v1       = <brf_results_val>-extra_v1.
+          sdm_gui_message_val-extra_v2       = <brf_results_val>-extra_v2.
+          sdm_gui_message_val-extra_v3       = <brf_results_val>-extra_v3.
+          sdm_gui_message_val-extra_v4       = <brf_results_val>-extra_v4.
+          sdm_gui_message_val-extra_v5       = <brf_results_val>-extra_v5.
+          sdm_gui_message_val-extra_v6       = <brf_results_val>-extra_v6.
+          sdm_gui_message_val-ds_link_id     = <brf_results_val>-ds_link_id.
+          sdm_gui_message_val-sdm_tabkey     = <brf_results_val>-sdm_tabkey.
 
-          ls_sdm_gui_out-message        = lv_message.
-          ls_sdm_gui_out-id             = <val_results>-id.
-          ls_sdm_gui_out-number         = <val_results>-number.
-          ls_sdm_gui_out-type           = <val_results>-type.
-          ls_sdm_gui_out-extra_v1       = <val_results>-extra_v1.
-          ls_sdm_gui_out-extra_v2       = <val_results>-extra_v2.
-          ls_sdm_gui_out-extra_v3       = <val_results>-extra_v3.
-          ls_sdm_gui_out-extra_v4       = <val_results>-extra_v4.
-          ls_sdm_gui_out-extra_v5       = <val_results>-extra_v5.
-          ls_sdm_gui_out-extra_v6       = <val_results>-extra_v6.
-          ls_sdm_gui_out-ds_link_id     = <val_results>-ds_link_id.
-          ls_sdm_gui_out-sdm_tabkey     = <val_results>-sdm_tabkey.
-
-          collect ls_sdm_gui_out into <table>.
-          clear ls_sdm_gui_out.
-
+          collect sdm_gui_message_val into <table>.
+          clear sdm_gui_message_val.
         endloop.
       endif.
-
-      mo_brf_result       = er_data.
-      mo_brf_result_empty = er_data_empty.
+      mo_brf_result       = sdm_messages.
+      mo_brf_result_empty = sdm_messages_empty.
     else.
-      assign me->mo_brf_result->* to <results>.
-
-      if me->mv_type = me->mc_derivation.
-        loop at <results>  assigning <any>.
-*          assign component 'VALUE' of structure <any> to <value>.
-*
-          assign component 'VALUE' of structure <any> to <value>.
-*          if <value> = 'Config'.
-          if <value> = text-100.
-            assign component 'TABLE' of structure <any> to <tab>.
+* POE
 * Special Conditions for screen fields names that are not standard
-            if <tab> = 'MEINH'.
-              <tab> = 'SMEINH'.
+      assign me->mo_brf_result->* to <brf_results>.
+      if me->mv_type = me->mc_derivation.
+        loop at <brf_results>  assigning <brf_result>.
+          assign component 'VALUE' of structure <brf_result> to FIELD-SYMBOL(<value>).
+          if <value> = text-100.
+            assign component 'TABLE' of structure <brf_result> to FIELD-SYMBOL(<table_name>).
+            if <table_name> = 'MEINH'.
+              <table_name> = 'SMEINH'.
             endif.
-         endif.
-*            assign component 'TABLE' of structure <any> to <tab>.
-*
-*            replace '_01' with '' into  <tab>.
-*            condense <tab> no-gaps.
-*
-*            if <tab> cs 'T/GDA/SDM_S_'.
-*              replace 'T/GDA/SDM_S_' with 'W' into  <tab>.
-*              condense <tab> no-gaps.
-*            elseif <tab> cs 'T/GDA/SDM_T_'.
-*              replace 'T/GDA/SDM_T_' with 'W' into  <tab>.
-*              condense <tab> no-gaps.
-*            elseif <tab> cs '/GDA/SDM_S_'.
-*              replace '/GDA/SDM_S_' with '' into  <tab>.
-*              condense <tab> no-gaps.
-*            elseif <tab> cs 'T/GDA/SDM_T_'.
-*              replace '/GDA/SDM_T_' with '' into  <tab>.
-*              condense <tab> no-gaps.
-*            endif.
-*
-*            assign component 'SCREEN_NAME' of structure <any> to <name>.
-*
-*            if <name> cs 'T/GDA/SDM_S_'.
-*              replace 'T/GDA/SDM_S_' with '/GDA/SDM_S_' into  <name>.
-*              condense <name> no-gaps.
-*            elseif <name> cs '/GDA/SDM_T_'.
-*              replace 'T/GDA/SDM_T_' with 'T/GDA/SDM_T_' into  <name>.
-*              condense <name> no-gaps.
-*            endif.
-*
-*          endif.
-*
+          endif.
         endloop.
       endif.
     endif.
