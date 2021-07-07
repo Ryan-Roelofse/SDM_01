@@ -170,7 +170,9 @@ public section.
   data MT_KONH_SPEC type /GDA/SDM_T_KONH_01 .
   data MT_MARA_RELATIONS type TTY_MARA_RELATIONS .
 
-  methods CONSTRUCTOR .
+  methods CONSTRUCTOR
+    importing
+      !IV_SPRINT type BOOLEAN optional .
   methods SET_SELSCREEN
     importing
       !IS_SELSCREEN type TY_SELSCREEN .
@@ -715,8 +717,8 @@ CLASS /GDA/SDM_CL_ART_SELECTIONS IMPLEMENTATION.
           ENDLOOP.
         ENDIF.
       ENDIF.
-
-      IF me->ms_selscreen-attyps IS INITIAL.
+*ST-1459
+      IF me->ms_selscreen-attyps IS INITIAL and me->mv_sprint is initial.
         r_attyp_line-sign = 'I'.
         r_attyp_line-option = 'EQ'.
         r_attyp_line-low = '00'.
@@ -2621,7 +2623,7 @@ CLASS /GDA/SDM_CL_ART_SELECTIONS IMPLEMENTATION.
 
   method CONSTRUCTOR.
 
-    super->constructor( ).
+    super->constructor( iv_sprint = iv_sprint ).
 
     data(class_name)  = cl_abap_classdescr=>get_class_name( me ).
     me->mv_class_name = class_name+7(30).
