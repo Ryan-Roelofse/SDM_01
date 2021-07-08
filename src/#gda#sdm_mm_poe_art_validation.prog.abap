@@ -54,7 +54,7 @@ MOVE-CORRESPONDING wmarc TO ls_marc.
 MOVE-CORRESPONDING wmarc TO gs_marc_sdm.
 gs_marc_sdm-sdm_tabkey = /gda/cl_sdm_data_model_main=>build_string_from_key( i_tabname  = 'MARC'
                                                                          i_contents = gs_marc_sdm ).
-append gs_marc_sdm to gt_marc_sdm.
+APPEND gs_marc_sdm TO gt_marc_sdm.
 
 * Storage Location
 MOVE-CORRESPONDING wmard TO gs_mard_sdm.
@@ -285,6 +285,20 @@ IF ( ls_marc-werks = ls_rmmw1-vzwrk  ) AND
     EXPORT gt_marc_sdm = gt_marc_sdm  TO MEMORY ID ls_marc-matnr.
   ENDIF.
 ENDIF.
+
+*EORD
+CREATE OBJECT go_selection.
+go_selection->mv_object = gs_mara_sdm-matnr.
+gs_selscreen-eord = abap_true.
+go_selection->set_selscreen( is_selscreen = gs_selscreen ).
+go_selection->main( ).
+go_selection->build_spec( ).
+gt_eord_sdm[] = go_selection->mt_eord_spec[].
+LOOP AT gt_eord_sdm ASSIGNING FIELD-SYMBOL(<eord_sdm>).
+  <eord_sdm>-sdm_tabkey = /gda/cl_sdm_data_model_main=>build_string_from_key( i_tabname  = 'EORD'
+                                                                          i_contents = <eord_sdm> ).
+ENDLOOP.
+DESCRIBE TABLE gt_eord_sdm.
 
 IMPORT gt_marc_sdm = gt_marc_sdm  FROM MEMORY ID ls_marc-matnr.
 

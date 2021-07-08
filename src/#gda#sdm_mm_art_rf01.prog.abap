@@ -835,21 +835,21 @@ FORM get_data .
     ENDIF.
 
 * KONH Records..
-    call function '/GDA/SDM_PP_BRF_PRICING1'
-      exporting
+    CALL FUNCTION '/GDA/SDM_PP_BRF_PRICING1'
+      EXPORTING
         x_matnr  = <mara_struc>-matnr
-      importing
+      IMPORTING
         y_result = ls_pricing.
 
     ls_pricing-matnr = <mara_struc>-matnr.
-    append ls_pricing to gt_pricing.
+    APPEND ls_pricing TO gt_pricing.
 
     ls_cond_header-matnr = <mara_struc>-matnr.
     ls_cond_header-knumh = ls_pricing-knumh.
-    insert ls_cond_header into table gt_cond_header.
+    INSERT ls_cond_header INTO TABLE gt_cond_header.
 *    APPEND ls_cond_header TO gt_cond_header.
 
-    clear:
+    CLEAR:
      ls_cond_header,
      ls_pricing.
 
@@ -3113,6 +3113,7 @@ FORM sdm_main_article.
     gt_konh_sdm[]   = go_selection->mt_konh_spec[].
     gt_tariff_sdm   = go_selection->mt_tariff_spec[].
     gt_mat_steur_sdm = go_selection->mt_mg03_spec[].
+    gt_pricing_sdm = go_selection->mt_konh_spec[].
 *    gt_mg03_sdm_brf[] = go_selection->mt_mg03_spec[].
     gs_syst_sdm     = syst.
     APPEND go_selection->ms_makt_spec TO gt_makt_sdm[].

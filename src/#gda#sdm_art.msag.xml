@@ -203,8 +203,19 @@
     <T100>
      <SPRSL>E</SPRSL>
      <ARBGB>/GDA/SDM_ART</ARBGB>
+     <MSGNR>032</MSGNR>
+     <TEXT>SDM: EINE TEST: The no cash discount tick must be X (Ticked)</TEXT>
+    </T100>
+    <T100>
+     <SPRSL>E</SPRSL>
+     <ARBGB>/GDA/SDM_ART</ARBGB>
+     <MSGNR>033</MSGNR>
+     <TEXT>SDM: EINE TEST: The no cash discount tick cannot be X (Ticked)</TEXT>
+    </T100>
+    <T100>
+     <SPRSL>E</SPRSL>
+     <ARBGB>/GDA/SDM_ART</ARBGB>
      <MSGNR>050</MSGNR>
-     <TEXT>SDM: No PIR records exists</TEXT>
     </T100>
     <T100>
      <SPRSL>E</SPRSL>
@@ -235,6 +246,21 @@
      <ARBGB>/GDA/SDM_ART</ARBGB>
      <MSGNR>055</MSGNR>
      <TEXT>SDM: Material Number Used by Supplier may not be blank</TEXT>
+    </T100>
+    <T100>
+     <SPRSL>E</SPRSL>
+     <ARBGB>/GDA/SDM_ART</ARBGB>
+     <MSGNR>056</MSGNR>
+    </T100>
+    <T100>
+     <SPRSL>E</SPRSL>
+     <ARBGB>/GDA/SDM_ART</ARBGB>
+     <MSGNR>057</MSGNR>
+    </T100>
+    <T100>
+     <SPRSL>E</SPRSL>
+     <ARBGB>/GDA/SDM_ART</ARBGB>
+     <MSGNR>058</MSGNR>
     </T100>
     <T100>
      <SPRSL>E</SPRSL>
@@ -463,6 +489,24 @@
      <ARBGB>/GDA/SDM_ART</ARBGB>
      <MSGNR>137</MSGNR>
      <TEXT>SDM: Planned Delivery Time in Days may not be blank</TEXT>
+    </T100>
+    <T100>
+     <SPRSL>E</SPRSL>
+     <ARBGB>/GDA/SDM_ART</ARBGB>
+     <MSGNR>138</MSGNR>
+     <TEXT>SDM: Gross Price condition not maintained for Pricing</TEXT>
+    </T100>
+    <T100>
+     <SPRSL>E</SPRSL>
+     <ARBGB>/GDA/SDM_ART</ARBGB>
+     <MSGNR>139</MSGNR>
+     <TEXT>SDM: Mark Up condition not maintained for Pricing</TEXT>
+    </T100>
+    <T100>
+     <SPRSL>E</SPRSL>
+     <ARBGB>/GDA/SDM_ART</ARBGB>
+     <MSGNR>140</MSGNR>
+     <TEXT>SDM: Price condition not maintained for Pricing</TEXT>
     </T100>
     <T100>
      <SPRSL>E</SPRSL>
@@ -1013,7 +1057,7 @@
      <SPRSL>E</SPRSL>
      <ARBGB>/GDA/SDM_ART</ARBGB>
      <MSGNR>613</MSGNR>
-     <TEXT>SDM Article (Basic Data): Gross Weight cannot be blank</TEXT>
+     <TEXT>SDM Article (Basic Data): Width cannot be blank</TEXT>
     </T100>
     <T100>
      <SPRSL>E</SPRSL>
@@ -1025,7 +1069,7 @@
      <SPRSL>E</SPRSL>
      <ARBGB>/GDA/SDM_ART</ARBGB>
      <MSGNR>615</MSGNR>
-     <TEXT>SDM Article (MRP): Planning material must be blank</TEXT>
+     <TEXT>SDM Article (MRP): Planning material cannot be blank</TEXT>
     </T100>
     <T100>
      <SPRSL>E</SPRSL>
@@ -1044,6 +1088,12 @@
      <ARBGB>/GDA/SDM_ART</ARBGB>
      <MSGNR>618</MSGNR>
      <TEXT>SDM Article (Sales): Item cat.group must be 0001</TEXT>
+    </T100>
+    <T100>
+     <SPRSL>E</SPRSL>
+     <ARBGB>/GDA/SDM_ART</ARBGB>
+     <MSGNR>619</MSGNR>
+     <TEXT>SDM TEST (Basic Data): Numerator cannot be 1</TEXT>
     </T100>
     <T100>
      <SPRSL>E</SPRSL>
