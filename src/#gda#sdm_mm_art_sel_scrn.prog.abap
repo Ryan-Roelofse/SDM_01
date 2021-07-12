@@ -3,25 +3,25 @@
 *&---------------------------------------------------------------------*
 
 *selection-screen begin of block b12 with frame title text-003.
-selection-screen begin of block b14." with frame title text-020.
+SELECTION-SCREEN BEGIN OF BLOCK b14." with frame title text-020.
 
-select-options: s_matnr  for mara-matnr,
-                s_mtart  for mara-mtart,
-                s_attyp  for mara-attyp,
-                s_matkl  for mara-matkl,
-                s_bwscl  for mara-bwscl,
-                s_ersda  for mara-ersda,
-                s_ernam  for mara-ernam,
-                s_laeda  for mara-laeda,
-                s_aenam  for mara-aenam.
-selection-screen skip.
+SELECT-OPTIONS: s_matnr  FOR mara-matnr,
+                s_mtart  FOR mara-mtart,
+                s_attyp  FOR mara-attyp NO-DISPLAY,         "ST-1483
+                s_matkl  FOR mara-matkl,
+                s_bwscl  FOR mara-bwscl,
+                s_ersda  FOR mara-ersda,
+                s_ernam  FOR mara-ernam,
+                s_laeda  FOR mara-laeda,
+                s_aenam  FOR mara-aenam.
+SELECTION-SCREEN SKIP.
 
-select-options: s_mstae  for mara-mstae.
+SELECT-OPTIONS: s_mstae  FOR mara-mstae.
 
-selection-screen skip.
-parameters:     p_struc   type char1 as checkbox user-command struc.
-select-options: s_attyps  for mara-attyp modif id sc1.
-selection-screen end of block b14.
+SELECTION-SCREEN SKIP.
+PARAMETERS:     p_struc   TYPE char1 AS CHECKBOX USER-COMMAND struc.
+SELECT-OPTIONS: s_attyps  FOR mara-attyp MODIF ID sc1.
+SELECTION-SCREEN END OF BLOCK b14.
 *selection-screen end of block b12.
 *selection-screen begin of block b15 with frame title text-021.
 *select-options: s_werks  for marc-werks,

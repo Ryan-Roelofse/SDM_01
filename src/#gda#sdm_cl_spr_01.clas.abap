@@ -116,7 +116,11 @@ CLASS /GDA/SDM_CL_SPR_01 IMPLEMENTATION.
       lt_warehousenumberdata TYPE bapie1mlgnrt_tab,
       lt_warehousenumberdatax TYPE bapie1mlgnrtx_tab,
       lt_storagetypedata TYPE bapie1mlgtrt_tab,
-      lt_storagetypedatax TYPE bapie1mlgtrtx_tab.
+      lt_storagetypedatax TYPE bapie1mlgtrtx_tab,
+      lt_valuationdata TYPE bapie1mbewrt_tab,
+      lt_valuationdatax TYPE bapie1mbewrtx_tab,
+      lt_storagelocationdata TYPE bapie1mardrt_tab,
+      lt_storagelocationdatax TYPE bapie1mardrtx_tab.
 
     DATA:
           is_headdata1          TYPE bapimathead,
@@ -126,16 +130,12 @@ CLASS /GDA/SDM_CL_SPR_01 IMPLEMENTATION.
           is_plantdatax         TYPE bapi_marcx,
           is_salesdata          TYPE bapi_mvke,
           is_salesdatax         TYPE bapi_mvkex,
-          is_valuationdata      TYPE bapi_mbew,
-          is_valuationdatax     TYPE bapi_mbewx,
           is_mat_desc1          TYPE bapi_makt,
           it_mat_desc1          TYPE t_bapi_makt,
           is_taxclass1          TYPE bapi_mlan,
           it_taxclass1          TYPE t_bapi_mlan,
           it_extensionin        TYPE t_bapiparex,
-          it_extensioninx       TYPE t_bapiparexx,
-          is_storagelocationdata TYPE bapi_mard,
-          is_storagelocationdatax TYPE bapi_mardx.
+          it_extensioninx       TYPE t_bapiparexx.
 
     FIELD-SYMBOLS:
        <update_field>  TYPE any,
@@ -187,6 +187,7 @@ CLASS /GDA/SDM_CL_SPR_01 IMPLEMENTATION.
         ENDIF.
       WHEN 'BAPIE1MAKTRT'.
         is_headdata-basic_view = abap_true.
+        is_headdata-function   = '004'.
 
         APPEND INITIAL LINE TO it_mat_desc  ASSIGNING FIELD-SYMBOL(<lfs_mat_desc>).
         ASSIGN COMPONENT me->ps_mapping-bapi_fieldname OF STRUCTURE <lfs_mat_desc> TO <update_field>.
@@ -258,7 +259,7 @@ CLASS /GDA/SDM_CL_SPR_01 IMPLEMENTATION.
         ASSIGN COMPONENT me->ps_mapping-bapi_fieldname OF STRUCTURE <lfs_unitofmeasuretexts> TO <update_field>.
         <update_field>        = me->pv_update_value.
       WHEN 'BAPIE1MAW1RT'.
-        is_headdata-basic_view = abap_true.
+        is_headdata-list_view = abap_true.
         is_headdata-function   = '004'.
 
         APPEND INITIAL LINE TO lt_addnlclientdata  ASSIGNING FIELD-SYMBOL(<lfs_addnlclientdata>).
@@ -267,6 +268,19 @@ CLASS /GDA/SDM_CL_SPR_01 IMPLEMENTATION.
         <update_field>        = me->pv_update_value.
 
         APPEND INITIAL LINE TO lt_addnlclientdatax ASSIGNING FIELD-SYMBOL(<lfs_addnlclientdatax>).
+        <lfs_addnlclientdatax>-material = is_headdata-material.
+        ASSIGN COMPONENT me->ps_mapping-bapi_fieldname OF STRUCTURE <lfs_addnlclientdatax> TO <update_fieldx>.
+        <update_fieldx>        = abap_true.
+      WHEN 'BAPIE1MWLIRT'.
+        is_headdata-list_view = abap_true.
+        is_headdata-function   = '004'.
+
+        APPEND INITIAL LINE TO lt_addnlclientdata  ASSIGNING <lfs_addnlclientdata>.
+        <lfs_addnlclientdata>-material = is_headdata-material.
+        ASSIGN COMPONENT me->ps_mapping-bapi_fieldname OF STRUCTURE <lfs_addnlclientdata> TO <update_field>.
+        <update_field>        = me->pv_update_value.
+
+        APPEND INITIAL LINE TO lt_addnlclientdatax ASSIGNING <lfs_addnlclientdatax>.
         <lfs_addnlclientdatax>-material = is_headdata-material.
         ASSIGN COMPONENT me->ps_mapping-bapi_fieldname OF STRUCTURE <lfs_addnlclientdatax> TO <update_fieldx>.
         <update_fieldx>        = abap_true.
@@ -449,6 +463,60 @@ CLASS /GDA/SDM_CL_SPR_01 IMPLEMENTATION.
           <lfs_storagetypedata>-stge_type = <key>-value.
           <lfs_storagetypedatax>-stge_type = <key>-value.
         ENDIF.
+      WHEN 'BAPIE1MBEWRT'.
+        is_headdata-logdc_view = abap_true.
+        is_headdata-function   = '004'.
+
+        APPEND INITIAL LINE TO lt_valuationdata  ASSIGNING FIELD-SYMBOL(<lfs_valuationdata>).
+        <lfs_valuationdata>-material = is_headdata-material.
+        <lfs_valuationdata>-function = '004'.
+        ASSIGN COMPONENT me->ps_mapping-bapi_fieldname OF STRUCTURE <lfs_valuationdata> TO <update_field>.
+        <update_field>        = me->pv_update_value.
+
+        APPEND INITIAL LINE TO lt_valuationdatax ASSIGNING FIELD-SYMBOL(<lfs_valuationdatax>).
+        <lfs_valuationdatax>-material = is_headdata-material.
+        <lfs_valuationdatax>-function = '004'.
+        ASSIGN COMPONENT me->ps_mapping-bapi_fieldname OF STRUCTURE <lfs_valuationdatax> TO <update_fieldx>.
+        <update_fieldx>        = abap_true.
+
+        READ TABLE keys ASSIGNING <key> WITH KEY fieldname = 'BWKEY'.
+        IF <key> IS NOT INITIAL.
+          <lfs_valuationdata>-val_area = <key>-value.
+          <lfs_valuationdatax>-val_area = <key>-value.
+        ENDIF.
+
+        READ TABLE keys ASSIGNING <key> WITH KEY fieldname = 'BWTAR'.
+        IF <key> IS NOT INITIAL.
+          <lfs_valuationdata>-val_type = <key>-value.
+          <lfs_valuationdatax>-val_type = <key>-value.
+        ENDIF.
+      WHEN 'BAPIE1MARDRT'.
+        is_headdata-logdc_view = abap_true.
+        is_headdata-function   = '004'.
+
+        APPEND INITIAL LINE TO lt_storagelocationdata  ASSIGNING FIELD-SYMBOL(<lfs_storagelocationdata>).
+        <lfs_storagelocationdata>-material = is_headdata-material.
+        <lfs_storagelocationdata>-function = '004'.
+        ASSIGN COMPONENT me->ps_mapping-bapi_fieldname OF STRUCTURE <lfs_storagelocationdata> TO <update_field>.
+        <update_field>        = me->pv_update_value.
+
+        APPEND INITIAL LINE TO lt_storagelocationdatax ASSIGNING FIELD-SYMBOL(<lfs_storagelocationdatax>).
+        <lfs_storagelocationdatax>-material = is_headdata-material.
+        <lfs_storagelocationdatax>-function = '004'.
+        ASSIGN COMPONENT me->ps_mapping-bapi_fieldname OF STRUCTURE <lfs_storagelocationdatax> TO <update_fieldx>.
+        <update_fieldx>        = abap_true.
+
+        READ TABLE keys ASSIGNING <key> WITH KEY fieldname = 'WERKS'.
+        IF <key> IS NOT INITIAL.
+          <lfs_storagelocationdata>-plant = <key>-value.
+          <lfs_storagelocationdatax>-plant = <key>-value.
+        ENDIF.
+
+        READ TABLE keys ASSIGNING <key> WITH KEY fieldname = 'LGORT'.
+        IF <key> IS NOT INITIAL.
+          <lfs_storagelocationdata>-stge_loc = <key>-value.
+          <lfs_storagelocationdatax>-stge_loc = <key>-value.
+        ENDIF.
       WHEN OTHERS.
         DATA(lv_check) = 'X'.
     ENDCASE.
@@ -469,6 +537,8 @@ CLASS /GDA/SDM_CL_SPR_01 IMPLEMENTATION.
           forecastparametersx  = lt_forecastparametersx
           planningdata         = lt_planningdata
           planningdatax        = lt_planningdatax
+          storagelocationdata  = lt_storagelocationdata
+          storagelocationdatax = lt_storagelocationdatax
           unitsofmeasure       = lt_unitofmeasure
           unitsofmeasurex      = lt_unitofmeasurex
           unitofmeasuretexts   = lt_unitofmeasuretexts
@@ -476,6 +546,8 @@ CLASS /GDA/SDM_CL_SPR_01 IMPLEMENTATION.
           vendorean            = lt_vendorean
           layoutmoduleassgmt   = lt_layoutmoduleassgmt
           layoutmoduleassgmtx  = lt_layoutmoduleassgmtx
+          valuationdata        = lt_valuationdata
+          valuationdatax       = lt_valuationdatax
           warehousenumberdata  = lt_warehousenumberdata
           warehousenumberdatax = lt_warehousenumberdatax
           storagetypedata      = lt_storagetypedata
@@ -535,48 +607,6 @@ CLASS /GDA/SDM_CL_SPR_01 IMPLEMENTATION.
             me->pv_message-message_v2 = me->pv_exception_details-field.
             RETURN.
           ENDIF.
-        WHEN 'BAPI_MBEW'.
-          is_headdata1-account_view = abap_true.
-
-          READ TABLE keys ASSIGNING <key> WITH KEY  fieldname = 'BWKEY'.
-          IF sy-subrc = 0.
-            is_valuationdata-val_area  = <key>-value.
-            is_valuationdatax-val_area = <key>-value.
-            READ TABLE keys ASSIGNING <key> WITH KEY  fieldname = 'BWTAR'.
-            IF sy-subrc = 0.
-              is_valuationdata-val_type  = <key>-value.
-              is_valuationdatax-val_type = <key>-value.
-
-              ASSIGN COMPONENT me->ps_mapping-bapi_fieldname OF STRUCTURE is_valuationdata TO <update_field>.
-              <update_field>        = me->pv_update_value.
-
-              ASSIGN COMPONENT me->ps_mapping-bapi_fieldname OF STRUCTURE is_valuationdatax TO <update_fieldx>.
-              <update_fieldx>        = abap_true.
-
-            ELSE.
-              me->pv_message-type       = 'E'.
-              me->pv_message-id         = '/GDA/SDM_SPRINT'.
-              me->pv_message-number     = '012'.
-              me->pv_message-message_v1 = me->pv_exception_details-tabname.
-              me->pv_message-message_v2 = me->pv_exception_details-field.
-              RETURN.
-            ENDIF.
-          ELSE.
-            me->pv_message-type       = 'E'.
-            me->pv_message-id         = '/GDA/SDM_SPRINT'.
-            me->pv_message-number     = '012'.
-            me->pv_message-message_v1 = me->pv_exception_details-tabname.
-            me->pv_message-message_v2 = me->pv_exception_details-field.
-            RETURN.
-          ENDIF.
-        WHEN 'BAPI_MARD'.
-          is_headdata-basic_view = abap_true.
-
-          ASSIGN COMPONENT me->ps_mapping-bapi_fieldname OF STRUCTURE is_storagelocationdata TO <update_field>.
-          <update_field>        = me->pv_update_value.
-
-          ASSIGN COMPONENT me->ps_mapping-bapi_fieldname OF STRUCTURE is_storagelocationdatax TO <update_fieldx>.
-          <update_fieldx>        = abap_true.
         WHEN 'BAPI_MLAN'.
           is_headdata1-basic_view = abap_true.
           ASSIGN COMPONENT me->ps_mapping-bapi_fieldname OF STRUCTURE is_taxclass1 TO <update_field>.
@@ -588,25 +618,21 @@ CLASS /GDA/SDM_CL_SPR_01 IMPLEMENTATION.
       CLEAR cs_messages.
       CALL FUNCTION 'BAPI_MATERIAL_SAVEDATA'
         EXPORTING
-          headdata             = is_headdata1
-          clientdata           = is_clientdata
-          clientdatax          = is_clientdatax
-          plantdata            = is_plantdata1
-          plantdatax           = is_plantdatax
-          storagelocationdata  = is_storagelocationdata
-          storagelocationdatax = is_storagelocationdatax
-          valuationdata        = is_valuationdata
-          valuationdatax       = is_valuationdatax
-          salesdata            = is_salesdata
-          salesdatax           = is_salesdatax
+          headdata            = is_headdata1
+          clientdata          = is_clientdata
+          clientdatax         = is_clientdatax
+          plantdata           = is_plantdata1
+          plantdatax          = is_plantdatax
+          salesdata           = is_salesdata
+          salesdatax          = is_salesdatax
         IMPORTING
-          return               = cs_messages
+          return              = cs_messages
         TABLES
-          materialdescription  = it_mat_desc1
-*         internationalartnos  = it_internationalartnos
-          taxclassifications   = it_taxclass1
-          extensionin          = it_extensionin
-          extensioninx         = it_extensioninx.
+          materialdescription = it_mat_desc1
+*         internationalartnos = it_internationalartnos
+          taxclassifications  = it_taxclass1
+          extensionin         = it_extensionin
+          extensioninx        = it_extensioninx.
 
 
       IF ls_return-type = 'S'.

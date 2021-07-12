@@ -494,7 +494,7 @@
      <SPRSL>E</SPRSL>
      <ARBGB>/GDA/SDM_ART</ARBGB>
      <MSGNR>138</MSGNR>
-     <TEXT>SDM: Gross Price condition not maintained for Pricing</TEXT>
+     <TEXT>SDM: Gross Price condition not maintained for Pricing (&amp;1)</TEXT>
     </T100>
     <T100>
      <SPRSL>E</SPRSL>
@@ -1093,6 +1093,11 @@
      <SPRSL>E</SPRSL>
      <ARBGB>/GDA/SDM_ART</ARBGB>
      <MSGNR>619</MSGNR>
+    </T100>
+    <T100>
+     <SPRSL>E</SPRSL>
+     <ARBGB>/GDA/SDM_ART</ARBGB>
+     <MSGNR>620</MSGNR>
      <TEXT>SDM TEST (Basic Data): Numerator cannot be 1</TEXT>
     </T100>
     <T100>
