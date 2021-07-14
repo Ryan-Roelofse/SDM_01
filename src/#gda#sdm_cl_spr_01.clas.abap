@@ -120,22 +120,15 @@ CLASS /GDA/SDM_CL_SPR_01 IMPLEMENTATION.
       lt_valuationdata TYPE bapie1mbewrt_tab,
       lt_valuationdatax TYPE bapie1mbewrtx_tab,
       lt_storagelocationdata TYPE bapie1mardrt_tab,
-      lt_storagelocationdatax TYPE bapie1mardrtx_tab.
+      lt_storagelocationdatax TYPE bapie1mardrtx_tab,
+      lt_plantdata TYPE bapie1marcrt_tab,
+      lt_plantdatax TYPE bapie1marcrtx_tab.
 
-    DATA:
-          is_headdata1          TYPE bapimathead,
-          is_clientdata         TYPE bapi_mara,
-          is_clientdatax        TYPE bapi_marax,
-          is_plantdata1         TYPE bapi_marc,
-          is_plantdatax         TYPE bapi_marcx,
-          is_salesdata          TYPE bapi_mvke,
-          is_salesdatax         TYPE bapi_mvkex,
-          is_mat_desc1          TYPE bapi_makt,
-          it_mat_desc1          TYPE t_bapi_makt,
-          is_taxclass1          TYPE bapi_mlan,
-          it_taxclass1          TYPE t_bapi_mlan,
-          it_extensionin        TYPE t_bapiparex,
-          it_extensioninx       TYPE t_bapiparexx.
+    DATA: ls_eord TYPE eord,
+          lt_eord TYPE STANDARD TABLE OF eord,
+          lt_eordu TYPE STANDARD TABLE OF eordu,
+          ls_eina TYPE eina,
+          ls_eine TYPE eine.
 
     FIELD-SYMBOLS:
        <update_field>  TYPE any,
@@ -143,7 +136,6 @@ CLASS /GDA/SDM_CL_SPR_01 IMPLEMENTATION.
        <key>           TYPE /gda/sdm_s_usmd_s_value.
 
     is_headdata-material   = me->pv_exception_details-sdm_object_val.  "convert_matn1_input( iv_matnr ).
-    is_headdata1-material   = me->pv_exception_details-sdm_object_val.  "convert_matn1_input( iv_matnr ).
 
     DATA(sap_table) = me->determine_sap_table( iv_sdm_structure = me->pv_exception_details-tabname ).
 
@@ -207,22 +199,20 @@ CLASS /GDA/SDM_CL_SPR_01 IMPLEMENTATION.
         is_headdata-logdc_view = abap_true.
         is_headdata-logst_view = abap_true.
 
+        APPEND INITIAL LINE TO lt_plantdata  ASSIGNING FIELD-SYMBOL(<lfs_plantdata>).
+        <lfs_plantdata>-material = is_headdata-material.
+        ASSIGN COMPONENT me->ps_mapping-bapi_fieldname OF STRUCTURE <lfs_plantdata> TO <update_field>.
+        <update_field>        = me->pv_update_value.
+
+        APPEND INITIAL LINE TO lt_plantdatax ASSIGNING FIELD-SYMBOL(<lfs_plantdatax>).
+        <lfs_plantdatax>-material = is_headdata-material.
+        ASSIGN COMPONENT me->ps_mapping-bapi_fieldname OF STRUCTURE <lfs_plantdatax> TO <update_fieldx>.
+        <update_fieldx>        = abap_true.
+
         READ TABLE keys ASSIGNING <key> WITH KEY  fieldname = 'WERKS'.
         IF sy-subrc = 0.
-*          is_plantdata-plant = <key>-value.
-*          ASSIGN COMPONENT me->ps_mapping-bapi_fieldname OF STRUCTURE is_plantdata TO <update_field>.
-*          <update_field>        = me->pv_update_value.
-*
-*          is_plantdatax-plant = <key>-value.
-*          ASSIGN COMPONENT me->ps_mapping-bapi_fieldname OF STRUCTURE is_plantdatax TO <update_fieldx>.
-*          <update_fieldx>        = abap_true.
-        ELSE.
-          me->pv_message-type       = 'E'.
-          me->pv_message-id         = '/GDA/SDM_SPRINT'.
-          me->pv_message-number     = '012'.
-          me->pv_message-message_v1 = me->pv_exception_details-tabname.
-          me->pv_message-message_v2 = me->pv_exception_details-field.
-          RETURN.
+          <lfs_plantdata>-plant = <key>-value.
+          <lfs_plantdatax>-plant = <key>-value.
         ENDIF.
       WHEN 'BAPIE1MARMRT'.
         is_headdata-basic_view = abap_true.
@@ -250,14 +240,46 @@ CLASS /GDA/SDM_CL_SPR_01 IMPLEMENTATION.
         <lfs_layoutmoduleassgmtx>-material = is_headdata-material.
         ASSIGN COMPONENT me->ps_mapping-bapi_fieldname OF STRUCTURE <lfs_layoutmoduleassgmtx> TO <update_fieldx>.
         <update_fieldx>        = abap_true.
+
+        READ TABLE keys ASSIGNING <key> WITH KEY fieldname = 'MEINH'.
+        IF <key>-value IS NOT INITIAL.
+          <lfs_layoutmoduleassgmt>-unit = <key>-value.
+          <lfs_layoutmoduleassgmtx>-unit = <key>-value.
+        ENDIF.
+
+        READ TABLE keys ASSIGNING <key> WITH KEY fieldname = 'LAYGR'.
+        IF <key>-value IS NOT INITIAL.
+          <lfs_layoutmoduleassgmt>-layout_mod = <key>-value.
+          <lfs_layoutmoduleassgmtx>-layout_mod = <key>-value.
+        ENDIF.
       WHEN 'BAPIE1MAMTRT'.
-        is_headdata-basic_view = abap_true.
+        is_headdata-pos_view = abap_true.
         is_headdata-function   = '004'.
 
         APPEND INITIAL LINE TO lt_unitofmeasuretexts  ASSIGNING FIELD-SYMBOL(<lfs_unitofmeasuretexts>).
         <lfs_unitofmeasuretexts>-material = is_headdata-material.
         ASSIGN COMPONENT me->ps_mapping-bapi_fieldname OF STRUCTURE <lfs_unitofmeasuretexts> TO <update_field>.
         <update_field>        = me->pv_update_value.
+
+        READ TABLE keys ASSIGNING <key> WITH KEY fieldname = 'SPRAS'.
+        IF <key>-value IS NOT INITIAL.
+          <lfs_unitofmeasuretexts>-langu = <key>-value.
+        ENDIF.
+
+        READ TABLE keys ASSIGNING <key> WITH KEY fieldname = 'MEINH'.
+        IF <key>-value IS NOT INITIAL.
+          <lfs_unitofmeasuretexts>-alt_unit = <key>-value.
+        ENDIF.
+
+        READ TABLE keys ASSIGNING <key> WITH KEY fieldname = 'MTXID'.
+        IF <key>-value IS NOT INITIAL.
+          <lfs_unitofmeasuretexts>-text_id = <key>-value.
+        ENDIF.
+
+        READ TABLE keys ASSIGNING <key> WITH KEY fieldname = 'LFDNR'.
+        IF <key>-value IS NOT INITIAL.
+          <lfs_unitofmeasuretexts>-consec_no = <key>-value.
+        ENDIF.
       WHEN 'BAPIE1MAW1RT'.
         is_headdata-list_view = abap_true.
         is_headdata-function   = '004'.
@@ -518,10 +540,10 @@ CLASS /GDA/SDM_CL_SPR_01 IMPLEMENTATION.
           <lfs_storagelocationdatax>-stge_loc = <key>-value.
         ENDIF.
       WHEN OTHERS.
-        DATA(lv_check) = 'X'.
+        DATA(lv_check) = abap_true.
     ENDCASE.
 
-    IF lv_check NE 'X'.
+    IF lv_check EQ abap_false.
       CALL FUNCTION 'BAPI_MATERIAL_MAINTAINDATA_RT'
         EXPORTING
           headdata             = is_headdata
@@ -533,6 +555,8 @@ CLASS /GDA/SDM_CL_SPR_01 IMPLEMENTATION.
           addnlclientdata      = lt_addnlclientdata
           addnlclientdatax     = lt_addnlclientdatax
           materialdescription  = it_mat_desc
+          plantdata            = lt_plantdata
+          plantdatax           = lt_plantdatax
           forecastparameters   = lt_forecastparameters
           forecastparametersx  = lt_forecastparametersx
           planningdata         = lt_planningdata
@@ -561,95 +585,140 @@ CLASS /GDA/SDM_CL_SPR_01 IMPLEMENTATION.
         CALL FUNCTION 'BAPI_TRANSACTION_COMMIT'.
       ENDIF.
     ELSE.
-      CASE me->ps_mapping-bapi_structure.
-        WHEN 'BAPI_MAKT'.
-          is_headdata1-basic_view = abap_true.
+      IF me->ps_mapping-bapi_structure = 'EORD'.
+        lv_sdm_tabkey = me->pv_exception_details-sdm_tabkey.
+        IF lv_sdm_tabkey+0(3) = sy-mandt.
+          DATA(lv_strlen) = strlen( lv_sdm_tabkey ).
+          lv_sdm_tabkey = lv_sdm_tabkey+3(lv_strlen).
+        ENDIF.
+        keys = /gda/cl_sdm_data_model_main=>build_key_from_string( iv_tabkey  = lv_sdm_tabkey
+                                                                   iv_tabname = sap_table ).
 
-          ASSIGN COMPONENT me->ps_mapping-bapi_fieldname OF STRUCTURE is_mat_desc1 TO <update_field>.
+        READ TABLE keys ASSIGNING <key> WITH KEY fieldname = 'WERKS'.
+        IF <key> IS NOT INITIAL.
+          lv_werks = <key>-value.
+        ENDIF.
+
+        READ TABLE keys ASSIGNING <key> WITH KEY fieldname = 'ZEORD'.
+        IF <key> IS NOT INITIAL.
+          DATA(lv_zeord) = <key>-value.
+        ENDIF.
+
+        SELECT SINGLE * FROM eord INTO ls_eord WHERE matnr = is_headdata-material
+                                                 AND werks = lv_werks AND zeord = lv_zeord.
+
+        APPEND INITIAL LINE TO lt_eord  ASSIGNING FIELD-SYMBOL(<lfs_eord>).
+        <lfs_eord> = ls_eord.
+        ASSIGN COMPONENT me->ps_mapping-bapi_fieldname OF STRUCTURE <lfs_eord> TO <update_field>.
+        IF me->ps_mapping-bapi_fieldname = 'VDATU'.
+          CALL FUNCTION 'CONVERT_DATE_TO_INTERNAL'
+            EXPORTING
+              date_external = me->pv_update_value
+            IMPORTING
+              date_internal = <update_field>.
+        ELSE.
           <update_field>        = me->pv_update_value.
-          is_mat_desc1-langu     = sy-langu.
-          is_mat_desc1-langu_iso = sy-langu.
-          APPEND is_mat_desc1 TO it_mat_desc1.
-        WHEN 'BAPI_MARA'.
-          is_headdata-basic_view = abap_true.
+        ENDIF.
 
-          ASSIGN COMPONENT me->ps_mapping-bapi_fieldname OF STRUCTURE is_clientdata TO <update_field>.
+        APPEND INITIAL LINE TO lt_eordu  ASSIGNING FIELD-SYMBOL(<lfs_eordu>).
+        <lfs_eordu> = ls_eord.
+        <lfs_eordu>-kz = abap_true.
+        ASSIGN COMPONENT me->ps_mapping-bapi_fieldname OF STRUCTURE <lfs_eordu> TO <update_field>.
+        IF me->ps_mapping-bapi_fieldname = 'VDATU'.
+          CALL FUNCTION 'CONVERT_DATE_TO_INTERNAL'
+            EXPORTING
+              date_external = me->pv_update_value
+            IMPORTING
+              date_internal = <update_field>.
+        ELSE.
           <update_field>        = me->pv_update_value.
+        ENDIF.
 
-          ASSIGN COMPONENT me->ps_mapping-bapi_fieldname OF STRUCTURE is_clientdatax TO <update_fieldx>.
-          <update_fieldx>        = abap_true.
-        WHEN 'BAPI_MARC'.
-          CONCATENATE  sap_table '-' me->ps_mapping-sdm_fieldname INTO name.
+        CALL FUNCTION 'ME_UPDATE_SOURCES_OF_SUPPLY'
+          TABLES
+            xeord = lt_eordu
+            yeord = lt_eord.
 
-* Determine which view to update...
-          SELECT SINGLE pstat FROM t130f
-                          INTO view
-                           WHERE fname = name.
-          IF view = 'D'.
-            is_headdata1-mrp_view     = abap_true.
-          ELSE.
-            is_headdata1-storage_view = abap_true.
-          ENDIF.
+        IF sy-subrc EQ 0.
+          MESSAGE s801(m3) WITH is_headdata-material.
+        ENDIF.
+      ELSEIF me->ps_mapping-bapi_structure = 'EINA'.
+        READ TABLE keys ASSIGNING <key> WITH KEY fieldname = 'INFNR'.
+        IF <key>-value IS NOT INITIAL.
+          SELECT SINGLE * FROM eina INTO ls_eina WHERE infnr = <key>-value.
+          DATA(ls_eina_old) = ls_eina.
+        ENDIF.
 
-          READ TABLE keys ASSIGNING <key> WITH KEY  fieldname = 'WERKS'.
-          IF sy-subrc = 0.
-            is_plantdata-plant = <key>-value.
-            ASSIGN COMPONENT me->ps_mapping-bapi_fieldname OF STRUCTURE is_plantdata TO <update_field>.
-            <update_field>        = me->pv_update_value.
-            is_plantdatax-plant = <key>-value.
-            ASSIGN COMPONENT me->ps_mapping-bapi_fieldname OF STRUCTURE is_plantdatax TO <update_fieldx>.
-            <update_fieldx>        = abap_true.
-          ELSE.
-            me->pv_message-type       = 'E'.
-            me->pv_message-id         = '/GDA/SDM_SPRINT'.
-            me->pv_message-number     = '012'.
-            me->pv_message-message_v1 = me->pv_exception_details-tabname.
-            me->pv_message-message_v2 = me->pv_exception_details-field.
-            RETURN.
-          ENDIF.
-        WHEN 'BAPI_MLAN'.
-          is_headdata1-basic_view = abap_true.
-          ASSIGN COMPONENT me->ps_mapping-bapi_fieldname OF STRUCTURE is_taxclass1 TO <update_field>.
-          <update_field>        = me->pv_update_value.
-          APPEND is_taxclass1 TO it_taxclass1.
-      ENDCASE.
+        ASSIGN COMPONENT me->ps_mapping-bapi_fieldname OF STRUCTURE ls_eina TO <update_field>.
+        <update_field>        = me->pv_update_value.
 
-* Save Material Master Data
-      CLEAR cs_messages.
-      CALL FUNCTION 'BAPI_MATERIAL_SAVEDATA'
-        EXPORTING
-          headdata            = is_headdata1
-          clientdata          = is_clientdata
-          clientdatax         = is_clientdatax
-          plantdata           = is_plantdata1
-          plantdatax          = is_plantdatax
-          salesdata           = is_salesdata
-          salesdatax          = is_salesdatax
-        IMPORTING
-          return              = cs_messages
-        TABLES
-          materialdescription = it_mat_desc1
-*         internationalartnos = it_internationalartnos
-          taxclassifications  = it_taxclass1
-          extensionin         = it_extensionin
-          extensioninx        = it_extensioninx.
-
-
-      IF ls_return-type = 'S'.
-        DATA:
-         commit_message TYPE bapiret2.
-
-        CALL FUNCTION 'BAPI_TRANSACTION_COMMIT'
+        CALL FUNCTION 'ME_UPDATE_INFORECORD' IN UPDATE TASK
           EXPORTING
-            wait   = abap_true
-          IMPORTING
-            return = commit_message.
+            xeina    = ls_eina
+            xeine    = ls_eine
+            yeina    = ls_eina_old
+            yeine    = ls_eine
+            reg_eina = ls_eina.
+
+        IF sy-subrc EQ 0.
+*          CALL FUNCTION 'BAPI_TRANSACTION_COMMIT'.
+          MESSAGE s801(m3) WITH is_headdata-material.
+        ENDIF.
+      ELSEIF me->ps_mapping-bapi_structure = 'EINE'.
+        READ TABLE keys ASSIGNING <key> WITH KEY fieldname = 'INFNR'.
+        IF <key>-value IS NOT INITIAL.
+          DATA(lv_infnr) = <key>-value.
+        ENDIF.
+
+        READ TABLE keys ASSIGNING <key> WITH KEY fieldname = 'EKORG'.
+        IF <key>-value IS NOT INITIAL.
+          DATA(lv_ekorg) = <key>-value.
+        ENDIF.
+
+        READ TABLE keys ASSIGNING <key> WITH KEY fieldname = 'ESOKZ'.
+        IF <key>-value IS NOT INITIAL.
+          DATA(lv_esokz) = <key>-value.
+        ENDIF.
+
+        READ TABLE keys ASSIGNING <key> WITH KEY fieldname = 'WERKS'.
+        IF <key>-value IS NOT INITIAL.
+          lv_werks = <key>-value.
+        ENDIF.
+
+        SELECT SINGLE * FROM eine INTO ls_eine WHERE infnr = lv_infnr AND ekorg = lv_ekorg
+                                                 AND esokz = lv_esokz AND werks = lv_werks.
+        DATA(ls_eine_old) = ls_eine.
+
+        ASSIGN COMPONENT me->ps_mapping-bapi_fieldname OF STRUCTURE ls_eine TO <update_field>.
+        <update_field>        = me->pv_update_value.
+
+        CALL FUNCTION 'ME_UPDATE_INFORECORD' IN UPDATE TASK
+          EXPORTING
+            xeina    = ls_eina
+            xeine    = ls_eine
+            yeina    = ls_eina
+            yeine    = ls_eine_old
+            reg_eina = ls_eina.
+
+        IF sy-subrc EQ 0.
+*          CALL FUNCTION 'BAPI_TRANSACTION_COMMIT'.
+          MESSAGE s801(m3) WITH is_headdata-material.
+        ENDIF.
+*      ELSEIF me->ps_mapping-bapi_structure = 'MG03STEUER'.
+*      CALL FUNCTION 'STEUERTAB_READ'
+*        EXPORTING
+*          matnr           = is_headdata-material
+*        TABLES
+*          steuertab       = lt_steuer
+*        EXCEPTIONS
+*          wrong_call      = 1
+*          steuertab_empty = 2
+*          OTHERS          = 3.
 
       ENDIF.
     ENDIF.
 
     MOVE-CORRESPONDING ls_return TO me->pv_message.
-*    me->pv_message = cs_messages.
 
 * ST-386
 * This message is too generic
