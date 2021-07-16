@@ -10,4 +10,6 @@ ELSEIF r_tabname = 'MPOP'.
   r_tabname = 'MAPR'.
 ELSEIF r_tabname = 'MWLI'.
   r_tabname = 'MAW1'.
+ELSEIF r_tabname = 'PRICING'.
+  r_tabname = 'KONH'.
 ENDIF.

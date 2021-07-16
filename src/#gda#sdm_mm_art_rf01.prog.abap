@@ -3113,7 +3113,12 @@ FORM sdm_main_article.
     gt_konh_sdm[]   = go_selection->mt_konh_spec[].
     gt_tariff_sdm   = go_selection->mt_tariff_spec[].
     gt_mat_steur_sdm = go_selection->mt_mg03_spec[].
-    gt_pricing_sdm = go_selection->mt_konh_spec[].
+*    gt_pricing_sdm = go_selection->mt_konh_spec[].
+    IF go_selection->mt_konh_spec[] IS NOT INITIAL.
+      MOVE-CORRESPONDING go_selection->mt_konh_spec[] TO gt_pricing_sdm.
+      READ TABLE gt_pricing_sdm ASSIGNING FIELD-SYMBOL(<lfs_pricing_sdm>) INDEX 1.
+      <lfs_pricing_sdm>-matnr = go_selection->ms_mara_spec-matnr.
+    ENDIF.
 *    gt_mg03_sdm_brf[] = go_selection->mt_mg03_spec[].
     gs_syst_sdm     = syst.
     APPEND go_selection->ms_makt_spec TO gt_makt_sdm[].
@@ -3165,6 +3170,12 @@ FORM sdm_main_article.
         go_selection->ms_mara_spec-attyp = '10'  OR
         go_selection->ms_mara_spec-attyp = '12'.
         gs_sdm_objects-linkage = go_selection->ms_mara_spec-matnr.
+      ELSEIF go_selection->ms_mara_spec-attyp = '02'.
+        IF gs_selscreen-struc = abap_true.
+          DATA(lv_strl_matnr) = strlen( go_selection->ms_mara_spec-matnr ).
+          lv_strl_matnr = lv_strl_matnr - 3.
+          gs_sdm_objects-linkage = go_selection->ms_mara_spec-matnr+0(lv_strl_matnr).
+        ENDIF.
       ENDIF.
     ENDIF.
     IF <relations> IS ASSIGNED.

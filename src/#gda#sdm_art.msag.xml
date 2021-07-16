@@ -973,7 +973,7 @@
      <SPRSL>E</SPRSL>
      <ARBGB>/GDA/SDM_ART</ARBGB>
      <MSGNR>599</MSGNR>
-     <TEXT>SDM Article (DC_PCOST): Valuation class must be 3100</TEXT>
+     <TEXT>SDM Article (Acc): Valuation Class for Project Stock cannot be blank</TEXT>
     </T100>
     <T100>
      <SPRSL>E</SPRSL>
@@ -1069,7 +1069,7 @@
      <SPRSL>E</SPRSL>
      <ARBGB>/GDA/SDM_ART</ARBGB>
      <MSGNR>615</MSGNR>
-     <TEXT>SDM Article (MRP): Planning material cannot be blank</TEXT>
+     <TEXT>SDM Article (MRP): Planning material must be blank</TEXT>
     </T100>
     <T100>
      <SPRSL>E</SPRSL>
