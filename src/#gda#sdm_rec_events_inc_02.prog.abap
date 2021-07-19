@@ -5,7 +5,8 @@
 IF r_tabname = 'MEINH'.
   r_tabname = 'MARM'.
 ELSEIF r_tabname = 'MPGD'.
-  r_tabname = 'MPGD_V'.
+*  r_tabname = 'MPGD_V'.
+  r_tabname = 'MARC'.
 ELSEIF r_tabname = 'MPOP'.
   r_tabname = 'MAPR'.
 ELSEIF r_tabname = 'MWLI'.
