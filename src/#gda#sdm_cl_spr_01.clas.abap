@@ -128,7 +128,9 @@ CLASS /GDA/SDM_CL_SPR_01 IMPLEMENTATION.
           lt_eord TYPE STANDARD TABLE OF eord,
           lt_eordu TYPE STANDARD TABLE OF eordu,
           ls_eina TYPE eina,
-          ls_eine TYPE eine.
+          ls_eine TYPE eine,
+          ls_mean TYPE mean,
+          internationalartnos TYPE bapie1meanrt.
 
     FIELD-SYMBOLS:
        <update_field>  TYPE any,
@@ -351,11 +353,26 @@ CLASS /GDA/SDM_CL_SPR_01 IMPLEMENTATION.
         is_headdata-basic_view = abap_true.
         is_headdata-function   = '004'.
 
+*        READ TABLE keys ASSIGNING <key> WITH KEY fieldname = 'MEINH'.
+*        READ TABLE keys ASSIGNING FIELD-SYMBOL(<fs_lfnum>) with key fieldname = 'LFNUM'.
+*        SELECT single * FROM mean INTO ls_mean WHERE matnr = is_headdata-material
+*                                                AND meinh = <key>-value
+*                                                AND lfnum = <fs_lfnum>-value.
+*
+*        CALL FUNCTION 'MAP2E_MEAN_TO_BAPIE1MEANRT'
+*          EXPORTING
+*            mean         = ls_mean
+*          CHANGING
+*            bapie1meanrt = internationalartnos
+*          EXCEPTIONS
+*            OTHERS       = 1.
+
         APPEND INITIAL LINE TO lt_internationalartnos  ASSIGNING FIELD-SYMBOL(<lfs_internationalartnos>).
         <lfs_internationalartnos>-material = is_headdata-material.
+*        <lfs_internationalartnos> = internationalartnos.
         ASSIGN COMPONENT me->ps_mapping-bapi_fieldname OF STRUCTURE <lfs_internationalartnos> TO <update_field>.
         <update_field>        = me->pv_update_value.
-
+*
         READ TABLE keys ASSIGNING <key> WITH KEY fieldname = 'MEINH'.
         IF <key>-value IS NOT INITIAL.
           <lfs_internationalartnos>-unit = <key>-value.
@@ -391,7 +408,7 @@ CLASS /GDA/SDM_CL_SPR_01 IMPLEMENTATION.
         DATA(lv_sdm_tabkey) = me->pv_exception_details-sdm_tabkey.
         DATA(lv_werks) = me->pv_exception_details-sdm_tabkey+0(4).
         DATA(lv_matnr) = me->pv_exception_details-sdm_tabkey+4(18).
-        CONCATENATE lv_matnr lv_werks INTO lv_sdm_tabkey.
+        CONCATENATE lv_matnr lv_werks INTO lv_sdm_tabkey RESPECTING BLANKS.
 
         DATA(keys_mpop) = /gda/cl_sdm_data_model_main=>build_key_from_string( iv_tabkey  = lv_sdm_tabkey
                                                                               iv_tabname = sap_table ).
@@ -714,10 +731,72 @@ CLASS /GDA/SDM_CL_SPR_01 IMPLEMENTATION.
 *          wrong_call      = 1
 *          steuertab_empty = 2
 *          OTHERS          = 3.
-
+*      ELSEIF me->ps_mapping-bapi_structure = 'BAPIE1MALGRT'.
+*        DATA : lt_malg TYPE TABLE OF bapie1malg.
+*
+*        APPEND INITIAL LINE TO lt_malg  ASSIGNING FIELD-SYMBOL(<lfs_layoutmoduleassgmt>).
+*        <lfs_layoutmoduleassgmt>-material = is_headdata-material.
+*        <lfs_layoutmoduleassgmt>-function = '004'.
+*        ASSIGN COMPONENT 'SHELF_BOARD_NUMBER' OF STRUCTURE <lfs_layoutmoduleassgmt> TO <update_field>.
+*        <update_field>        = me->pv_update_value.
+*
+*        READ TABLE keys ASSIGNING <key> WITH KEY fieldname = 'MEINH'.
+*        IF <key>-value IS NOT INITIAL.
+*          <lfs_layoutmoduleassgmt>-unit = <key>-value.
+*        ENDIF.
+*
+*        READ TABLE keys ASSIGNING <key> WITH KEY fieldname = 'LAYGR'.
+*        IF <key>-value IS NOT INITIAL.
+*          <lfs_layoutmoduleassgmt>-layout_mod = <key>-value.
+*        ENDIF.
+*
+*        TRY.
+*            CALL FUNCTION 'WRF_MALG_ARRAY_CHANGE'
+*              EXPORTING
+*                kzrfb                          = ''
+*              TABLES
+*                items                          = lt_malg
+*              EXCEPTIONS
+*                db_buffer_refresh_failed       = 1
+*                no_items_transmitted           = 2
+*                item_not_found                 = 3
+*                laymod_not_found               = 4
+*                version_not_found              = 5
+*                variant_not_found              = 6
+*                malg_lock_failed               = 7
+*                fixture_assignment_look_failed = 8
+*                more_than_1_malg_record_found  = 9
+*                item_exists                    = 10
+*                lock_on_material               = 11
+*                article_not_found              = 12
+*                material_check_failed          = 13
+*                lm_version_not_found           = 14
+*                wrong_fix_assigment            = 15
+*                wrong_laymod                   = 16
+*                variant_error                  = 17
+*                fixture_use_error              = 18
+*                delete_record_failed           = 19
+*                modify_record_failed           = 20
+*                insert_record_failed           = 21
+*                double_entries_found           = 22
+*                error_converting_iso_code      = 23
+*                converting_failed              = 24
+*                article_variant_error          = 25
+*                lm_num_range_exception         = 26
+*                material_master_exception      = 27
+*                no_generic_article             = 28
+**               others                         = 29
+*                ga_double_placed               = 30
+*                mabw_error                     = 31
+*                change_document_error          = 32
+*                laymod_lock_failed             = 33
+*                version_look_failed            = 34
+*                listing_error                  = 35
+*                wrong_mtart                    = 36
+*                OTHERS                         = 37.
+*        ENDTRY.
       ENDIF.
     ENDIF.
-
     MOVE-CORRESPONDING ls_return TO me->pv_message.
 
 * ST-386
