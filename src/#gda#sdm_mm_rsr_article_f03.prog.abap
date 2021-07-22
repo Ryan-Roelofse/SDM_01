@@ -92,11 +92,7 @@ FORM sdm_logic .
     gt_myms_sdm[]   = go_selection->mt_myms_spec[].
     gt_konh_sdm[]   = go_selection->mt_konh_spec[].
     gt_tariff_sdm   = go_selection->mt_tariff_spec[].
-    IF go_selection->mt_konh_spec[] IS NOT INITIAL.
-      MOVE-CORRESPONDING go_selection->mt_konh_spec[] TO gt_pricing_sdm.
-      READ TABLE gt_pricing_sdm ASSIGNING FIELD-SYMBOL(<lfs_pricing_sdm>) INDEX 1.
-      <lfs_pricing_sdm>-matnr = go_selection->ms_mara_spec-matnr.
-    ENDIF.
+    gt_pricing_sdm = go_selection->mt_pricing_spec[].
 
 *    gt_mlan_sdm[]   = go_selection->mt_mlan_spec[].
 *    gt_steuer_sdm[] = go_selection->mt_steuertab_spec[].

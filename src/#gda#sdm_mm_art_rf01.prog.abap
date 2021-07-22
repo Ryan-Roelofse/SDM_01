@@ -838,20 +838,15 @@ FORM get_data .
     CALL FUNCTION '/GDA/SDM_PP_BRF_PRICING1'
       EXPORTING
         x_matnr  = <mara_struc>-matnr
-      IMPORTING
-        y_result = ls_pricing.
+      CHANGING
+        c_result = gt_pricing.
 
-    ls_pricing-matnr = <mara_struc>-matnr.
-    APPEND ls_pricing TO gt_pricing.
-
-    ls_cond_header-matnr = <mara_struc>-matnr.
-    ls_cond_header-knumh = ls_pricing-knumh.
-    INSERT ls_cond_header INTO TABLE gt_cond_header.
-*    APPEND ls_cond_header TO gt_cond_header.
-
-    CLEAR:
-     ls_cond_header,
-     ls_pricing.
+    LOOP AT gt_pricing INTO ls_pricing WHERE matnr = <mara_struc>-matnr.
+      ls_cond_header-matnr = <mara_struc>-matnr.
+      ls_cond_header-knumh = ls_pricing-knumh.
+      INSERT ls_cond_header INTO TABLE gt_cond_header.
+      CLEAR: ls_pricing, ls_cond_header.
+    ENDLOOP.
 
 ** Source List Logic
 *    CALL FUNCTION '/GDA/SDM_PP_BRF_SRC_LIST2'
@@ -3113,12 +3108,8 @@ FORM sdm_main_article.
     gt_konh_sdm[]   = go_selection->mt_konh_spec[].
     gt_tariff_sdm   = go_selection->mt_tariff_spec[].
     gt_mat_steur_sdm = go_selection->mt_mg03_spec[].
-*    gt_pricing_sdm = go_selection->mt_konh_spec[].
-    IF go_selection->mt_konh_spec[] IS NOT INITIAL.
-      MOVE-CORRESPONDING go_selection->mt_konh_spec[] TO gt_pricing_sdm.
-      READ TABLE gt_pricing_sdm ASSIGNING FIELD-SYMBOL(<lfs_pricing_sdm>) INDEX 1.
-      <lfs_pricing_sdm>-matnr = go_selection->ms_mara_spec-matnr.
-    ENDIF.
+    gt_pricing_sdm = go_selection->mt_pricing_spec[].
+
 *    gt_mg03_sdm_brf[] = go_selection->mt_mg03_spec[].
     gs_syst_sdm     = syst.
     APPEND go_selection->ms_makt_spec TO gt_makt_sdm[].

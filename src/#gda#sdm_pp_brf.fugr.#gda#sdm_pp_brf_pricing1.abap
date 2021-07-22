@@ -3,36 +3,26 @@ FUNCTION /gda/sdm_pp_brf_pricing1.
 *"*"Local Interface:
 *"  IMPORTING
 *"     REFERENCE(X_MATNR) TYPE  MATNR
-*"  EXPORTING
-*"     REFERENCE(Y_RESULT) TYPE  /GDA/SDM_ST_PRICING
+*"  CHANGING
+*"     REFERENCE(C_RESULT) TYPE  /GDA/SDM_T_PRICING_01
 *"  EXCEPTIONS
 *"      DECISION_TABLE
 *"----------------------------------------------------------------------
-*https://blogs.sap.com/2018/08/28/reading-price-conditions-dynamically-from-condition-tables/
-
-
   DATA:
     ob_rec    TYPE REF TO data,
-*    lt_result TYPE /gda/sdm_t_pricing,
-    ls_struc  TYPE struc1.
-*    lt_struc                 TYPE STANDARD TABLE OF struc1.
-*    lv_app_id                TYPE fdt_admn_0000-id,
-*    lv_id2                   TYPE fdt_admn_0000-id,
-*    lt_table_data_converted1 TYPE if_fdt_decision_table=>ts_table_data,
-*    lt_table_data_converted2 TYPE if_fdt_decision_table=>ts_table_data.
-
+    ls_struc  TYPE struc1,
+    ls_result LIKE LINE OF c_result.
 
   FIELD-SYMBOLS:
     <table>          TYPE any,
-*    <condition>      TYPE any,
     <kschl>          TYPE any,
     <ls_rec>         TYPE any,
-*    <datbi>          TYPE any,
-*    <datab>          TYPE any,
     <knumh>          TYPE any,
+    <ekorg> TYPE any,
+    <datbi> TYPE any,
+    <datab> TYPE any,
     <table_data>     LIKE LINE OF gt_table_data_converted1,
     <condition_data> LIKE LINE OF gt_table_data_converted2.
-
 
   IF gv_init = abap_false.
     SELECT SINGLE active FROM /gda/sdm_setup6 INTO gv_is_active
@@ -40,16 +30,8 @@ FUNCTION /gda/sdm_pp_brf_pricing1.
           AND ( type        = '04' OR type = '41')
           AND  active     = abap_true.
 
-*    IF sy-subrc <> 0.
-*      SELECT SINGLE active FROM /gda/sdm_setup6 INTO gv_is_active
-*          WHERE sdm_object  = 'ARTICLE'
-*            AND type        = '41'
-*            AND  active     = abap_true.
-*
-*    ENDIF.
     gv_init = abap_true.
   ENDIF.
-
 
   IF gv_app_id IS INITIAL AND gv_is_active = abap_true.
     SELECT SINGLE id FROM fdt_admn_0000 INTO gv_app_id
@@ -60,8 +42,8 @@ FUNCTION /gda/sdm_pp_brf_pricing1.
                        AND object_type    = 'EX'
                        AND application_id = gv_app_id.
   ENDIF.
-  CHECK sy-subrc = 0 AND gv_id2 IS NOT INITIAL.
 
+  CHECK sy-subrc = 0 AND gv_id2 IS NOT INITIAL.
   IF gt_struc IS INITIAL.
     TRY.
         CALL METHOD cl_fdt_simplifier=>simplify_decision_table
@@ -70,7 +52,7 @@ FUNCTION /gda/sdm_pp_brf_pricing1.
           IMPORTING
             ets_table_data_converted = gt_table_data_converted2.
       CATCH cx_fdt_input .
-        RAISE DECISION_TABLE.
+        RAISE decision_table.
     ENDTRY.
 
     gt_table_data_converted1[] = gt_table_data_converted2[].
@@ -81,22 +63,17 @@ FUNCTION /gda/sdm_pp_brf_pricing1.
       ls_struc-kschl = <kschl>.
       LOOP AT gt_table_data_converted1 ASSIGNING <table_data> WHERE col_no = '2'
                                                                AND  row_no = <condition_data>-row_no.
-
         ASSIGN COMPONENT 'R_VALUE' OF STRUCTURE <table_data> TO <table>.
         ASSIGN <table>->* TO <table>.
         ls_struc-tabname = <table>.
         APPEND ls_struc TO gt_struc.
         CLEAR ls_struc.
-
       ENDLOOP.
     ENDLOOP.
   ENDIF.
-* Build details from column 1 - Condition Type
-
 
 * First check for any SUCCESS Records
   LOOP AT gt_struc INTO ls_struc.
-
     CREATE DATA ob_rec TYPE (ls_struc-tabname).
     ASSIGN ob_rec->* TO <ls_rec>.
 
@@ -108,58 +85,73 @@ FUNCTION /gda/sdm_pp_brf_pricing1.
                AND datab <= sy-datum.
 
     IF sy-subrc = 0.
-*      ASSIGN COMPONENT 'DATBI' OF STRUCTURE <ls_rec> TO <datbi>.
-*      ASSIGN COMPONENT 'DATAB' OF STRUCTURE <ls_rec> TO <datab>.
       ASSIGN COMPONENT 'KNUMH' OF STRUCTURE <ls_rec> TO <knumh>.
-*      IF ( <datab> <= sy-datum AND <datbi> >= sy-datum ).
-      y_result-id     = '0'.
-      y_result-knumh  =  <knumh>.
-      y_result-kschl  =  ls_struc-kschl.
-      EXIT.
-*      ELSE.
-*        y_result-id     = 'W'.
-*        y_result-knumh  =  <knumh>.
+      ASSIGN COMPONENT 'EKORG' OF STRUCTURE <ls_rec> TO <ekorg>.
+      ASSIGN COMPONENT 'DATBI' OF STRUCTURE <ls_rec> TO <datbi>.
+      ASSIGN COMPONENT 'DATAB' OF STRUCTURE <ls_rec> TO <datab>.
 
-*      ENDIF.
-*    ELSE.
-*      y_result-id     = 'E'.
-*      y_result-knumh  =  ''.
+      ls_result-matnr  = x_matnr.
+      ls_result-id     = '0'.
+      ls_result-knumh  = <knumh>.
+      ls_result-kschl  = ls_struc-kschl.
+      IF <ekorg> IS ASSIGNED.
+        ls_result-ekorg  = <ekorg>.
+      ENDIF.
+
+      IF <datbi> IS ASSIGNED.
+        ls_result-datbi  = <datbi>.
+      ENDIF.
+
+      IF <datab> IS ASSIGNED.
+        ls_result-datab  = <datab>.
+      ENDIF.
+
+      APPEND ls_result TO c_result.
     ENDIF.
   ENDLOOP.
 
-  CHECK y_result-id     = space.
 * If no SUCCESS then check for WARNING
-  LOOP AT gt_struc INTO ls_struc.
+  IF c_result[] IS INITIAL.
+    LOOP AT gt_struc INTO ls_struc.
+      CREATE DATA ob_rec TYPE (ls_struc-tabname).
+      ASSIGN ob_rec->* TO <ls_rec>.
 
-    CREATE DATA ob_rec TYPE (ls_struc-tabname).
-    ASSIGN ob_rec->* TO <ls_rec>.
+      SELECT SINGLE * INTO <ls_rec>
+               FROM (ls_struc-tabname)
+               WHERE matnr = x_matnr
+                 AND kschl = ls_struc-kschl.
 
-    SELECT SINGLE * INTO <ls_rec>
-             FROM (ls_struc-tabname)
-             WHERE matnr = x_matnr
-               AND kschl = ls_struc-kschl.
+      IF sy-subrc = 0.
+        ASSIGN COMPONENT 'KNUMH' OF STRUCTURE <ls_rec> TO <knumh>.
+        ASSIGN COMPONENT 'EKORG' OF STRUCTURE <ls_rec> TO <ekorg>.
+        ASSIGN COMPONENT 'DATBI' OF STRUCTURE <ls_rec> TO <datbi>.
+        ASSIGN COMPONENT 'DATAB' OF STRUCTURE <ls_rec> TO <datab>.
 
-    IF sy-subrc = 0.
-*      ASSIGN COMPONENT 'DATBI' OF STRUCTURE <ls_rec> TO <datbi>.
-*      ASSIGN COMPONENT 'DATAB' OF STRUCTURE <ls_rec> TO <datab>.
-      ASSIGN COMPONENT 'KNUMH' OF STRUCTURE <ls_rec> TO <knumh>.
-*      IF ( <datab> <= sy-datum AND <datbi> >= sy-datum ).
-*        y_result-id     = '0'.
-*        y_result-knumh  =  <knumh>.
-*        EXIT.
-*      ELSE.
-        y_result-id     = 'W'.
-        y_result-knumh  =  <knumh>.
-        y_result-kschl  =  ls_struc-kschl.
-        EXIT.
-*      ENDIF.
-*    ELSE.
-*      y_result-id     = 'E'.
-*      y_result-knumh  =  ''.
-    ENDIF.
-  ENDLOOP.
+        ls_result-matnr  = x_matnr.
+        ls_result-id     = 'W'.
+        ls_result-knumh  =  <knumh>.
+        ls_result-kschl  =  ls_struc-kschl.
+      IF <ekorg> IS ASSIGNED.
+        ls_result-ekorg  = <ekorg>.
+      ENDIF.
 
-  CHECK y_result-id     = space.
+      IF <datbi> IS ASSIGNED.
+        ls_result-datbi  = <datbi>.
+      ENDIF.
+
+      IF <datab> IS ASSIGNED.
+        ls_result-datab  = <datab>.
+      ENDIF.
+        APPEND ls_result TO c_result.
+        CLEAR ls_result.
+      ENDIF.
+    ENDLOOP.
+  ENDIF.
+
 * No SUCCESS or WARNING therefore set to ERROR
-  y_result-id = 'E'.
+  IF c_result[] IS INITIAL.
+    ls_result-id = 'E'.
+    APPEND ls_result TO c_result.
+    CLEAR ls_result.
+  ENDIF.
 ENDFUNCTION.

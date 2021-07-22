@@ -18,13 +18,13 @@
        <TYP>MATNR</TYP>
       </RSIMP>
      </IMPORT>
-     <EXPORT>
-      <RSEXP>
-       <PARAMETER>Y_RESULT</PARAMETER>
+     <CHANGING>
+      <RSCHA>
+       <PARAMETER>C_RESULT</PARAMETER>
        <REFERENCE>X</REFERENCE>
-       <TYP>/GDA/SDM_ST_PRICING</TYP>
-      </RSEXP>
-     </EXPORT>
+       <TYP>/GDA/SDM_T_PRICING_01</TYP>
+      </RSCHA>
+     </CHANGING>
      <EXCEPTION>
       <RSEXC>
        <EXCEPTION>DECISION_TABLE</EXCEPTION>
@@ -37,9 +37,9 @@
        <STEXT>Material Number</STEXT>
       </RSFDO>
       <RSFDO>
-       <PARAMETER>Y_RESULT</PARAMETER>
+       <PARAMETER>C_RESULT</PARAMETER>
        <KIND>P</KIND>
-       <STEXT>Boolean Variable (X=true, -=false, space=unknown)</STEXT>
+       <STEXT>SDM:Pricing</STEXT>
       </RSFDO>
       <RSFDO>
        <PARAMETER>DECISION_TABLE</PARAMETER>

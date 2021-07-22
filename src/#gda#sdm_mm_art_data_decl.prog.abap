@@ -106,7 +106,7 @@ data:
   gt_steuer       like table of gs_mg03steuer,
   gt_konh         type standard table of konh,
   gt_cond_header  type sorted table of cond_header with non-unique key matnr knumh,
-  gt_pricing      type /gda/sdm_t_pricing,
+  gt_pricing      type /GDA/SDM_T_PRICING_01,
   gt_mlgn         type /gda/sdm_t_mlgn_01,
   gt_mlgt         type /gda/sdm_t_mlgt_01,
   gt_myms         type /gda/sdm_t_myms_01,
