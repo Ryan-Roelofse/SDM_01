@@ -2082,7 +2082,7 @@ CLASS /GDA/SDM_CL_ART_SELECTIONS IMPLEMENTATION.
     ENDIF.
 
 *PRICING
-    LOOP AT me->mt_pricing ASSIGNING <ls_pricing>.
+    LOOP AT me->mt_pricing ASSIGNING <ls_pricing> WHERE matnr = mv_object.
       READ TABLE me->mt_konh ASSIGNING <ls_konh>
                                      WITH KEY knumh = <ls_pricing>-knumh.
       IF sy-subrc EQ 0.
@@ -2735,7 +2735,8 @@ CLASS /GDA/SDM_CL_ART_SELECTIONS IMPLEMENTATION.
           me->mt_eord_spec, me->mt_tariff_spec,
           me->mt_rmmw1_spec, me->mt_mlea_spec,
           me->mt_mpgd_spec, me->mt_wrpl_spec,
-          me->mt_meinh_spec.
+          me->mt_meinh_spec, mt_pricing_spec,
+          mt_konh_spec.
 
 
   ENDMETHOD.

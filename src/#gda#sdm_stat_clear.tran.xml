@@ -14,7 +14,7 @@
    <TSTCT>
     <SPRSL>E</SPRSL>
     <TCODE>/GDA/SDM_STAT_CLEAR</TCODE>
-    <TTEXT>GlueData:SDM:Clear Article Status</TTEXT>
+    <TTEXT>SDM:Clear Article Status</TTEXT>
    </TSTCT>
   </asx:values>
  </asx:abap>

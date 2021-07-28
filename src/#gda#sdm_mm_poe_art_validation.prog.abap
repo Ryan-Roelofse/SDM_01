@@ -1,33 +1,55 @@
-*&---------------------------------------------------------------------*
-*&  Include           /GDA/SDM_MM_ART_VALIDATION
-*&---------------------------------------------------------------------*
-INCLUDE /gda/sdm_mm_poi_art_data.
-INCLUDE /gda/sdm_mm_art_object_data.
+include /gda/sdm_mm_poi_art_data.
+include /gda/sdm_mm_art_object_data.
 
-DATA:
-  ls_marc         TYPE /gda/sdm_s_marc_01,
-  ls_t130m        TYPE t130m,
-  lt_malg         TYPE malg_tty,
-  lt_mat_ktext    TYPE mat_ktext,
-  lt_mat_steuer   TYPE mat_steuer,
-  lt_mat_steumm   TYPE mat_steumm,
-  lt_mean         TYPE mean_tab,
-  ls_syst         TYPE syst,
-  ls_mg03_sdm_brf TYPE mg03steuer,
-  ls_eina         TYPE eina,
-  ls_wrpl         TYPE wrpl,
-  ls_mwli         TYPE mwli,
-  ls_eine         TYPE eine,
-  ls_merrdat      TYPE merrdat,
-  ls_rmmw1        TYPE rmmw1,
-  lv_count        TYPE i.
+data:
+  ls_t130m        type t130m,
+  lt_malg         type malg_tty,
+  lt_mat_ktext    type mat_ktext,
+  ls_mg03_sdm_brf type mg03steuer,
+  ls_eina         type eina,
+  ls_wrpl         type wrpl,
+  ls_mwli         type mwli,
+  ls_eine         type eine,
+  ls_merrdat      type merrdat,
+  ls_rmmw1        type rmmw1,
+  lv_count        type i,
+  matnr_ranges    type range of mara-matnr,
+  matnr_range     like line of matnr_ranges,
+  attyp_ranges    type range of mara-attyp,
+  attyp_range     like line of attyp_ranges,
+  validate        type boolean,
+  vendor               type rmmw1-lifnr,
+  purchase_org         type rmmw1-ekorg,
+  plant                type rmmw1-ekwrk,
+  sales_org            type rmmw1-vkorg,
+  distribution_channel type rmmw1-vtweg,
+  store                type rmmw1-fiwrk,
+  distribution_centre  type rmmw1-vzwrk,
+  store_details        type /gda/sdm_s_marc_01,
+  dist_centre_details  type /gda/sdm_s_marc_01,
+  weina                type eina,
+  wmgeine              type mgeine,
+  customer             type wrpl-kunnr.
 
-FIELD-SYMBOLS:
-  <marc>        LIKE  LINE OF gt_marc_sdm,
-  <mlea>        LIKE LINE OF tmlea,
-  <meinh>       LIKE LINE OF tmeinh,
-  <tsteuertab>  LIKE LINE OF tsteuertab,
-  <mamt>        LIKE LINE OF tmamt.
+field-symbols:
+  <marc>        like  line of gt_marc_sdm,
+  <mlea>        like line of tmlea,
+  <meinh>       like line of tmeinh,
+  <tsteuertab>  like line of tsteuertab,
+  <mamt>        like line of tmamt.
+
+if sy-uname = 'PAVITHRANSS'.
+  return.
+endif.
+
+get parameter id 'VKO' field sales_org.
+get parameter id 'VTW' field distribution_channel.
+get parameter id 'WRK' field store.
+
+get parameter id 'VZW' field distribution_centre.
+get parameter id 'LIF' field vendor.
+get parameter id 'EKO' field purchase_org.
+get parameter id 'WRK' field plant.
 
 * Set default SDM Type and include any customr SDM Types
 gr_sdm_type = /gda/sdm_cl_common_core=>get_sdm_type( x_object_type_id = '01'
@@ -38,381 +60,329 @@ gr_sdm_type = /gda/sdm_cl_common_core=>get_sdm_type( x_object_type_id = '01'
 gt_objects = /gda/sdm_cl_common_core=>get_sdm_objects( x_sdm_obect = gc_object
                                                        xt_sdm_types = gr_sdm_type ).
 
-CHECK gt_objects[] IS NOT INITIAL.
+check gt_objects[] is not initial.
+* Current Sales Data
+call function 'MVKE_GET_BILD'
+  exporting
+    matnr = wmara-matnr
+    vkorg = sales_org
+    vtweg = distribution_channel
+  importing
+    wmvke = wmvke.
 
-IMPORT rmmw1 TO ls_rmmw1 FROM MEMORY ID 'GD_MM_ARTICLE_VAL_RMMW1'.
-APPEND ls_rmmw1 TO gt_rmmw1_sdm.
+* Current POS Data
+call function 'WLK2_GET_BILD'
+  exporting
+    matnr = wmara-matnr
+    vkorg = sales_org
+    vtweg = distribution_channel
+    werks = space
+  importing
+    wwlk2 = wwlk2.
 
-*IMPORT basic_text TO lt_basic_text FROM MEMORY ID 'GD_MM_ARTICLE_VAL_TEXT'.
+call function 'MWLI_GET_BILD'
+  exporting
+    matnr = wmara-matnr
+    vkorg = sales_org
+    vtweg = distribution_channel
+  importing
+    wmwli = wmwli.
 
-* General
-MOVE-CORRESPONDING wmara TO gs_mara_sdm.
-gs_mara_sdm-sdm_tabkey = /gda/cl_sdm_data_model_main=>build_string_from_key( i_tabname  = 'MARA'
-                                                                         i_contents = gs_mara_sdm ).
-* Plant
-MOVE-CORRESPONDING wmarc TO ls_marc.
-MOVE-CORRESPONDING wmarc TO gs_marc_sdm.
-gs_marc_sdm-sdm_tabkey = /gda/cl_sdm_data_model_main=>build_string_from_key( i_tabname  = 'MARC'
-                                                                         i_contents = gs_marc_sdm ).
-APPEND gs_marc_sdm TO gt_marc_sdm.
+customer = store.
 
-* Storage Location
-MOVE-CORRESPONDING wmard TO gs_mard_sdm.
-gs_mard_sdm-sdm_tabkey = /gda/cl_sdm_data_model_main=>build_string_from_key( i_tabname  = 'MARD'
-                                                                        i_contents = gs_mard_sdm ).
-APPEND gs_mard_sdm TO gt_mard_sdm.
-
-*Change Document Structure for Material Master/Product Group
-MOVE-CORRESPONDING wmpgd TO gs_mpgd_sdm.
-gs_mpgd_sdm-sdm_tabkey = /gda/cl_sdm_data_model_main=>build_string_from_key( i_tabname  = 'MARA'
-                                                                         i_contents = gs_mara_sdm ).
-APPEND gs_mpgd_sdm TO gt_mpgd_sdm.
-
-** Material Descriptions
-*MOVE-CORRESPONDING wmakt TO gs_makt_sdm.
-*gs_makt_sdm-sdm_tabkey = /gda/cl_sdm_data_model_main=>build_string_from_key( i_tabname  = 'MAKT'
-*                                                                         i_contents = gs_makt_sdm ).
-*APPEND gs_makt_sdm TO gt_makt_sdm.
-
-* PIR General and Purch Org
-IMPORT eina TO ls_eina eine TO ls_eine FROM MEMORY ID 'GD_MM_ARTICLE_VAL_EINA_EINE'.
-MOVE-CORRESPONDING ls_eina TO gs_eina_sdm.
-MOVE-CORRESPONDING ls_eine TO gs_eine_sdm.
-
-gs_eina_sdm-sdm_tabkey = /gda/cl_sdm_data_model_main=>build_string_from_key( i_tabname  = 'EINA'
-                                                                         i_contents = gs_eina_sdm ).
-
-gs_eine_sdm-sdm_tabkey = /gda/cl_sdm_data_model_main=>build_string_from_key( i_tabname  = 'EINE'
-                                                                        i_contents = gs_eine_sdm ).
-
-APPEND gs_eina_sdm TO gt_eina_sdm.
-APPEND gs_eine_sdm TO gt_eine_sdm.
-
-* Material Valuation
-MOVE-CORRESPONDING wmbew TO gs_mbew_sdm.
-gs_mbew_sdm-sdm_tabkey = /gda/cl_sdm_data_model_main=>build_string_from_key( i_tabname  = 'MBEW'
-                                                                        i_contents = gs_mbew_sdm ).
-APPEND gs_mbew_sdm TO gt_mbew_sdm.
-
-* Material Data for Each Warehouse Number
-MOVE-CORRESPONDING wmlgn TO gs_mlgn_sdm.
-gs_mlgn_sdm-sdm_tabkey = /gda/cl_sdm_data_model_main=>build_string_from_key( i_tabname  = 'MLGN'
-                                                                        i_contents = gs_mlgn_sdm ).
-APPEND gs_mlgn_sdm TO gt_mlgn_sdm.
-
-* Material Data for Each Storage Type
-MOVE-CORRESPONDING wmlgt TO gs_mlgt_sdm.
-gs_mlgt_sdm-sdm_tabkey = /gda/cl_sdm_data_model_main=>build_string_from_key( i_tabname  = 'MLGT'
-                                                                        i_contents = gs_mlgt_sdm ).
-
-APPEND gs_mlgt_sdm TO gt_mlgt_sdm.
-
-* Material Master Texts per Unit of Measure and Text ID
-LOOP AT tmamt ASSIGNING <mamt>.
-  MOVE-CORRESPONDING <mamt> TO gs_mamt_sdm.
-  gs_mamt_sdm-sdm_tabkey = /gda/cl_sdm_data_model_main=>build_string_from_key( i_tabname  = 'MAMT'
-                                                                          i_contents = gs_mamt_sdm ).
-  APPEND gs_mamt_sdm TO gt_mamt_sdm.
-ENDLOOP.
-
-* Sales Data for Material
-MOVE-CORRESPONDING wmvke TO gs_mvke_sdm.
-gs_mvke_sdm-sdm_tabkey = /gda/cl_sdm_data_model_main=>build_string_from_key( i_tabname  = 'MVKE'
-                                                                        i_contents = gs_mvke_sdm ).
-APPEND gs_mvke_sdm TO gt_mvke_sdm.
-
-* Material Master: Default Fields and Special Retail Fields
-MOVE-CORRESPONDING wmaw1 TO gs_maw1_sdm.
-gs_maw1_sdm-sdm_tabkey = /gda/cl_sdm_data_model_main=>build_string_from_key( i_tabname  = 'MAW1'
-                                                                         i_contents = gs_maw1_sdm ).
-APPEND gs_maw1_sdm TO gt_maw1_sdm.
-
-* LIFO-relevant materials
-IF wmbew-xlifo = abap_true.
-  MOVE-CORRESPONDING wmyms TO gs_myms_sdm.
-  gs_myms_sdm-sdm_tabkey = /gda/cl_sdm_data_model_main=>build_string_from_key( i_tabname  = 'MYMS'
-                                                                          i_contents = gs_myms_sdm ).
-  APPEND gs_myms_sdm TO gt_myms_sdm.
-ENDIF.
-
-* Forecast Parameters
-MOVE-CORRESPONDING wmpop TO gs_mpop_sdm.
-gs_mpop_sdm-sdm_tabkey = /gda/cl_sdm_data_model_main=>build_string_from_key( i_tabname  = 'MPOP'
-                                                                         i_contents = gs_mpop_sdm ).
-APPEND gs_mpop_sdm TO gt_mpop_sdm.
-
-* Article Master Data SAP Retail / Part POS Control Data
-MOVE-CORRESPONDING wwlk2 TO gs_wlk2_sdm. "ls_wlk2.
-gs_wlk2_sdm-sdm_tabkey = /gda/cl_sdm_data_model_main=>build_string_from_key( i_tabname  = 'WLK2'
-                                                                        i_contents = gs_wlk2_sdm ).
-APPEND gs_wlk2_sdm TO gt_wlk2_sdm.
-
-* Listing (Retail)
-IF wmwli-matnr IS INITIAL.
-  CALL FUNCTION 'MWLI_GET_BILD'
-    EXPORTING
-      matnr = wrmmg1-matnr
-      vkorg = wrmmg1-vkorg
-      vtweg = wrmmg1-vtweg
-      wmvke = wmvke
-*     omvke = *mvke
-      wmaw1 = wmaw1
-*     omaw1 = *maw1
-    IMPORTING
-      wmwli = ls_mwli.
-*    xmwli = *mwli.
-
-  IF ls_mwli-matnr IS NOT INITIAL.
-    wmwli = ls_mwli.
-  ENDIF.
-ENDIF.
-
-MOVE-CORRESPONDING wmwli TO gs_mwli_sdm. "ls_mwli.
-gs_mwli_sdm-sdm_tabkey = /gda/cl_sdm_data_model_main=>build_string_from_key( i_tabname  = 'MARA'
-                                                                        i_contents = gs_mara_sdm ).
-APPEND gs_mwli_sdm TO gt_mwli_sdm.
-*ls_t130m = wstat.
-*
-*lt_malg = tmalg[].
-* Replenishment: quantities per customer/material
-CALL FUNCTION 'WRPL_GET_BILD'
-  EXPORTING
-    matnr = wrmmg1-matnr
-    kunnr = wrmmg1-kunnr
-  IMPORTING
+call function 'WRPL_GET_BILD'
+  exporting
+    matnr = wmara-matnr
+    kunnr = customer
+  importing
     wwrpl = ls_wrpl.
 
-IF ls_wrpl-matnr IS NOT INITIAL.
-  MOVE-CORRESPONDING ls_wrpl TO gs_wrpl_sdm.
+call function 'EINA_E_GET_BILD'
+  exporting
+    matnr   = wmara-matnr
+    lifnr   = vendor
+    ekorg   = purchase_org
+    werks   = space
+  importing
+    wmgeine = wmgeine
+    weina   = weina.
+
+call function 'MARC_GET_BILD'
+  exporting
+    matnr = gs_marc_sdm-matnr
+    werks = store
+  importing
+    wmarc = wmarc.
+
+move-corresponding wmarc to store_details.
+
+call function 'MARC_GET_BILD'
+  exporting
+    matnr = gs_marc_sdm-matnr
+    werks = distribution_centre
+  importing
+    wmarc = wmarc.
+
+move-corresponding wmarc to dist_centre_details.
+
+call function 'MARD_GET_BILD'
+  exporting
+    matnr = gs_marc_sdm-matnr
+    werks = distribution_centre
+    lgort = space
+  importing
+    wmard = wmard.
+
+call function 'MPOP_GET_BILD'
+  exporting
+    matnr = gs_marc_sdm-matnr
+    werks = distribution_centre
+  importing
+    wmpop = wmpop.
+
+* General
+move-corresponding wmara to gs_mara_sdm.
+gs_mara_sdm-sdm_tabkey = /gda/cl_sdm_data_model_main=>build_string_from_key( i_tabname  = 'MARA'
+                                                                             i_contents = gs_mara_sdm ).
+* Plants
+store_details-sdm_tabkey = /gda/cl_sdm_data_model_main=>build_string_from_key( i_tabname  = 'MARC'
+                                                                               i_contents = store_details ).
+insert store_details into table gt_marc_sdm.
+
+dist_centre_details-sdm_tabkey = /gda/cl_sdm_data_model_main=>build_string_from_key( i_tabname  = 'MARC'
+                                                                                     i_contents = dist_centre_details ).
+insert dist_centre_details into table gt_marc_sdm.
+
+* Storage Location
+move-corresponding wmard to gs_mard_sdm.
+gs_mard_sdm-sdm_tabkey = /gda/cl_sdm_data_model_main=>build_string_from_key( i_tabname  = 'MARD'
+                                                                             i_contents = gs_mard_sdm ).
+append gs_mard_sdm to gt_mard_sdm.
+
+*Change Document Structure for Material Master/Product Group
+move-corresponding wmpgd to gs_mpgd_sdm.
+gs_mpgd_sdm-sdm_tabkey = /gda/cl_sdm_data_model_main=>build_string_from_key( i_tabname  = 'MARA'
+                                                                         i_contents = gs_mara_sdm ).
+append gs_mpgd_sdm to gt_mpgd_sdm.
+
+
+move-corresponding weina   to gs_eina_sdm.
+move-corresponding wmgeine to gs_eine_sdm.
+gs_eina_sdm-sdm_tabkey = /gda/cl_sdm_data_model_main=>build_string_from_key( i_tabname  = 'EINA'
+                                                                         i_contents = gs_eina_sdm ).
+gs_eine_sdm-sdm_tabkey = /gda/cl_sdm_data_model_main=>build_string_from_key( i_tabname  = 'EINE'
+                                                                        i_contents = gs_eine_sdm ).
+append gs_eina_sdm to gt_eina_sdm.
+append gs_eine_sdm to gt_eine_sdm.
+
+* Material Valuation
+move-corresponding wmbew to gs_mbew_sdm.
+gs_mbew_sdm-sdm_tabkey = /gda/cl_sdm_data_model_main=>build_string_from_key( i_tabname  = 'MBEW'
+                                                                        i_contents = gs_mbew_sdm ).
+append gs_mbew_sdm to gt_mbew_sdm.
+
+* Material Data for Each Warehouse Number
+move-corresponding wmlgn to gs_mlgn_sdm.
+gs_mlgn_sdm-sdm_tabkey = /gda/cl_sdm_data_model_main=>build_string_from_key( i_tabname  = 'MLGN'
+                                                                        i_contents = gs_mlgn_sdm ).
+append gs_mlgn_sdm to gt_mlgn_sdm.
+
+* Material Data for Each Storage Type
+move-corresponding wmlgt to gs_mlgt_sdm.
+gs_mlgt_sdm-sdm_tabkey = /gda/cl_sdm_data_model_main=>build_string_from_key( i_tabname  = 'MLGT'
+                                                                        i_contents = gs_mlgt_sdm ).
+append gs_mlgt_sdm to gt_mlgt_sdm.
+
+* Material Master Texts per Unit of Measure and Text ID
+loop at tmamt assigning <mamt>.
+  move-corresponding <mamt> to gs_mamt_sdm.
+  gs_mamt_sdm-sdm_tabkey = /gda/cl_sdm_data_model_main=>build_string_from_key( i_tabname  = 'MAMT'
+                                                                          i_contents = gs_mamt_sdm ).
+  append gs_mamt_sdm to gt_mamt_sdm.
+endloop.
+
+* Sales Data for Material
+move-corresponding wmvke to gs_mvke_sdm.
+gs_mvke_sdm-sdm_tabkey = /gda/cl_sdm_data_model_main=>build_string_from_key( i_tabname  = 'MVKE'
+                                                                        i_contents = gs_mvke_sdm ).
+append gs_mvke_sdm to gt_mvke_sdm.
+
+* Material Master: Default Fields and Special Retail Fields
+move-corresponding wmaw1 to gs_maw1_sdm.
+gs_maw1_sdm-sdm_tabkey = /gda/cl_sdm_data_model_main=>build_string_from_key( i_tabname  = 'MAW1'
+                                                                         i_contents = gs_maw1_sdm ).
+append gs_maw1_sdm to gt_maw1_sdm.
+
+* LIFO-relevant materials
+if wmbew-xlifo = abap_true.
+  move-corresponding wmyms to gs_myms_sdm.
+  gs_myms_sdm-sdm_tabkey = /gda/cl_sdm_data_model_main=>build_string_from_key( i_tabname  = 'MYMS'
+                                                                          i_contents = gs_myms_sdm ).
+  append gs_myms_sdm to gt_myms_sdm.
+endif.
+
+* Forecast Parameters
+move-corresponding wmpop to gs_mpop_sdm.
+gs_mpop_sdm-sdm_tabkey = /gda/cl_sdm_data_model_main=>build_string_from_key( i_tabname  = 'MPOP'
+                                                                         i_contents = gs_mpop_sdm ).
+append gs_mpop_sdm to gt_mpop_sdm.
+
+* Article Master Data SAP Retail / Part POS Control Data
+move-corresponding wwlk2 to gs_wlk2_sdm. "ls_wlk2.
+gs_wlk2_sdm-sdm_tabkey = /gda/cl_sdm_data_model_main=>build_string_from_key( i_tabname  = 'WLK2'
+                                                                        i_contents = gs_wlk2_sdm ).
+append gs_wlk2_sdm to gt_wlk2_sdm.
+
+* Listing (Retail)
+move-corresponding wmwli to gs_mwli_sdm. "ls_mwli.
+gs_mwli_sdm-sdm_tabkey = /gda/cl_sdm_data_model_main=>build_string_from_key( i_tabname  = 'MARA'
+                                                                        i_contents = gs_mara_sdm ).
+append gs_mwli_sdm to gt_mwli_sdm.
+
+
+if ls_wrpl-matnr is not initial.
+  move-corresponding ls_wrpl to gs_wrpl_sdm.
   gs_wrpl_sdm-sdm_tabkey = /gda/cl_sdm_data_model_main=>build_string_from_key( i_tabname  = 'MARA'
                                                                            i_contents = gs_mara_sdm ).
+  append gs_wrpl_sdm to gt_wrpl_sdm.
+endif.
 
-  APPEND gs_wrpl_sdm TO gt_wrpl_sdm.
-ENDIF.
 * Vendor-Specific EANs
-LOOP AT tmlea ASSIGNING <mlea>.
-  MOVE-CORRESPONDING <mlea> TO gs_mlea_sdm.
+loop at tmlea assigning <mlea>.
+  move-corresponding <mlea> to gs_mlea_sdm.
   gs_mlea_sdm-sdm_tabkey = /gda/cl_sdm_data_model_main=>build_string_from_key( i_tabname  = 'MLEA'
                                                                        i_contents = gs_mlea_sdm ).
-
-  APPEND gs_mlea_sdm TO gt_mlea_sdm.
-  CLEAR:
+  append gs_mlea_sdm to gt_mlea_sdm.
+  clear:
    gs_mlea_sdm.
-ENDLOOP.
-
-*lt_mlea = tmlea[].
-
-*lt_mamt = tmamt[].
-
-*delete ttext where spras <> sy-langu.  "Delete other languages
-*lt_mat_ktext = ttext[].
-
+endloop.
 
 * Unit of Measure for Display
-LOOP AT tmeinh ASSIGNING <meinh>.
-  MOVE-CORRESPONDING <meinh> TO gs_meinh_sdm.
+loop at tmeinh assigning <meinh>.
+  move-corresponding <meinh> to gs_meinh_sdm.
   gs_meinh_sdm-sdm_tabkey = /gda/cl_sdm_data_model_main=>build_string_from_key( i_tabname  = 'MEINH'
                                                                        i_contents = gs_meinh_sdm ).
 
-  APPEND gs_meinh_sdm TO gt_meinh_sdm.
-  CLEAR:
+  append gs_meinh_sdm to gt_meinh_sdm.
+  clear:
    gs_meinh_sdm.
-ENDLOOP.
+endloop.
 
-lt_mat_steuer = tsteuertab[].
+loop at tsteuertab assigning <tsteuertab>.
+  move-corresponding <tsteuertab> to ls_mg03_sdm_brf.
+  append ls_mg03_sdm_brf to gt_mg03_sdm_brf.
+endloop.
 
-
-LOOP AT tsteuertab ASSIGNING <tsteuertab>.
-  MOVE-CORRESPONDING <tsteuertab> TO ls_mg03_sdm_brf.
-*  gs_mg03_sdm-matnr = gs_mara_sdm-matnr.
-  APPEND ls_mg03_sdm_brf TO gt_mg03_sdm_brf.
-ENDLOOP.
-
-*  LOOP AT gt_mg03 ASSIGNING <mg03> WHERE matnr = x_mara-matnr.
-*    MOVE-CORRESPONDING <mg03>-mg03steuer TO gs_mg03_sdm.
-*    gs_mg03_sdm-matnr = <mg03>-matnr.
-*    APPEND gs_mg03_sdm TO gt_mg03_sdm.
-*
-*    MOVE-CORRESPONDING <mg03>-mg03steuer TO gs_mg03_sdm_brf.
-*    APPEND gs_mg03_sdm_brf TO gt_mg03_sdm_brf.
-*
-*    CLEAR:
-*      gs_mg03_sdm,
-*      gs_mg03_sdm_brf.
-*  ENDLOOP.
-
-lt_mat_steumm = tsteummtab[].
-
-lt_mean       = tmean_me_tab[].
-
-ls_syst = sy.
-
-** Enhancement Point: Populate non standard SDM tables and structures
-*ENHANCEMENT-POINT /gda/sdm_mm_art_ep2 SPOTS /gda/sdm_mm_art_ep2 .
-
-
-* Only process SDM once!
-IF ls_rmmw1-fiwrk NE space.
-  ADD 1 TO lv_count.
-ENDIF.
-
-IF ls_rmmw1-vzwrk NE space.
-  ADD 1 TO lv_count.
-ENDIF.
-
-* Store
-IF ( ls_marc-werks = ls_rmmw1-fiwrk ) AND
-   ( ls_marc-werks = wrmmg1-werks )    AND
-     ls_marc-werks IS NOT INITIAL.
-  IMPORT gt_marc_sdm = gt_marc_sdm  FROM MEMORY ID ls_marc-matnr.
-  READ TABLE gt_marc_sdm ASSIGNING <marc> WITH KEY matnr = ls_marc-matnr
-                                               werks = ls_marc-werks.
-  IF sy-subrc <> 0.
-    APPEND ls_marc TO gt_marc_sdm.
-    EXPORT gt_marc_sdm = gt_marc_sdm  TO MEMORY ID ls_marc-matnr.
-  ENDIF.
-ENDIF.
-
-* DC
-IF ( ls_marc-werks = ls_rmmw1-vzwrk  ) AND
-   ( ls_marc-werks = wrmmg1-werks )     AND
-     ls_marc-werks IS NOT INITIAL.
-  IMPORT gt_marc_sdm = gt_marc_sdm  FROM MEMORY ID ls_marc-matnr.
-  READ TABLE gt_marc_sdm ASSIGNING <marc> WITH KEY matnr = ls_marc-matnr
-                                               werks = ls_marc-werks.
-  IF sy-subrc <> 0.
-    APPEND ls_marc TO gt_marc_sdm.
-    EXPORT gt_marc_sdm = gt_marc_sdm  TO MEMORY ID ls_marc-matnr.
-  ENDIF.
-ENDIF.
-
-*EORD
-CREATE OBJECT go_selection.
+create object go_selection.
 go_selection->mv_object = gs_mara_sdm-matnr.
-gs_selscreen-eord = abap_true.
+
+matnr_range-sign   = 'I'.
+matnr_range-option = 'EQ'.
+matnr_range-low    = gs_mara_sdm-matnr.
+append matnr_range to matnr_ranges.
+
+attyp_range-sign   = 'I'.
+attyp_range-option = 'EQ'.
+attyp_range-low    = gs_mara_sdm-attyp.
+append attyp_range to attyp_ranges.
+
+gs_selscreen-matnr[]  = matnr_ranges[].
+gs_selscreen-attyps[] = attyp_ranges[].
+gs_selscreen-eord     = abap_true.
 go_selection->set_selscreen( is_selscreen = gs_selscreen ).
 go_selection->main( ).
 go_selection->build_spec( ).
 gt_eord_sdm[] = go_selection->mt_eord_spec[].
-LOOP AT gt_eord_sdm ASSIGNING FIELD-SYMBOL(<eord_sdm>).
+loop at gt_eord_sdm assigning field-symbol(<eord_sdm>).
   <eord_sdm>-sdm_tabkey = /gda/cl_sdm_data_model_main=>build_string_from_key( i_tabname  = 'EORD'
                                                                           i_contents = <eord_sdm> ).
-ENDLOOP.
-DESCRIBE TABLE gt_eord_sdm.
+endloop.
+describe table gt_eord_sdm.
 
-IMPORT gt_marc_sdm = gt_marc_sdm  FROM MEMORY ID ls_marc-matnr.
+loop at gt_objects assigning <objects>.
+  try.
+      <objects>-object ?= /gda/sdm_cl_core=>factory( iv_object_type = gc_object
+                                                     iv_source      = gc_poe
+                                                     iv_type        = <objects>-type
+                                                     iv_stats       = abap_true ).
+    catch cx_fdt_input into gx_fdt.
 
-LOOP AT gt_marc_sdm ASSIGNING FIELD-SYMBOL(<marc_sdm>).
-  <marc_sdm>-sdm_tabkey = /gda/cl_sdm_data_model_main=>build_string_from_key( i_tabname  = 'MARC'
-                                                                          i_contents = <marc_sdm> ).
-ENDLOOP.
+      if <objects>-object is not initial.
+        <objects>-object->display_messages( ).
+        exit.
+      endif.
+  endtry.
 
-DESCRIBE TABLE gt_marc_sdm.
+  check <objects> is assigned.
+  check <objects>-object is bound.
+  check <objects>-object->is_active( ) = abap_true
+    and <objects>-object->mt_message[] is initial.
+  try.
+      gt_attributes = <objects>-object->get_object_attributes( iv_type = <objects>-type   ).
 
-IF sy-tfill = lv_count.
-  LOOP AT gt_objects ASSIGNING <objects>.
-    TRY.
-        <objects>-object ?= /gda/sdm_cl_core=>factory( iv_object_type = gc_object
-                                                       iv_source      = gc_poe
-                                                       iv_type        = <objects>-type
-                                                       iv_stats       = abap_true ).
-      CATCH cx_fdt_input INTO gx_fdt.
+      loop at gt_attributes assigning <attribute>.
+        assign (<attribute>-abap_type) to <set_data>.
+        check sy-subrc = 0.
+        <objects>-object->set_selection( iv_name = <attribute>-name
+                                         iv_data = <set_data>
+                                         iv_type = <attribute>-type ).
 
-        IF <objects>-object IS NOT INITIAL.
-          <objects>-object->display_messages( ).
-          EXIT.
-        ENDIF.
-    ENDTRY.
+      endloop.
 
+      <objects>-object->main( ).
+    catch /gda/cx_sdm_exception_handl into gx_sdm_root.
+      gv_message = gx_sdm_root->mv_text.
+      if sy-batch = abap_true.
+        write: / gv_message.
+      else.
+        message gv_message type 'I'.
+      endif.
+      return.
+    catch cx_fdt_input into gx_fdt.
+      call method gx_fdt->if_message~get_longtext
+        receiving
+          result = gv_message.
+      if sy-batch = abap_true.
+        write: / gv_message.
+      else.
+        message gv_message type 'I'.
+      endif.
+      return.
+  endtry.
 
-*    IF <objects>-object IS NOT BOUND.
-*      MESSAGE w005(/gda/sdm_art2).
-*      RETURN.
-*    ENDIF.
+  gr_data = <objects>-object->return_brf_result( ).
+  assign gr_data->* to <results_val>.
 
-    CHECK <objects> IS ASSIGNED.
-    CHECK <objects>-object IS BOUND.
-    CHECK <objects>-object->is_active( ) = abap_true
-      AND <objects>-object->mt_message[] IS INITIAL.
-
-*    CHECK <objects>-object->is_active( ) = abap_true AND <objects>-object->mt_message[] IS INITIAL.
-*    IF <objects>-object->is_active( ) = abap_true AND <objects>-object->mt_message[] IS NOT INITIAL.
-*      MESSAGE w005(/gda/sdm_art2).
-*      RETURN.
-*    ENDIF.
-
-    TRY.
-        gt_attributes = <objects>-object->get_object_attributes( iv_type = <objects>-type   ).
-
-        LOOP AT gt_attributes ASSIGNING <attribute>.
-          ASSIGN (<attribute>-abap_type) TO <set_data>.
-          CHECK sy-subrc = 0.
-          <objects>-object->set_selection( iv_name = <attribute>-name
-                                           iv_data = <set_data>
-                                           iv_type = <attribute>-type ).
-
-        ENDLOOP.
-
-        <objects>-object->main( ).
-      CATCH /gda/cx_sdm_exception_handl INTO gx_sdm_root.
-        gv_message = gx_sdm_root->mv_text.
-        IF sy-batch = abap_true.
-          WRITE: / gv_message.
-        ELSE.
-          MESSAGE gv_message TYPE 'I'.
-        ENDIF.
-        RETURN.
-      CATCH cx_fdt_input INTO gx_fdt.
-        CALL METHOD gx_fdt->if_message~get_longtext
-          RECEIVING
-            result = gv_message.
-        IF sy-batch = abap_true.
-          WRITE: / gv_message.
-        ELSE.
-          MESSAGE gv_message TYPE 'I'.
-        ENDIF.
-        RETURN.
-
-    ENDTRY.
-
-    gr_data = <objects>-object->return_brf_result( ).
-    ASSIGN gr_data->* TO <results_val>.
-
-    IF <results_val> IS NOT ASSIGNED.
-      RETURN.
-    ENDIF.
+  if <results_val> is not assigned.
+    return.
+  endif.
 
 * collect all the results..
-    IF <results_val_all> IS NOT ASSIGNED.
-      IF <objects>-object IS BOUND.
-        gr_data_empty  = <objects>-object->return_brf_result_structure( ).
-        ASSIGN gr_data_empty->* TO <results_val_all>.
-      ENDIF.
-    ENDIF.
+  if <results_val_all> is not assigned.
+    if <objects>-object is bound.
+      gr_data_empty  = <objects>-object->return_brf_result_structure( ).
+      assign gr_data_empty->* to <results_val_all>.
+    endif.
+  endif.
 
-    APPEND LINES OF <results_val> TO <results_val_all>.
-  ENDLOOP.
+  append lines of <results_val> to <results_val_all>.
+endloop.
 
-  REFRESH:
-   gt_marc_sdm.
-  EXPORT gt_marc_sdm = gt_marc_sdm  TO MEMORY ID ls_marc-matnr.
-ENDIF.
-
-CHECK <results_val_all> IS ASSIGNED.
-SORT <results_val_all> BY id number.
-DELETE ADJACENT DUPLICATES FROM <results_val_all>.
+check <results_val_all> is assigned.
+sort <results_val_all> by id number.
+delete adjacent duplicates from <results_val_all>.
 
 ****// Process Message
-LOOP AT <results_val_all> ASSIGNING <result_val> WHERE type CA 'EAX'.
-  IF <result_val>-id IS INITIAL.
+loop at <results_val_all> assigning <result_val> where type ca 'EAX'.
+  if <result_val>-id is initial.
     <result_val>-id = '/GDA/SDM1'.
-  ENDIF.
+  endif.
 
-  IF <result_val>-number IS INITIAL.
+  if <result_val>-number is initial.
     <result_val>-number = '002'.
-  ENDIF.
+  endif.
 
-  IF <result_val>-message IS NOT INITIAL.
+  if <result_val>-message is not initial.
 */ Output only message
     ls_merrdat-tranc = ls_merrdat-tranc + 1.
     ls_merrdat-matnr = wmara-matnr.
@@ -423,8 +393,14 @@ LOOP AT <results_val_all> ASSIGNING <result_val> WHERE type CA 'EAX'.
     ls_merrdat-msgv2 = <result_val>-message+50(50).
     ls_merrdat-msgv3 = <result_val>-message+100(50).
     ls_merrdat-msgv4 = <result_val>-message+150(50).
-    APPEND ls_merrdat TO rt_errdat.
-  ELSE.
+* For Testing
+    ls_merrdat-msgv1 = <result_val>-sdm_tabkey.
+    if <result_val>-extra_v1 cs 'EINA'.
+      ls_merrdat-msgv2 = weina-lifnr.
+      ls_merrdat-msgv3 = wmgeine-ekorg.
+    endif.
+    append ls_merrdat to rt_errdat.
+  else.
 
 */ Output Variable parts
     ls_merrdat-tranc = ls_merrdat-tranc + 1.
@@ -436,7 +412,80 @@ LOOP AT <results_val_all> ASSIGNING <result_val> WHERE type CA 'EAX'.
     ls_merrdat-msgv2 = <result_val>-message_v2.
     ls_merrdat-msgv3 = <result_val>-message_v3.
     ls_merrdat-msgv4 = <result_val>-message_v4.
-    APPEND ls_merrdat TO rt_errdat.
-  ENDIF.
-ENDLOOP.
-*!
+* For Testing
+    ls_merrdat-msgv1 = <result_val>-sdm_tabkey.
+    if <result_val>-extra_v1 cs 'EINA' or <result_val>-extra_v1 cs 'EINE'.
+      ls_merrdat-msgv2 = weina-lifnr.
+      ls_merrdat-msgv3 = wmgeine-ekorg.
+    endif.
+    if <result_val>-extra_v1 cs 'MPOP'.
+      ls_merrdat-msgv1 = wmpop-werks.
+    endif.
+    if <result_val>-extra_v1 cs 'MARD'.
+      ls_merrdat-msgv1 = wmard-werks.
+      ls_merrdat-msgv2 = wmard-lgort.
+    endif.
+    if <result_val>-extra_v1 cs 'MARC'.
+      ls_merrdat-msgv1 = wmarc-werks.
+    endif.
+    if <result_val>-extra_v1 cs 'MBEW'.
+      ls_merrdat-msgv1 = wmara-matnr.
+    endif.
+    if <result_val>-extra_v1 cs 'MYMS'.
+      ls_merrdat-msgv1 = wmyms-matnr.
+    endif.
+    if <result_val>-extra_v1 cs 'WLK2'.
+      ls_merrdat-msgv1 = wwlk2-vkorg.
+      ls_merrdat-msgv2 = wwlk2-vtweg.
+    endif.
+    if <result_val>-extra_v1 cs 'MAW1'.
+      ls_merrdat-msgv1 = wmaw1-matnr.
+    endif.
+    if <result_val>-extra_v1 cs 'MAMT'.
+      loop at gt_mamt_sdm into gs_mamt_sdm.
+        if <result_val>-sdm_tabkey cs  gs_mamt_sdm-matnr.
+          ls_merrdat-msgv1 = gs_mamt_sdm-matnr.
+        endif.
+      endloop.
+    endif.
+    if <result_val>-extra_v1 cs 'MPGD'.
+      ls_merrdat-msgv1 = wmpgd-matnr.
+    endif.
+
+    if <result_val>-extra_v1 cs 'EORD'.
+      loop at gt_eord_sdm assigning <eord_sdm>.
+        if <result_val>-sdm_tabkey cs  <eord_sdm>-werks.
+          ls_merrdat-msgv1 = <eord_sdm>-werks.
+        endif.
+      endloop.
+    endif.
+
+    if <result_val>-extra_v1 cs 'MVKE'.
+      loop at gt_mvke_sdm into gs_mvke_sdm.
+        if <result_val>-sdm_tabkey cs  gs_mvke_sdm-vkorg and
+           <result_val>-sdm_tabkey cs  gs_mvke_sdm-vtweg.
+          ls_merrdat-msgv1 = gs_mvke_sdm-vkorg.
+          ls_merrdat-msgv2 = gs_mvke_sdm-vtweg.
+        endif.
+      endloop.
+    endif.
+
+    if <result_val>-extra_v1 cs 'MEINH'.
+      loop at gt_meinh_sdm into gs_meinh_sdm.
+        if <result_val>-sdm_tabkey cs  gs_meinh_sdm-matnr.
+          ls_merrdat-msgv1 = gs_meinh_sdm-matnr.
+        endif.
+      endloop.
+    endif.
+
+    if <result_val>-extra_v1 cs 'MLEA'.
+      loop at gt_mlea_sdm into gs_mlea_sdm.
+        if <result_val>-sdm_tabkey cs  gs_mlea_sdm-lifnr.
+          ls_merrdat-msgv1 = gs_mlea_sdm-matnr.
+        endif.
+      endloop.
+    endif.
+
+    append ls_merrdat to rt_errdat.
+  endif.
+endloop.

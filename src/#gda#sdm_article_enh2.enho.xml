@@ -21,12 +21,28 @@
       <item>INCLUDE /GDA/SDM_MM_POE_ART_EXPORT_1.</item>
      </SOURCE>
     </ENH_HOOK_IMPL>
+    <ENH_HOOK_IMPL>
+     <PROGRAMNAME>SAPLMGMW</PROGRAMNAME>
+     <ENHMODE>D</ENHMODE>
+     <FULL_NAME>\PR:SAPLMGMW\FO:LISTE_EMPTY_FIELDS_RT\SE:END\EI</FULL_NAME>
+     <SOURCE>
+      <item>INCLUDE /GDA/SDM_MM_POE_ART_ERRS_POST.</item>
+      <item/>
+     </SOURCE>
+    </ENH_HOOK_IMPL>
    </ENHANCEMENTS>
    <SPACES>
     <item>
      <FULL_NAME>\PR:SAPLMGMW\FO:OKCODE_BUCHEN_RETAIL\SE:BEGIN\EI</FULL_NAME>
      <SPACES>
       <item>1</item>
+     </SPACES>
+    </item>
+    <item>
+     <FULL_NAME>\PR:SAPLMGMW\FO:LISTE_EMPTY_FIELDS_RT\SE:END\EI</FULL_NAME>
+     <SPACES>
+      <item>0</item>
+      <item>0</item>
      </SPACES>
     </item>
    </SPACES>
