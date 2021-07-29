@@ -522,253 +522,288 @@
      <SPRSL>E</SPRSL>
      <ARBGB>/GDA/SDM_ART</ARBGB>
      <MSGNR>209</MSGNR>
-     <TEXT>SDM: Sales Price (VKP0) condition not maintained for Article</TEXT>
+     <TEXT>SDM:(SALES) Sales Price (VKP0) condition not maintained for Article</TEXT>
     </T100>
     <T100>
      <SPRSL>E</SPRSL>
      <ARBGB>/GDA/SDM_ART</ARBGB>
      <MSGNR>210</MSGNR>
-     <TEXT>SDM: Base Price (PB00) not maintained for Article</TEXT>
+     <TEXT>SDM:(Purchase) Base Price (PB00) not maintained for Article</TEXT>
     </T100>
     <T100>
      <SPRSL>E</SPRSL>
      <ARBGB>/GDA/SDM_ART</ARBGB>
      <MSGNR>211</MSGNR>
-     <TEXT>SDM: Comp. price IS-R (VKPM) not maintained for Article</TEXT>
+     <TEXT>SDM:(Sales) Comp. price IS-R (VKPM) not maintained for Article</TEXT>
     </T100>
     <T100>
      <SPRSL>E</SPRSL>
      <ARBGB>/GDA/SDM_ART</ARBGB>
      <MSGNR>212</MSGNR>
-     <TEXT>SDM Article (Basic Data): ABC Indicator must be A or B</TEXT>
+     <TEXT>SDM:(Basic Data) ABC Indicator must be A or B</TEXT>
     </T100>
     <T100>
      <SPRSL>E</SPRSL>
      <ARBGB>/GDA/SDM_ART</ARBGB>
      <MSGNR>213</MSGNR>
-     <TEXT>SDM Article (Basic Data): Prod.hierarchy must be 10</TEXT>
+     <TEXT>SDM:(Basic Data) Prod.hierarchy must be 10</TEXT>
     </T100>
     <T100>
      <SPRSL>E</SPRSL>
      <ARBGB>/GDA/SDM_ART</ARBGB>
      <MSGNR>214</MSGNR>
-     <TEXT>SDM Article (Listing): Assortment grade must be 1</TEXT>
+     <TEXT>SDM:(Listing) Assortment grade must be 1</TEXT>
     </T100>
     <T100>
      <SPRSL>E</SPRSL>
      <ARBGB>/GDA/SDM_ART</ARBGB>
      <MSGNR>215</MSGNR>
-     <TEXT>SDM Article (Purchasing): Return Agmt must be 01</TEXT>
+     <TEXT>SDM:(Purchasing) Return Agmt must be 01</TEXT>
     </T100>
     <T100>
      <SPRSL>E</SPRSL>
      <ARBGB>/GDA/SDM_ART</ARBGB>
      <MSGNR>216</MSGNR>
-     <TEXT>SDM Article (Purchasing): PurchasingGroup must be 002</TEXT>
+     <TEXT>SDM:(Purchasing) PurchasingGroup must be 002</TEXT>
     </T100>
     <T100>
      <SPRSL>E</SPRSL>
      <ARBGB>/GDA/SDM_ART</ARBGB>
      <MSGNR>217</MSGNR>
-     <TEXT>SDM Article (Sales): Item cat.group must be 0001</TEXT>
+     <TEXT>SDM:(Sales) Item cat.group must be 0001</TEXT>
+    </T100>
+    <T100>
+     <SPRSL>E</SPRSL>
+     <ARBGB>/GDA/SDM_ART</ARBGB>
+     <MSGNR>218</MSGNR>
     </T100>
     <T100>
      <SPRSL>E</SPRSL>
      <ARBGB>/GDA/SDM_ART</ARBGB>
      <MSGNR>219</MSGNR>
-     <TEXT>SDM Article (Logistics DC): MRP type must be ND</TEXT>
+     <TEXT>SDM:(Logistics DC) MRP type must be ND</TEXT>
     </T100>
     <T100>
      <SPRSL>E</SPRSL>
      <ARBGB>/GDA/SDM_ART</ARBGB>
      <MSGNR>220</MSGNR>
-     <TEXT>SDM Article (Logistics DC): Forecast model must be S</TEXT>
+     <TEXT>SDM:(Logistics DC) Forecast model must be S</TEXT>
     </T100>
     <T100>
      <SPRSL>E</SPRSL>
      <ARBGB>/GDA/SDM_ART</ARBGB>
      <MSGNR>221</MSGNR>
-     <TEXT>SDM Article (Logistics DC): Storage bin must be BIN</TEXT>
+     <TEXT>SDM:(Logistics DC) Storage bin must be BIN</TEXT>
     </T100>
     <T100>
      <SPRSL>E</SPRSL>
      <ARBGB>/GDA/SDM_ART</ARBGB>
      <MSGNR>222</MSGNR>
-     <TEXT>SDM Article (Basic Data 2): Purchasing value key must be 1</TEXT>
+     <TEXT>SDM:(Basic Data 2) Purchasing value key must be 1</TEXT>
     </T100>
     <T100>
      <SPRSL>E</SPRSL>
      <ARBGB>/GDA/SDM_ART</ARBGB>
      <MSGNR>223</MSGNR>
-     <TEXT>SDM Article (Source List): Valid from must be 06.05.2021</TEXT>
+     <TEXT>SDM:(Source List) Valid from must be 06.05.2021</TEXT>
     </T100>
     <T100>
      <SPRSL>E</SPRSL>
      <ARBGB>/GDA/SDM_ART</ARBGB>
      <MSGNR>224</MSGNR>
-     <TEXT>SDM Article (PIR): Certif. Cat. must be 1</TEXT>
+     <TEXT>SDM:(PIR) Certif. Cat. must be 1</TEXT>
     </T100>
     <T100>
      <SPRSL>E</SPRSL>
      <ARBGB>/GDA/SDM_ART</ARBGB>
      <MSGNR>225</MSGNR>
-     <TEXT>SDM Article (Store Logistics): Rnding Profile must be 0090</TEXT>
+     <TEXT>SDM:(Store Logistics) Rnding Profile must be 0090</TEXT>
     </T100>
     <T100>
      <SPRSL>E</SPRSL>
      <ARBGB>/GDA/SDM_ART</ARBGB>
      <MSGNR>226</MSGNR>
-     <TEXT>SDM Article (Tariffs): Comm. code cannot be blank</TEXT>
+     <TEXT>SDM:(Tariffs) Comm. code cannot be blank</TEXT>
     </T100>
     <T100>
      <SPRSL>E</SPRSL>
      <ARBGB>/GDA/SDM_ART</ARBGB>
      <MSGNR>227</MSGNR>
-     <TEXT>SDM Article (POS): No repeat key must be 1</TEXT>
+     <TEXT>SDM:(POS) No repeat key must be 1</TEXT>
     </T100>
     <T100>
      <SPRSL>E</SPRSL>
      <ARBGB>/GDA/SDM_ART</ARBGB>
      <MSGNR>228</MSGNR>
-     <TEXT>SDM Article (MRP): ABC Indicator must be A</TEXT>
+     <TEXT>SDM:(MRP) ABC Indicator must be A</TEXT>
     </T100>
     <T100>
      <SPRSL>E</SPRSL>
      <ARBGB>/GDA/SDM_ART</ARBGB>
      <MSGNR>229</MSGNR>
-     <TEXT>SDM Article (Pricing): CondRecNo must be blank</TEXT>
+     <TEXT>SDM:(Pricing) CondRecNo must be blank</TEXT>
     </T100>
     <T100>
      <SPRSL>E</SPRSL>
      <ARBGB>/GDA/SDM_ART</ARBGB>
      <MSGNR>230</MSGNR>
-     <TEXT>SDM Article (POS): Descr. for unit must be Yoghurt</TEXT>
+     <TEXT>SDM:(POS) Descr. for unit must be Yoghurt</TEXT>
     </T100>
     <T100>
      <SPRSL>E</SPRSL>
      <ARBGB>/GDA/SDM_ART</ARBGB>
      <MSGNR>231</MSGNR>
-     <TEXT>SDM Article (Acc): Valuation Class for Project Stock cannot be blank</TEXT>
+     <TEXT>SDM:(Acc) Valuation Class for Project Stock cannot be blank</TEXT>
     </T100>
     <T100>
      <SPRSL>E</SPRSL>
      <ARBGB>/GDA/SDM_ART</ARBGB>
      <MSGNR>232</MSGNR>
-     <TEXT>SDM Article (PP): Description must contain TEST</TEXT>
+     <TEXT>SDM:(PP) Description must contain TEST</TEXT>
     </T100>
     <T100>
      <SPRSL>E</SPRSL>
      <ARBGB>/GDA/SDM_ART</ARBGB>
      <MSGNR>233</MSGNR>
-     <TEXT>SDM Article (PP): Shelf section must be 5</TEXT>
+     <TEXT>SDM:(PP) Shelf section must be 5</TEXT>
     </T100>
     <T100>
      <SPRSL>E</SPRSL>
      <ARBGB>/GDA/SDM_ART</ARBGB>
      <MSGNR>234</MSGNR>
-     <TEXT>SDM Article (PP): Counter must be 20</TEXT>
+     <TEXT>SDM:(PP) Counter must be 20</TEXT>
     </T100>
     <T100>
      <SPRSL>E</SPRSL>
      <ARBGB>/GDA/SDM_ART</ARBGB>
      <MSGNR>235</MSGNR>
-     <TEXT>SDM Article (PP): EAN Category must be IE</TEXT>
+     <TEXT>SDM:(PP) EAN Category must be IE</TEXT>
     </T100>
     <T100>
      <SPRSL>E</SPRSL>
      <ARBGB>/GDA/SDM_ART</ARBGB>
      <MSGNR>236</MSGNR>
-     <TEXT>SDM Article (PP): Listing source must be 1</TEXT>
+     <TEXT>SDM:(PP) Listing source must be 1</TEXT>
     </T100>
     <T100>
      <SPRSL>E</SPRSL>
      <ARBGB>/GDA/SDM_ART</ARBGB>
      <MSGNR>237</MSGNR>
-     <TEXT>SDM Article (Warehouse Data): Storage Section Indicators must be 002</TEXT>
+     <TEXT>SDM:(Warehouse Data) Storage Section Indicators must be 002</TEXT>
     </T100>
     <T100>
      <SPRSL>E</SPRSL>
      <ARBGB>/GDA/SDM_ART</ARBGB>
      <MSGNR>238</MSGNR>
-     <TEXT>SDM Article (Warehouse Data): Storage Bin must be PVB1-01</TEXT>
+     <TEXT>SDM:(Warehouse Data) Storage Bin must be PVB1-01</TEXT>
     </T100>
     <T100>
      <SPRSL>E</SPRSL>
      <ARBGB>/GDA/SDM_ART</ARBGB>
      <MSGNR>239</MSGNR>
-     <TEXT>SDM Article (PP): Pool number must be 0003</TEXT>
+     <TEXT>SDM:(PP) Pool number must be 0003</TEXT>
     </T100>
     <T100>
      <SPRSL>E</SPRSL>
      <ARBGB>/GDA/SDM_ART</ARBGB>
      <MSGNR>240</MSGNR>
-     <TEXT>SDM Article (Basic Data): Vendor Mat. No. cannot be blank</TEXT>
+     <TEXT>SDM:(Basic Data) Vendor Mat. No. cannot be blank</TEXT>
     </T100>
     <T100>
      <SPRSL>E</SPRSL>
      <ARBGB>/GDA/SDM_ART</ARBGB>
      <MSGNR>241</MSGNR>
-     <TEXT>SDM Article (DC QM): Inspection interval must be 7 days</TEXT>
+     <TEXT>SDM:(DC QM) Inspection interval must be 7 days</TEXT>
     </T100>
     <T100>
      <SPRSL>E</SPRSL>
      <ARBGB>/GDA/SDM_ART</ARBGB>
      <MSGNR>242</MSGNR>
-     <TEXT>SDM Article (DC ACC): Base Unit of Measure must be PC</TEXT>
+     <TEXT>SDM:(DC ACC) Base Unit of Measure must be PC</TEXT>
     </T100>
     <T100>
      <SPRSL>E</SPRSL>
      <ARBGB>/GDA/SDM_ART</ARBGB>
      <MSGNR>243</MSGNR>
-     <TEXT>SDM Article (Other DC Logistics): Max Storage period must be 5 days</TEXT>
+     <TEXT>SDM:(Other DC Logistics) Max Storage period must be 5 days</TEXT>
     </T100>
     <T100>
      <SPRSL>E</SPRSL>
      <ARBGB>/GDA/SDM_ART</ARBGB>
      <MSGNR>244</MSGNR>
-     <TEXT>SDM Article (MRP): Sloc mrp indicator must be 1</TEXT>
+     <TEXT>SDM:(MRP) Sloc mrp indicator must be 1</TEXT>
     </T100>
     <T100>
      <SPRSL>E</SPRSL>
      <ARBGB>/GDA/SDM_ART</ARBGB>
      <MSGNR>245</MSGNR>
-     <TEXT>SDM Article (Basic Data): Width cannot be blank</TEXT>
+     <TEXT>SDM:(Basic Data) Width cannot be blank</TEXT>
     </T100>
     <T100>
      <SPRSL>E</SPRSL>
      <ARBGB>/GDA/SDM_ART</ARBGB>
      <MSGNR>246</MSGNR>
-     <TEXT>SDM Article (PP): Country must be DE</TEXT>
+     <TEXT>SDM:(PP) Country must be DE</TEXT>
     </T100>
     <T100>
      <SPRSL>E</SPRSL>
      <ARBGB>/GDA/SDM_ART</ARBGB>
      <MSGNR>247</MSGNR>
-     <TEXT>SDM Article (MRP): Planning material must be blank</TEXT>
+     <TEXT>SDM:(MRP) Planning material must be blank</TEXT>
     </T100>
     <T100>
      <SPRSL>E</SPRSL>
      <ARBGB>/GDA/SDM_ART</ARBGB>
      <MSGNR>248</MSGNR>
-     <TEXT>SDM Article (PP): Alternative BOM cannot be blank</TEXT>
+     <TEXT>SDM:(PP) Alternative BOM cannot be blank</TEXT>
     </T100>
     <T100>
      <SPRSL>E</SPRSL>
      <ARBGB>/GDA/SDM_ART</ARBGB>
      <MSGNR>249</MSGNR>
-     <TEXT>SDM Article (Tax Data): Tax category must be 0001</TEXT>
+     <TEXT>SDM:(Tax Data) Tax category must be 0001</TEXT>
     </T100>
     <T100>
      <SPRSL>E</SPRSL>
      <ARBGB>/GDA/SDM_ART</ARBGB>
      <MSGNR>250</MSGNR>
-     <TEXT>SDM Article (Sales): Item cat.group must be 0001</TEXT>
+     <TEXT>SDM:(Sales) Item cat.group must be 0001</TEXT>
     </T100>
     <T100>
      <SPRSL>E</SPRSL>
      <ARBGB>/GDA/SDM_ART</ARBGB>
      <MSGNR>251</MSGNR>
-     <TEXT>SDM Article (Basic Data): Numerator cannot be 1</TEXT>
+     <TEXT>SDM:(Basic Data) Numerator cannot be 1</TEXT>
+    </T100>
+    <T100>
+     <SPRSL>E</SPRSL>
+     <ARBGB>/GDA/SDM_ART</ARBGB>
+     <MSGNR>252</MSGNR>
+     <TEXT>EORD TEST</TEXT>
+    </T100>
+    <T100>
+     <SPRSL>E</SPRSL>
+     <ARBGB>/GDA/SDM_ART</ARBGB>
+     <MSGNR>253</MSGNR>
+     <TEXT>RMMW1 TEST</TEXT>
+    </T100>
+    <T100>
+     <SPRSL>E</SPRSL>
+     <ARBGB>/GDA/SDM_ART</ARBGB>
+     <MSGNR>254</MSGNR>
+     <TEXT>MARC TEST</TEXT>
+    </T100>
+    <T100>
+     <SPRSL>E</SPRSL>
+     <ARBGB>/GDA/SDM_ART</ARBGB>
+     <MSGNR>255</MSGNR>
+     <TEXT>SRC LIST TEST</TEXT>
+    </T100>
+    <T100>
+     <SPRSL>E</SPRSL>
+     <ARBGB>/GDA/SDM_ART</ARBGB>
+     <MSGNR>256</MSGNR>
+     <TEXT>MARA TEST</TEXT>
     </T100>
     <T100>
      <SPRSL>E</SPRSL>
@@ -1023,246 +1058,7 @@
     <T100>
      <SPRSL>E</SPRSL>
      <ARBGB>/GDA/SDM_ART</ARBGB>
-     <MSGNR>580</MSGNR>
-     <TEXT>SDM Article (Basic Data): ABC Indicator must be A or B</TEXT>
-    </T100>
-    <T100>
-     <SPRSL>E</SPRSL>
-     <ARBGB>/GDA/SDM_ART</ARBGB>
-     <MSGNR>581</MSGNR>
-     <TEXT>SDM Article (Basic Data): Prod.hierarchy must be 10</TEXT>
-    </T100>
-    <T100>
-     <SPRSL>E</SPRSL>
-     <ARBGB>/GDA/SDM_ART</ARBGB>
-     <MSGNR>582</MSGNR>
-     <TEXT>SDM Article (Listing): Assortment grade must be 1</TEXT>
-    </T100>
-    <T100>
-     <SPRSL>E</SPRSL>
-     <ARBGB>/GDA/SDM_ART</ARBGB>
-     <MSGNR>583</MSGNR>
-     <TEXT>SDM Article (Purchasing): Return Agmt must be 01</TEXT>
-    </T100>
-    <T100>
-     <SPRSL>E</SPRSL>
-     <ARBGB>/GDA/SDM_ART</ARBGB>
-     <MSGNR>584</MSGNR>
-     <TEXT>SDM Article (Purchasing): PurchasingGroup must be 002</TEXT>
-    </T100>
-    <T100>
-     <SPRSL>E</SPRSL>
-     <ARBGB>/GDA/SDM_ART</ARBGB>
-     <MSGNR>585</MSGNR>
-     <TEXT>SDM Article (Sales): Item cat.group must be 0001</TEXT>
-    </T100>
-    <T100>
-     <SPRSL>E</SPRSL>
-     <ARBGB>/GDA/SDM_ART</ARBGB>
-     <MSGNR>586</MSGNR>
-    </T100>
-    <T100>
-     <SPRSL>E</SPRSL>
-     <ARBGB>/GDA/SDM_ART</ARBGB>
-     <MSGNR>587</MSGNR>
-     <TEXT>SDM Article (Logistics DC): MRP type must be ND</TEXT>
-    </T100>
-    <T100>
-     <SPRSL>E</SPRSL>
-     <ARBGB>/GDA/SDM_ART</ARBGB>
-     <MSGNR>588</MSGNR>
-     <TEXT>SDM Article (Logistics DC): Forecast model must be S</TEXT>
-    </T100>
-    <T100>
-     <SPRSL>E</SPRSL>
-     <ARBGB>/GDA/SDM_ART</ARBGB>
-     <MSGNR>589</MSGNR>
-     <TEXT>SDM Article (Logistics DC): Storage bin must be BIN</TEXT>
-    </T100>
-    <T100>
-     <SPRSL>E</SPRSL>
-     <ARBGB>/GDA/SDM_ART</ARBGB>
-     <MSGNR>590</MSGNR>
-     <TEXT>SDM Article (Basic Data 2): Purchasing value key must be 1</TEXT>
-    </T100>
-    <T100>
-     <SPRSL>E</SPRSL>
-     <ARBGB>/GDA/SDM_ART</ARBGB>
-     <MSGNR>591</MSGNR>
-     <TEXT>SDM Article (Source List): Valid from must be 06.05.2021</TEXT>
-    </T100>
-    <T100>
-     <SPRSL>E</SPRSL>
-     <ARBGB>/GDA/SDM_ART</ARBGB>
-     <MSGNR>592</MSGNR>
-     <TEXT>SDM Article (PIR): Certif. Cat. must be 1</TEXT>
-    </T100>
-    <T100>
-     <SPRSL>E</SPRSL>
-     <ARBGB>/GDA/SDM_ART</ARBGB>
-     <MSGNR>593</MSGNR>
-     <TEXT>SDM Article (Store Logistics): Rnding Profile must be 0090</TEXT>
-    </T100>
-    <T100>
-     <SPRSL>E</SPRSL>
-     <ARBGB>/GDA/SDM_ART</ARBGB>
-     <MSGNR>594</MSGNR>
-     <TEXT>SDM Article (Tariffs): Comm. code cannot be blank</TEXT>
-    </T100>
-    <T100>
-     <SPRSL>E</SPRSL>
-     <ARBGB>/GDA/SDM_ART</ARBGB>
-     <MSGNR>595</MSGNR>
-     <TEXT>SDM Article (POS): No repeat key must be 1</TEXT>
-    </T100>
-    <T100>
-     <SPRSL>E</SPRSL>
-     <ARBGB>/GDA/SDM_ART</ARBGB>
-     <MSGNR>596</MSGNR>
-     <TEXT>SDM Article (MRP): ABC Indicator must be A</TEXT>
-    </T100>
-    <T100>
-     <SPRSL>E</SPRSL>
-     <ARBGB>/GDA/SDM_ART</ARBGB>
-     <MSGNR>597</MSGNR>
-     <TEXT>SDM Article (Pricing): CondRecNo must be blank</TEXT>
-    </T100>
-    <T100>
-     <SPRSL>E</SPRSL>
-     <ARBGB>/GDA/SDM_ART</ARBGB>
-     <MSGNR>598</MSGNR>
-     <TEXT>SDM Article (POS): Descr. for unit must be Yoghurt</TEXT>
-    </T100>
-    <T100>
-     <SPRSL>E</SPRSL>
-     <ARBGB>/GDA/SDM_ART</ARBGB>
      <MSGNR>599</MSGNR>
-     <TEXT>SDM Article (Acc): Valuation Class for Project Stock cannot be blank</TEXT>
-    </T100>
-    <T100>
-     <SPRSL>E</SPRSL>
-     <ARBGB>/GDA/SDM_ART</ARBGB>
-     <MSGNR>600</MSGNR>
-     <TEXT>SDM Article (PP): Description must contain TEST</TEXT>
-    </T100>
-    <T100>
-     <SPRSL>E</SPRSL>
-     <ARBGB>/GDA/SDM_ART</ARBGB>
-     <MSGNR>601</MSGNR>
-     <TEXT>SDM Article (PP): Shelf section must be 5</TEXT>
-    </T100>
-    <T100>
-     <SPRSL>E</SPRSL>
-     <ARBGB>/GDA/SDM_ART</ARBGB>
-     <MSGNR>602</MSGNR>
-     <TEXT>SDM Article (PP): Counter must be 20</TEXT>
-    </T100>
-    <T100>
-     <SPRSL>E</SPRSL>
-     <ARBGB>/GDA/SDM_ART</ARBGB>
-     <MSGNR>603</MSGNR>
-     <TEXT>SDM Article (PP): EAN Category must be IE</TEXT>
-    </T100>
-    <T100>
-     <SPRSL>E</SPRSL>
-     <ARBGB>/GDA/SDM_ART</ARBGB>
-     <MSGNR>604</MSGNR>
-     <TEXT>SDM Article (PP): Listing source must be 1</TEXT>
-    </T100>
-    <T100>
-     <SPRSL>E</SPRSL>
-     <ARBGB>/GDA/SDM_ART</ARBGB>
-     <MSGNR>605</MSGNR>
-     <TEXT>SDM Article (Warehouse Data): Storage Section Indicators must be 002</TEXT>
-    </T100>
-    <T100>
-     <SPRSL>E</SPRSL>
-     <ARBGB>/GDA/SDM_ART</ARBGB>
-     <MSGNR>606</MSGNR>
-     <TEXT>SDM Article (Warehouse Data): Storage Bin must be PVB1-01</TEXT>
-    </T100>
-    <T100>
-     <SPRSL>E</SPRSL>
-     <ARBGB>/GDA/SDM_ART</ARBGB>
-     <MSGNR>607</MSGNR>
-     <TEXT>SDM Article (PP): Pool number must be 0003</TEXT>
-    </T100>
-    <T100>
-     <SPRSL>E</SPRSL>
-     <ARBGB>/GDA/SDM_ART</ARBGB>
-     <MSGNR>608</MSGNR>
-     <TEXT>SDM Article (Basic Data): Vendor Mat. No. cannot be blank</TEXT>
-    </T100>
-    <T100>
-     <SPRSL>E</SPRSL>
-     <ARBGB>/GDA/SDM_ART</ARBGB>
-     <MSGNR>609</MSGNR>
-     <TEXT>SDM Article (DC QM): Inspection interval must be 7 days</TEXT>
-    </T100>
-    <T100>
-     <SPRSL>E</SPRSL>
-     <ARBGB>/GDA/SDM_ART</ARBGB>
-     <MSGNR>610</MSGNR>
-     <TEXT>SDM Article (DC ACC): Base Unit of Measure must be PC</TEXT>
-    </T100>
-    <T100>
-     <SPRSL>E</SPRSL>
-     <ARBGB>/GDA/SDM_ART</ARBGB>
-     <MSGNR>611</MSGNR>
-     <TEXT>SDM Article (Other DC Logistics): Max Storage period must be 5 days</TEXT>
-    </T100>
-    <T100>
-     <SPRSL>E</SPRSL>
-     <ARBGB>/GDA/SDM_ART</ARBGB>
-     <MSGNR>612</MSGNR>
-     <TEXT>SDM Article (MRP): Sloc mrp indicator must be 1</TEXT>
-    </T100>
-    <T100>
-     <SPRSL>E</SPRSL>
-     <ARBGB>/GDA/SDM_ART</ARBGB>
-     <MSGNR>613</MSGNR>
-     <TEXT>SDM Article (Basic Data): Width cannot be blank</TEXT>
-    </T100>
-    <T100>
-     <SPRSL>E</SPRSL>
-     <ARBGB>/GDA/SDM_ART</ARBGB>
-     <MSGNR>614</MSGNR>
-     <TEXT>SDM Article (PP): Country must be DE</TEXT>
-    </T100>
-    <T100>
-     <SPRSL>E</SPRSL>
-     <ARBGB>/GDA/SDM_ART</ARBGB>
-     <MSGNR>615</MSGNR>
-     <TEXT>SDM Article (MRP): Planning material must be blank</TEXT>
-    </T100>
-    <T100>
-     <SPRSL>E</SPRSL>
-     <ARBGB>/GDA/SDM_ART</ARBGB>
-     <MSGNR>616</MSGNR>
-     <TEXT>SDM Article (PP): Alternative BOM cannot be blank</TEXT>
-    </T100>
-    <T100>
-     <SPRSL>E</SPRSL>
-     <ARBGB>/GDA/SDM_ART</ARBGB>
-     <MSGNR>617</MSGNR>
-     <TEXT>SDM Article (Tax Data): Tax category must be 0001</TEXT>
-    </T100>
-    <T100>
-     <SPRSL>E</SPRSL>
-     <ARBGB>/GDA/SDM_ART</ARBGB>
-     <MSGNR>618</MSGNR>
-     <TEXT>SDM Article (Sales): Item cat.group must be 0001</TEXT>
-    </T100>
-    <T100>
-     <SPRSL>E</SPRSL>
-     <ARBGB>/GDA/SDM_ART</ARBGB>
-     <MSGNR>619</MSGNR>
-    </T100>
-    <T100>
-     <SPRSL>E</SPRSL>
-     <ARBGB>/GDA/SDM_ART</ARBGB>
-     <MSGNR>620</MSGNR>
-     <TEXT>SDM TEST (Basic Data): Numerator cannot be 1</TEXT>
     </T100>
     <T100>
      <SPRSL>E</SPRSL>

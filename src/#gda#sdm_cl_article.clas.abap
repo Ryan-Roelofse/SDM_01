@@ -1,15 +1,15 @@
-CLASS /gda/sdm_cl_article DEFINITION
-  PUBLIC
-  INHERITING FROM /gda/sdm_cl_core
-  FINAL
-  CREATE PUBLIC .
+class /GDA/SDM_CL_ARTICLE definition
+  public
+  inheriting from /GDA/SDM_CL_CORE
+  final
+  create public .
 
-  PUBLIC SECTION.
+public section.
 
-    INTERFACES /gda/sdm_if_core_statics .
+  interfaces /GDA/SDM_IF_CORE_STATICS .
 
-    TYPES:
-      BEGIN OF ty_report_output,
+  types:
+    BEGIN OF ty_report_output,
               matnr          TYPE matnr,
               maktx          TYPE maktx,
               mtart          TYPE mtart,
@@ -27,10 +27,10 @@ CLASS /gda/sdm_cl_article DEFINITION
               extra_v5       TYPE /gda/sdm_extra_information,
               extra_v6       TYPE /gda/sdm_extra_information,
           END OF ty_report_output .
-    TYPES:
-      ty_it_report_output TYPE TABLE OF ty_report_output .
-    TYPES:
-      BEGIN OF ty_report_output_der,
+  types:
+    ty_it_report_output TYPE TABLE OF ty_report_output .
+  types:
+    BEGIN OF ty_report_output_der,
               sdm_type        TYPE  /gda/sdm_de_type,
               sdm_description TYPE val_text,
               matnr           TYPE  matnr,
@@ -54,11 +54,10 @@ CLASS /gda/sdm_cl_article DEFINITION
               message2        TYPE  char255,
               message3        TYPE  char255,
           END OF ty_report_output_der .
-    TYPES:
-      ty_it_report_output_der TYPE TABLE OF ty_report_output_der .
-
-    TYPES:
-      BEGIN OF ty_rept_output,
+  types:
+    ty_it_report_output_der TYPE TABLE OF ty_report_output_der .
+  types:
+    BEGIN OF ty_rept_output,
               sdm_type        TYPE /gda/sdm_de_type,
               sdm_description TYPE val_text,
               matnr           TYPE matnr,
@@ -85,45 +84,45 @@ CLASS /gda/sdm_cl_article DEFINITION
               ds_link_id      TYPE /gda/sdm_de_ds_link8,
               sdm_tabkey      TYPE cdtabkey,
           END OF ty_rept_output .
-    TYPES:
-      ty_it_rept_output TYPE TABLE OF ty_rept_output .
+  types:
+    ty_it_rept_output TYPE TABLE OF ty_rept_output .
 
-    CONSTANTS mc_primary TYPE typename VALUE 'MATNR'.       "#EC NOTEXT
-    CLASS-DATA mc_object TYPE /gda/sdm_de_object VALUE 'ARTICLE'. "#EC NOTEXT .  .  .  . " .
-    CLASS-DATA mc_object_id TYPE /gda/sdm_de_object_id VALUE 01. "#EC NOTEXT .  .  .  . " .
-    CONSTANTS mc_bor TYPE massobjtyp VALUE 'BUS1001'.       "#EC NOTEXT
+  constants MC_PRIMARY type TYPENAME value 'MATNR'. "#EC NOTEXT
+  class-data MC_OBJECT type /GDA/SDM_DE_OBJECT value 'ARTICLE'. "#EC NOTEXT .  .  .  .  . " .
+  class-data MC_OBJECT_ID type /GDA/SDM_DE_OBJECT_ID value 01. "#EC NOTEXT .  .  .  .  . " .
+  constants MC_BOR type MASSOBJTYP value 'BUS1001001'. "#EC NOTEXT
 
-    METHODS constructor
-      IMPORTING
-        !iv_object_type TYPE /gda/sdm_de_object
-        !iv_source TYPE /gda/sdm_de_source
-        !iv_type TYPE /gda/sdm_de_type
-        !iv_stats TYPE boolean
-        !iv_stats_brf TYPE boolean OPTIONAL
-        !iv_errors_only TYPE boolean OPTIONAL
-        !iv_sprint TYPE boolean OPTIONAL
-        !iv_mapping TYPE REF TO /gda/sdm_cl_brf_mapping OPTIONAL
-        !iv_stewardship TYPE REF TO /gda/sdm_cl_stwd_app_main OPTIONAL
-      RAISING
-        cx_fdt_input .
-    CLASS-METHODS class_constructor .
+  methods CONSTRUCTOR
+    importing
+      !IV_OBJECT_TYPE type /GDA/SDM_DE_OBJECT
+      !IV_SOURCE type /GDA/SDM_DE_SOURCE
+      !IV_TYPE type /GDA/SDM_DE_TYPE
+      !IV_STATS type BOOLEAN
+      !IV_STATS_BRF type BOOLEAN optional
+      !IV_ERRORS_ONLY type BOOLEAN optional
+      !IV_SPRINT type BOOLEAN optional
+      !IV_MAPPING type ref to /GDA/SDM_CL_BRF_MAPPING optional
+      !IV_STEWARDSHIP type ref to /GDA/SDM_CL_STWD_APP_MAIN optional
+    raising
+      CX_FDT_INPUT .
+  class-methods CLASS_CONSTRUCTOR .
 
-    METHODS /gda/sdm_if_action_processor~process_action
-      REDEFINITION .
-    METHODS create_brf_result_structure
-      REDEFINITION .
-    METHODS get_object_keys
-      REDEFINITION .
-    METHODS get_primary_object
-      REDEFINITION .
-    METHODS get_rsr_structure
-      REDEFINITION .
-    METHODS get_rsr_structure_key
-      REDEFINITION .
-    METHODS get_table_from_structure
-      REDEFINITION .
-    METHODS return_brf_result_structure
-      REDEFINITION .
+  methods /GDA/SDM_IF_ACTION_PROCESSOR~PROCESS_ACTION
+    redefinition .
+  methods CREATE_BRF_RESULT_STRUCTURE
+    redefinition .
+  methods GET_OBJECT_KEYS
+    redefinition .
+  methods GET_PRIMARY_OBJECT
+    redefinition .
+  methods GET_RSR_STRUCTURE
+    redefinition .
+  methods GET_RSR_STRUCTURE_KEY
+    redefinition .
+  methods GET_TABLE_FROM_STRUCTURE
+    redefinition .
+  methods RETURN_BRF_RESULT_STRUCTURE
+    redefinition .
 protected section.
 
   methods CALL_BRF

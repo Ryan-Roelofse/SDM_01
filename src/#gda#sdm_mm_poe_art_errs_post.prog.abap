@@ -18,7 +18,9 @@ loop at fehlerliste assigning field-symbol(<error_on_posting>) from 3.
       concatenate 'Material : ' <error_on_posting>-msgv1 into additional_line-text_zeile.
       append additional_line to fehlerliste_buffer.
 
+      if <error_on_posting>-msgv1 is not INITIAL.
       replace all occurrences of <error_on_posting>-msgv1 in <error_on_posting>-text_zeile with space.
+      endif.
       clear <error_on_posting>-msgv1.
       append <error_on_posting> to fehlerliste_buffer.
       continue.
@@ -29,10 +31,13 @@ loop at fehlerliste assigning field-symbol(<error_on_posting>) from 3.
       concatenate 'Material : ' <error_on_posting>-msgv1 into additional_line-text_zeile.
       append additional_line to fehlerliste_buffer.
 
+      if <error_on_posting>-msgv1 is not initial.
       replace all occurrences of <error_on_posting>-msgv1 in <error_on_posting>-text_zeile with space.
       clear <error_on_posting>-msgv1.
+      endif.
       append <error_on_posting> to fehlerliste_buffer.
       continue.
+
     endif.
    if <error_on_posting>-msgv1 is not INITIAL and <error_on_posting>-msgv2 is not INITIAL.
       concatenate 'Sales Org: ' <error_on_posting>-msgv1 'Distribution Channel: ' <error_on_posting>-msgv2 into additional_line-text_zeile.
@@ -112,7 +117,9 @@ loop at fehlerliste assigning field-symbol(<error_on_posting>) from 3.
       concatenate 'Sales Org: ' <error_on_posting>-msgv1 'Distribution Channel: ' <error_on_posting>-msgv2 into additional_line-text_zeile.
       append additional_line to fehlerliste_buffer.
 
+      if <error_on_posting>-msgv1 is not initial.
       replace all occurrences of substring <error_on_posting>-msgv1 in <error_on_posting>-text_zeile with space.
+      endif.
       if <error_on_posting>-msgv2 is not initial.
         replace all occurrences of substring <error_on_posting>-msgv2 in <error_on_posting>-text_zeile with space.
       endif.

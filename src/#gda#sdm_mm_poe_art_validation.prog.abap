@@ -2,33 +2,31 @@ include /gda/sdm_mm_poi_art_data.
 include /gda/sdm_mm_art_object_data.
 
 data:
-  ls_t130m        type t130m,
-  lt_malg         type malg_tty,
-  lt_mat_ktext    type mat_ktext,
-  ls_mg03_sdm_brf type mg03steuer,
-  ls_eina         type eina,
-  ls_wrpl         type wrpl,
-  ls_mwli         type mwli,
-  ls_eine         type eine,
-  ls_merrdat      type merrdat,
-  ls_rmmw1        type rmmw1,
-  lv_count        type i,
-  matnr_ranges    type range of mara-matnr,
-  matnr_range     like line of matnr_ranges,
-  attyp_ranges    type range of mara-attyp,
-  attyp_range     like line of attyp_ranges,
-  validate        type boolean,
-  vendor               type rmmw1-lifnr,
-  purchase_org         type rmmw1-ekorg,
-  plant                type rmmw1-ekwrk,
-  sales_org            type rmmw1-vkorg,
-  distribution_channel type rmmw1-vtweg,
-  store                type rmmw1-fiwrk,
-  distribution_centre  type rmmw1-vzwrk,
-  store_details        type /gda/sdm_s_marc_01,
-  dist_centre_details  type /gda/sdm_s_marc_01,
-  weina                type eina,
-  wmgeine              type mgeine,
+  ls_mg03_sdm_brf         type mg03steuer,
+  ls_wrpl                 type wrpl,
+  ls_merrdat              type merrdat,
+  ls_rmmw1                type rmmw1,
+  matnr_ranges            type range of mara-matnr,
+  matnr_range             like line of matnr_ranges,
+  attyp_ranges            type range of mara-attyp,
+  attyp_range             like line of attyp_ranges,
+  validate                type boolean,
+  material                type matnr,
+  vendor                  type rmmw1-lifnr,
+  purchase_org            type rmmw1-ekorg,
+*  plant                   type rmmw1-ekwrk,
+  sales_org               type rmmw1-vkorg,
+  distribution_channel    type rmmw1-vtweg,
+  store                   type rmmw1-fiwrk,
+  store_location_dc       type rmmg1-lgort,
+  store_location_st       type rmmg1-lgort,
+  distribution_centre     type rmmw1-vzwrk,
+  store_details           type /gda/sdm_s_marc_01,
+  dist_centre_details     type /gda/sdm_s_marc_01,
+  store_details_stl       type /gda/sdm_s_mard_01,
+  dist_centre_details_stl type /gda/sdm_s_mard_01,
+  weina                   type eina,
+  wmgeine                 type mgeine,
   customer             type wrpl-kunnr.
 
 field-symbols:
@@ -42,14 +40,62 @@ if sy-uname = 'PAVITHRANSS'.
   return.
 endif.
 
-get parameter id 'VKO' field sales_org.
-get parameter id 'VTW' field distribution_channel.
-get parameter id 'WRK' field store.
+data:
+ details_original_material type rmmg1,
+ details_dc_material       type rmmw2.
 
-get parameter id 'VZW' field distribution_centre.
-get parameter id 'LIF' field vendor.
-get parameter id 'EKO' field purchase_org.
-get parameter id 'WRK' field plant.
+import details_original_material = details_original_material from memory id 'DETAILS_ORIGINAL'.
+import details_dc_material       = details_dc_material       from memory id 'DETAILS_DC'.
+
+material             = details_original_material-matnr.
+sales_org            = details_original_material-vkorg.
+distribution_channel = details_original_material-vtweg.
+store                = details_original_material-werks.
+store_location_st    = details_original_material-lgort.
+
+*get parameter id 'VKO' field sales_org.
+*get parameter id 'VTW' field distribution_channel.
+*get parameter id 'WRK' field store.
+
+
+*plant               = details_dc_material-werks.
+store_location_dc   = details_dc_material-lgort.
+vendor              = details_dc_material-lifnr.
+distribution_centre = details_dc_material-werks.
+purchase_org        = details_dc_material-ekorg.
+
+*get parameter id 'VZW' field distribution_centre.
+*get parameter id 'LIF' field vendor.
+*get parameter id 'EKO' field purchase_org.
+*get parameter id 'WRK' field plant.
+
+
+*import store_location_dc = store_location_dc from memory id 'LGORT_DC'.
+*import store_location_st = store_location_st from memory id 'LGORT_ST'.
+
+if store is initial.
+* then use reference store
+  if wrmmw2-rmatn is not initial.
+    select single marc~werks
+      into  store
+      from marc inner join t001w on ( marc~werks = t001w~werks )
+      where marc~matnr = wrmmw2-rmatn
+      and   t001w~vlfkz = 'A'.
+  endif.
+endif.
+
+if distribution_centre is initial.
+* then use reference DC
+  if wrmmw2-rmatn is not initial.
+    select single marc~werks
+      into  distribution_centre
+      from marc inner join t001w on ( marc~werks = t001w~werks )
+      where marc~matnr = wrmmw2-rmatn
+      and   t001w~vlfkz = 'B'.
+  endif.
+endif.
+
+
 
 * Set default SDM Type and include any customr SDM Types
 gr_sdm_type = /gda/sdm_cl_common_core=>get_sdm_type( x_object_type_id = '01'
@@ -64,7 +110,7 @@ check gt_objects[] is not initial.
 * Current Sales Data
 call function 'MVKE_GET_BILD'
   exporting
-    matnr = wmara-matnr
+    matnr = material
     vkorg = sales_org
     vtweg = distribution_channel
   importing
@@ -73,7 +119,7 @@ call function 'MVKE_GET_BILD'
 * Current POS Data
 call function 'WLK2_GET_BILD'
   exporting
-    matnr = wmara-matnr
+    matnr = material
     vkorg = sales_org
     vtweg = distribution_channel
     werks = space
@@ -82,7 +128,7 @@ call function 'WLK2_GET_BILD'
 
 call function 'MWLI_GET_BILD'
   exporting
-    matnr = wmara-matnr
+    matnr = material
     vkorg = sales_org
     vtweg = distribution_channel
   importing
@@ -92,14 +138,14 @@ customer = store.
 
 call function 'WRPL_GET_BILD'
   exporting
-    matnr = wmara-matnr
+    matnr = material
     kunnr = customer
   importing
     wwrpl = ls_wrpl.
 
 call function 'EINA_E_GET_BILD'
   exporting
-    matnr   = wmara-matnr
+    matnr   = material
     lifnr   = vendor
     ekorg   = purchase_org
     werks   = space
@@ -109,7 +155,7 @@ call function 'EINA_E_GET_BILD'
 
 call function 'MARC_GET_BILD'
   exporting
-    matnr = gs_marc_sdm-matnr
+    matnr = material
     werks = store
   importing
     wmarc = wmarc.
@@ -118,7 +164,7 @@ move-corresponding wmarc to store_details.
 
 call function 'MARC_GET_BILD'
   exporting
-    matnr = gs_marc_sdm-matnr
+    matnr = material
     werks = distribution_centre
   importing
     wmarc = wmarc.
@@ -127,15 +173,28 @@ move-corresponding wmarc to dist_centre_details.
 
 call function 'MARD_GET_BILD'
   exporting
-    matnr = gs_marc_sdm-matnr
-    werks = distribution_centre
-    lgort = space
+    matnr = material
+    werks = store
+    lgort = store_location_st
   importing
     wmard = wmard.
 
+move-corresponding wmard to store_details_stl.
+
+call function 'MARD_GET_BILD'
+  exporting
+    matnr = material
+    werks = distribution_centre
+    lgort = store_location_dc
+  importing
+    wmard = wmard.
+
+move-corresponding wmard to dist_centre_details_stl.
+
+
 call function 'MPOP_GET_BILD'
   exporting
-    matnr = gs_marc_sdm-matnr
+    matnr = material
     werks = distribution_centre
   importing
     wmpop = wmpop.
@@ -153,11 +212,20 @@ dist_centre_details-sdm_tabkey = /gda/cl_sdm_data_model_main=>build_string_from_
                                                                                      i_contents = dist_centre_details ).
 insert dist_centre_details into table gt_marc_sdm.
 
-* Storage Location
-move-corresponding wmard to gs_mard_sdm.
-gs_mard_sdm-sdm_tabkey = /gda/cl_sdm_data_model_main=>build_string_from_key( i_tabname  = 'MARD'
-                                                                             i_contents = gs_mard_sdm ).
-append gs_mard_sdm to gt_mard_sdm.
+* Storage Location - store
+*move-corresponding store_details_stl to gs_mard_sdm.
+store_details_stl-matnr = gs_marc_sdm-matnr.
+store_details_stl-sdm_tabkey = /gda/cl_sdm_data_model_main=>build_string_from_key( i_tabname  = 'MARD'
+                                                                                   i_contents = store_details_stl ).
+insert store_details_stl into table gt_mard_sdm.
+
+* Storage Location - dc
+*move-corresponding dist_centre_details to gs_mard_sdm.
+dist_centre_details_stl-matnr = gs_marc_sdm-matnr.
+dist_centre_details_stl-sdm_tabkey = /gda/cl_sdm_data_model_main=>build_string_from_key( i_tabname  = 'MARD'
+                                                                                     i_contents = dist_centre_details_stl ).
+insert dist_centre_details_stl into table gt_mard_sdm.
+
 
 *Change Document Structure for Material Master/Product Group
 move-corresponding wmpgd to gs_mpgd_sdm.
@@ -293,11 +361,11 @@ go_selection->set_selscreen( is_selscreen = gs_selscreen ).
 go_selection->main( ).
 go_selection->build_spec( ).
 gt_eord_sdm[] = go_selection->mt_eord_spec[].
+
 loop at gt_eord_sdm assigning field-symbol(<eord_sdm>).
   <eord_sdm>-sdm_tabkey = /gda/cl_sdm_data_model_main=>build_string_from_key( i_tabname  = 'EORD'
-                                                                          i_contents = <eord_sdm> ).
+                                                                              i_contents = <eord_sdm> ).
 endloop.
-describe table gt_eord_sdm.
 
 loop at gt_objects assigning <objects>.
   try.
@@ -422,12 +490,29 @@ loop at <results_val_all> assigning <result_val> where type ca 'EAX'.
       ls_merrdat-msgv1 = wmpop-werks.
     endif.
     if <result_val>-extra_v1 cs 'MARD'.
-      ls_merrdat-msgv1 = wmard-werks.
-      ls_merrdat-msgv2 = wmard-lgort.
+      loop at gt_mard_sdm into gs_mard_sdm.
+        if <result_val>-sdm_tabkey cs  gs_mard_sdm-werks
+        and <result_val>-sdm_tabkey cs  gs_mard_sdm-lgort.
+          ls_merrdat-msgv1 = gs_mard_sdm-werks.
+          ls_merrdat-msgv2 = gs_mard_sdm-lgort.
+        endif.
+      endloop.
     endif.
     if <result_val>-extra_v1 cs 'MARC'.
-      ls_merrdat-msgv1 = wmarc-werks.
+      loop at gt_marc_sdm into gs_marc_sdm.
+        if <result_val>-sdm_tabkey cs gs_marc_sdm-werks.
+          ls_merrdat-msgv1 = gs_marc_sdm-werks.
+        endif.
+      endloop.
     endif.
+
+    if <result_val>-extra_v1 cs 'MWLI'.
+      if wmwli-matnr is initial.
+        wmwli-matnr = wmara-matnr.
+      endif.
+      ls_merrdat-msgv1 = wmwli-matnr.
+    endif.
+
     if <result_val>-extra_v1 cs 'MBEW'.
       ls_merrdat-msgv1 = wmara-matnr.
     endif.
