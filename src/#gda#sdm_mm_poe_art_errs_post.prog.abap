@@ -13,7 +13,8 @@ loop at fehlerliste assigning field-symbol(<error_on_posting>) from 3.
     if <error_on_posting>-text_zeile cs '(Basic Data)'   or
        <error_on_posting>-text_zeile cs '(Listing)'      or
        <error_on_posting>-text_zeile cs '(Basic Data 2)' or
-       <error_on_posting>-text_zeile cs '(Acc)'.
+       <error_on_posting>-text_zeile cs '(Acc)'          or
+       <error_on_posting>-text_zeile cs '(PIR)'.
 
       concatenate 'Material : ' <error_on_posting>-msgv1 into additional_line-text_zeile.
       append additional_line to fehlerliste_buffer.

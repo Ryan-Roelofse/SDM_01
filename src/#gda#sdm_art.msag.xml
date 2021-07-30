@@ -575,11 +575,6 @@
     <T100>
      <SPRSL>E</SPRSL>
      <ARBGB>/GDA/SDM_ART</ARBGB>
-     <MSGNR>218</MSGNR>
-    </T100>
-    <T100>
-     <SPRSL>E</SPRSL>
-     <ARBGB>/GDA/SDM_ART</ARBGB>
      <MSGNR>219</MSGNR>
      <TEXT>SDM:(Logistics DC) MRP type must be ND</TEXT>
     </T100>
