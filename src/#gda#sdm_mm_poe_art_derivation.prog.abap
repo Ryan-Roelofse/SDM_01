@@ -13,17 +13,15 @@ INCLUDE /gda/sdm_mm_art_object_data.
 
 DATA:
   ls_screen_control TYPE /gda/sdm_s_screen_control,
-  lt_screen_control LIKE HASHED TABLE OF ls_screen_control
-                         WITH UNIQUE KEY screen_name,
- ls_rmmw1        TYPE rmmw1,
- ls_rmmw1_sdm    TYPE /gda/sdm_s_rmmw1,
- ls_mg03_sdm_brf TYPE mg03steuer,
- ls_wrpl         TYPE wrpl,
- ls_mwli         TYPE mwli,
- lv_tabname      TYPE tabname.
+  lt_screen_control LIKE HASHED TABLE OF ls_screen_control WITH UNIQUE KEY screen_name,
+  ls_rmmw1          TYPE rmmw1,
+  ls_rmmw1_sdm      TYPE /gda/sdm_s_rmmw1,
+  ls_mg03_sdm_brf   TYPE mg03steuer,
+  ls_wrpl           TYPE wrpl,
+  ls_mwli           TYPE mwli,
+  lv_tabname        TYPE tabname.
 
 FIELD-SYMBOLS:
-*  <field>       type any,
   <table>       TYPE any,
   <mlea>        LIKE LINE OF tmlea,
   <meinh>       LIKE LINE OF wmeinh,

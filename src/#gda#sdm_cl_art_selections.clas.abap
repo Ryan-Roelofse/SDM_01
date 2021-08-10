@@ -929,7 +929,7 @@ CLASS /GDA/SDM_CL_ART_SELECTIONS IMPLEMENTATION.
   ENDMETHOD.
 
 
-  method BUILD_MARC.
+  method build_marc.
 
 
     data:
@@ -943,6 +943,9 @@ CLASS /GDA/SDM_CL_ART_SELECTIONS IMPLEMENTATION.
     endif.
 
     me->build_field_selection( iv_struct_name = '/GDA/SDM_S_MARC_01' ).
+
+* Remove Plant Category as it is not a MARC Field but is required for the BRF+ call
+    delete me->mt_field_list where table_line = 'VLFKZ'.
 
     try.
 */ Select Data
@@ -962,13 +965,19 @@ CLASS /GDA/SDM_CL_ART_SELECTIONS IMPLEMENTATION.
             mv_text = mv_message.
     endtry.
 
+* Add Plant Category as it is not a MARC Field but is required for the BRF+ call
+    delete me->mt_field_list where table_line = 'VLFKZ'.
+    append 'VLFKZ' TO me->mt_field_list.
 
     loop at me->mt_marc assigning <ls_marc>.
+      select single vlfkz
+              from t001w
+              into <ls_marc>-vlfkz
+             where werks = <ls_marc>-werks.
+
       <ls_marc>-sdm_tabkey = /gda/cl_sdm_data_model_main=>build_string_from_key( i_tabname  = 'MARC'
                                                                            i_contents = <ls_marc> ).
     endloop.
-
-
   endmethod.
 
 
@@ -986,6 +995,9 @@ CLASS /GDA/SDM_CL_ART_SELECTIONS IMPLEMENTATION.
     endif.
 
     me->build_field_selection( iv_struct_name = '/GDA/SDM_S_MARD_01' ).
+
+* Remove Plant Category as it is not a MARC Field but is required for the BRF+ call
+    delete me->mt_field_list where table_line = 'VLFKZ'.
 
     try.
 */ Select Data
@@ -1005,7 +1017,17 @@ CLASS /GDA/SDM_CL_ART_SELECTIONS IMPLEMENTATION.
             mv_text = mv_message.
     endtry.
 
+* Add Plant Category as it is not a MARC Field but is required for the BRF+ call
+    delete me->mt_field_list where table_line = 'VLFKZ'.
+    append 'VLFKZ' TO me->mt_field_list.
+
     loop at me->mt_mard assigning <ls_mard>.
+
+      select single vlfkz
+              from t001w
+              into <ls_mard>-vlfkz
+             where werks = <ls_mard>-werks.
+
       <ls_mard>-sdm_tabkey = /gda/cl_sdm_data_model_main=>build_string_from_key( i_tabname  = 'MARD'
                                                                            i_contents = <ls_mard> ).
     endloop.

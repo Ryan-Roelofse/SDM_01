@@ -210,7 +210,7 @@
      <SPRSL>E</SPRSL>
      <ARBGB>/GDA/SDM_ART</ARBGB>
      <MSGNR>033</MSGNR>
-     <TEXT>SDM: EINE TEST: The no cash discount tick cannot be X (Ticked)</TEXT>
+     <TEXT>SDM: EINA TEST: Regular Vendor must be ~ (Blank)</TEXT>
     </T100>
     <T100>
      <SPRSL>E</SPRSL>
@@ -612,13 +612,13 @@
      <SPRSL>E</SPRSL>
      <ARBGB>/GDA/SDM_ART</ARBGB>
      <MSGNR>225</MSGNR>
-     <TEXT>SDM:(Store Logistics) Rnding Profile must be 0090</TEXT>
+     <TEXT>SDM Article (DC Logistics): Rnding Profile must be 0090</TEXT>
     </T100>
     <T100>
      <SPRSL>E</SPRSL>
      <ARBGB>/GDA/SDM_ART</ARBGB>
      <MSGNR>226</MSGNR>
-     <TEXT>SDM:(Tariffs) Comm. code cannot be blank</TEXT>
+     <TEXT>SDM Article (DC Logistics): Comm. code cannot be blank</TEXT>
     </T100>
     <T100>
      <SPRSL>E</SPRSL>
@@ -630,7 +630,7 @@
      <SPRSL>E</SPRSL>
      <ARBGB>/GDA/SDM_ART</ARBGB>
      <MSGNR>228</MSGNR>
-     <TEXT>SDM:(MRP) ABC Indicator must be A</TEXT>
+     <TEXT>SDM Article (DC MRP): ABC Indicator must be A</TEXT>
     </T100>
     <T100>
      <SPRSL>E</SPRSL>
@@ -762,7 +762,7 @@
      <SPRSL>E</SPRSL>
      <ARBGB>/GDA/SDM_ART</ARBGB>
      <MSGNR>250</MSGNR>
-     <TEXT>SDM:(Sales) Item cat.group must be 0001</TEXT>
+     <TEXT>SDM:(Basic Data) Item cat.group must be 0001</TEXT>
     </T100>
     <T100>
      <SPRSL>E</SPRSL>
@@ -773,32 +773,38 @@
     <T100>
      <SPRSL>E</SPRSL>
      <ARBGB>/GDA/SDM_ART</ARBGB>
-     <MSGNR>252</MSGNR>
-     <TEXT>EORD TEST</TEXT>
-    </T100>
-    <T100>
-     <SPRSL>E</SPRSL>
-     <ARBGB>/GDA/SDM_ART</ARBGB>
      <MSGNR>253</MSGNR>
-     <TEXT>RMMW1 TEST</TEXT>
+     <TEXT>SDM:(Store Logistics) MRP type must be ND</TEXT>
     </T100>
     <T100>
      <SPRSL>E</SPRSL>
      <ARBGB>/GDA/SDM_ART</ARBGB>
      <MSGNR>254</MSGNR>
-     <TEXT>MARC TEST</TEXT>
+     <TEXT>SDM:(Store Logistics) Forecast model must be S</TEXT>
     </T100>
     <T100>
      <SPRSL>E</SPRSL>
      <ARBGB>/GDA/SDM_ART</ARBGB>
      <MSGNR>255</MSGNR>
-     <TEXT>SRC LIST TEST</TEXT>
+     <TEXT>SDM Article (Store Logistics): Rnding Profile must be 0090</TEXT>
     </T100>
     <T100>
      <SPRSL>E</SPRSL>
      <ARBGB>/GDA/SDM_ART</ARBGB>
      <MSGNR>256</MSGNR>
-     <TEXT>MARA TEST</TEXT>
+     <TEXT>SDM Article (Store Logistics): Comm. code cannot be blank</TEXT>
+    </T100>
+    <T100>
+     <SPRSL>E</SPRSL>
+     <ARBGB>/GDA/SDM_ART</ARBGB>
+     <MSGNR>257</MSGNR>
+     <TEXT>SDM Article (Store MRP): ABC Indicator must be A</TEXT>
+    </T100>
+    <T100>
+     <SPRSL>E</SPRSL>
+     <ARBGB>/GDA/SDM_ART</ARBGB>
+     <MSGNR>258</MSGNR>
+     <TEXT>SDM Article (Store QM): Inspection interval must be 7 days</TEXT>
     </T100>
     <T100>
      <SPRSL>E</SPRSL>

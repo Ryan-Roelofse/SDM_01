@@ -36,9 +36,6 @@ field-symbols:
   <tsteuertab>  like line of tsteuertab,
   <mamt>        like line of tmamt.
 
-if sy-uname = 'PAVITHRANSS'.
-  return.
-endif.
 
 data:
  details_original_material type rmmg1,
@@ -73,6 +70,10 @@ purchase_org        = details_dc_material-ekorg.
 *import store_location_dc = store_location_dc from memory id 'LGORT_DC'.
 *import store_location_st = store_location_st from memory id 'LGORT_ST'.
 
+if sy-uname = 'PAVITHRANSS'.
+  return.
+endif.
+
 if store is initial.
 * then use reference store
   if wrmmw2-rmatn is not initial.
@@ -94,8 +95,6 @@ if distribution_centre is initial.
       and   t001w~vlfkz = 'B'.
   endif.
 endif.
-
-
 
 * Set default SDM Type and include any customr SDM Types
 gr_sdm_type = /gda/sdm_cl_common_core=>get_sdm_type( x_object_type_id = '01'
@@ -131,6 +130,8 @@ call function 'MWLI_GET_BILD'
     matnr = material
     vkorg = sales_org
     vtweg = distribution_channel
+    wmvke = wmvke
+    wmaw1 = wmaw1
   importing
     wmwli = wmwli.
 
@@ -162,6 +163,11 @@ call function 'MARC_GET_BILD'
 
 move-corresponding wmarc to store_details.
 
+select single vlfkz
+        from t001w
+        into store_details-vlfkz
+       where werks = store_details-werks.
+
 call function 'MARC_GET_BILD'
   exporting
     matnr = material
@@ -170,6 +176,11 @@ call function 'MARC_GET_BILD'
     wmarc = wmarc.
 
 move-corresponding wmarc to dist_centre_details.
+
+select single vlfkz
+        from t001w
+        into dist_centre_details-vlfkz
+       where werks = dist_centre_details-werks.
 
 call function 'MARD_GET_BILD'
   exporting
@@ -181,6 +192,11 @@ call function 'MARD_GET_BILD'
 
 move-corresponding wmard to store_details_stl.
 
+select single vlfkz
+        from t001w
+        into store_details_stl-vlfkz
+       where werks = store_details_stl-werks.
+
 call function 'MARD_GET_BILD'
   exporting
     matnr = material
@@ -191,6 +207,10 @@ call function 'MARD_GET_BILD'
 
 move-corresponding wmard to dist_centre_details_stl.
 
+select single vlfkz
+        from t001w
+        into dist_centre_details_stl-vlfkz
+       where werks = dist_centre_details_stl-werks.
 
 call function 'MPOP_GET_BILD'
   exporting
@@ -506,6 +526,14 @@ loop at <results_val_all> assigning <result_val> where type ca 'EAX'.
       endloop.
     endif.
 
+    if <result_val>-extra_v1 cs 'MLGN'.
+      loop at gt_mlgn_sdm into gs_mlgn_sdm.
+        if <result_val>-sdm_tabkey cs gs_mlgn_sdm-lgnum.
+          ls_merrdat-msgv1 = gs_mlgn_sdm-lgnum.
+        endif.
+      endloop.
+    endif.
+
     if <result_val>-extra_v1 cs 'MWLI'.
       if wmwli-matnr is initial.
         wmwli-matnr = wmara-matnr.
@@ -534,7 +562,7 @@ loop at <results_val_all> assigning <result_val> where type ca 'EAX'.
       endloop.
     endif.
     if <result_val>-extra_v1 cs 'MPGD'.
-      ls_merrdat-msgv1 = wmpgd-matnr.
+      ls_merrdat-msgv1 = wmpgd-werks.
     endif.
 
     if <result_val>-extra_v1 cs 'EORD'.
@@ -547,6 +575,12 @@ loop at <results_val_all> assigning <result_val> where type ca 'EAX'.
 
     if <result_val>-extra_v1 cs 'MVKE'.
       loop at gt_mvke_sdm into gs_mvke_sdm.
+        if gs_mvke_sdm-vkorg = space or gs_mvke_sdm-vtweg = space.
+          ls_merrdat-msgv1 = ' ref '.
+          ls_merrdat-msgv2 = ' ref '.
+          continue.
+        endif.
+
         if <result_val>-sdm_tabkey cs  gs_mvke_sdm-vkorg and
            <result_val>-sdm_tabkey cs  gs_mvke_sdm-vtweg.
           ls_merrdat-msgv1 = gs_mvke_sdm-vkorg.

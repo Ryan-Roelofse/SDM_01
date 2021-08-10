@@ -13,8 +13,8 @@ loop at fehlerliste assigning field-symbol(<error_on_posting>) from 3.
     if <error_on_posting>-text_zeile cs '(Basic Data)'   or
        <error_on_posting>-text_zeile cs '(Listing)'      or
        <error_on_posting>-text_zeile cs '(Basic Data 2)' or
-       <error_on_posting>-text_zeile cs '(Acc)'          or
-       <error_on_posting>-text_zeile cs '(PIR)'.
+       <error_on_posting>-text_zeile cs '(Acc)'."          or
+*       <error_on_posting>-text_zeile cs '(PIR)'.
 
       concatenate 'Material : ' <error_on_posting>-msgv1 into additional_line-text_zeile.
       append additional_line to fehlerliste_buffer.
@@ -52,11 +52,17 @@ loop at fehlerliste assigning field-symbol(<error_on_posting>) from 3.
 
  endif.
 
-    if <error_on_posting>-text_zeile cs '(Purchasing)'.
+    if <error_on_posting>-text_zeile cs '(Purchasing)' or
+       <error_on_posting>-text_zeile cs '(PIR)'.
+
 * Vendor Purchase Org
       concatenate 'Vendor : ' <error_on_posting>-msgv2 'Purchase Org : ' <error_on_posting>-msgv3
       into additional_line-text_zeile.
       append additional_line to fehlerliste_buffer.
+
+      if <error_on_posting>-msgv1 is not initial.
+        replace all occurrences of substring <error_on_posting>-msgv1 in <error_on_posting>-text_zeile with space.
+      endif.
 
       if <error_on_posting>-msgv2 is not initial.
         replace all occurrences of substring <error_on_posting>-msgv2 in <error_on_posting>-text_zeile with space.
@@ -74,9 +80,11 @@ loop at fehlerliste assigning field-symbol(<error_on_posting>) from 3.
     endif.
 
     if <error_on_posting>-text_zeile cs '(Logistics DC)' or
+       <error_on_posting>-text_zeile cs 'DC Logistics)' or
        <error_on_posting>-text_zeile cs '(MRP)'   or
        <error_on_posting>-text_zeile cs '(DC QM)' or
-       <error_on_posting>-text_zeile cs '(Tariffs)'.
+       <error_on_posting>-text_zeile cs '(Tariffs)' or
+       <error_on_posting>-text_zeile cs '(DC MRP)'.
 
 * DC
       shift <error_on_posting>-msgv1 left deleting leading space.
@@ -94,7 +102,9 @@ loop at fehlerliste assigning field-symbol(<error_on_posting>) from 3.
       continue.
     endif.
 
-    if <error_on_posting>-text_zeile cs '(Store Logistics)'.
+    if <error_on_posting>-text_zeile cs '(Store Logistics)' or
+       <error_on_posting>-text_zeile cs '(Store QM)' or
+       <error_on_posting>-text_zeile cs '(Store MRP)'.
 
 * Store
       shift <error_on_posting>-msgv1 left deleting leading space.
@@ -116,6 +126,27 @@ loop at fehlerliste assigning field-symbol(<error_on_posting>) from 3.
     if <error_on_posting>-text_zeile cs '(POS)'.
       shift <error_on_posting>-msgv1 left deleting leading space.
       concatenate 'Sales Org: ' <error_on_posting>-msgv1 'Distribution Channel: ' <error_on_posting>-msgv2 into additional_line-text_zeile.
+      append additional_line to fehlerliste_buffer.
+
+      if <error_on_posting>-msgv1 is not initial.
+      replace all occurrences of substring <error_on_posting>-msgv1 in <error_on_posting>-text_zeile with space.
+      endif.
+      if <error_on_posting>-msgv2 is not initial.
+        replace all occurrences of substring <error_on_posting>-msgv2 in <error_on_posting>-text_zeile with space.
+      endif.
+      clear:
+        <error_on_posting>-msgv1,
+        <error_on_posting>-msgv2,
+        <error_on_posting>-msgv3.
+
+      append <error_on_posting> to fehlerliste_buffer.
+      continue.
+    endif.
+
+* Warehouse Data
+    if <error_on_posting>-text_zeile cs '(Warehouse Data)'.
+      shift <error_on_posting>-msgv1 left deleting leading space.
+      concatenate 'Warehouse No.: ' <error_on_posting>-msgv1 into additional_line-text_zeile.
       append additional_line to fehlerliste_buffer.
 
       if <error_on_posting>-msgv1 is not initial.

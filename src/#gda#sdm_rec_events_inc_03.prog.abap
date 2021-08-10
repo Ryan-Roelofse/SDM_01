@@ -2,20 +2,35 @@
 *&  Include           /GDA/SDM_REC_EVENTS_INC_3
 *&---------------------------------------------------------------------*
 
-if <primary>-tabname = '/GDA/SDM_S_EINE_01' and current_table = 'MAKT'.
+IF <primary>-tabname = '/GDA/SDM_S_EINE_01' AND current_table = 'MAKT'.
   break rroelofse.
-  read table current_keys_empty with key fieldname = 'INFNR' transporting no fields.
-  if sy-subrc <> 0.
-    read table context_keys_empty assigning field-symbol(<transfer_to_primary>) with key fieldname = 'INFNR'.
-    check sy-subrc = 0.
-    append <transfer_to_primary> to current_keys_empty.
-  endif.
+  READ TABLE current_keys_empty WITH KEY fieldname = 'INFNR' TRANSPORTING NO FIELDS.
+  IF sy-subrc <> 0.
+    READ TABLE context_keys_empty ASSIGNING FIELD-SYMBOL(<transfer_to_primary>) WITH KEY fieldname = 'INFNR'.
+    CHECK sy-subrc = 0.
+    APPEND <transfer_to_primary> TO current_keys_empty.
+  ENDIF.
 
-  read table current_keys with key fieldname = 'INFNR' transporting no fields.
-  if sy-subrc <> 0.
-    read table context_keys assigning field-symbol(<transfer_to_primary2>) with key fieldname = 'INFNR'.
-    check sy-subrc = 0.
-    append <transfer_to_primary2> to current_keys.
-  endif.
+  READ TABLE current_keys WITH KEY fieldname = 'INFNR' TRANSPORTING NO FIELDS.
+  IF sy-subrc <> 0.
+    READ TABLE context_keys ASSIGNING FIELD-SYMBOL(<transfer_to_primary2>) WITH KEY fieldname = 'INFNR'.
+    CHECK sy-subrc = 0.
+    APPEND <transfer_to_primary2> TO current_keys.
+  ENDIF.
+ENDIF.
 
-endif.
+*IF <primary>-tabname = '/GDA/SDM_S_PRICING_01' AND current_table = 'KONH'.
+*  READ TABLE current_keys_empty WITH KEY fieldname = 'KSCHL' TRANSPORTING NO FIELDS.
+*  IF sy-subrc <> 0.
+*    READ TABLE context_keys_empty ASSIGNING <transfer_to_primary> WITH KEY fieldname = 'KSCHL'.
+*    CHECK sy-subrc = 0.
+*    APPEND <transfer_to_primary> TO context_keys_empty.
+*  ENDIF.
+*
+*  READ TABLE current_keys WITH KEY fieldname = 'KSCHL' TRANSPORTING NO FIELDS.
+*  IF sy-subrc <> 0.
+*    READ TABLE context_keys ASSIGNING <transfer_to_primary2> WITH KEY fieldname = 'KSCHL'.
+*    CHECK sy-subrc = 0.
+*    APPEND <transfer_to_primary2> TO context_keys.
+*  ENDIF.
+*ENDIF.
