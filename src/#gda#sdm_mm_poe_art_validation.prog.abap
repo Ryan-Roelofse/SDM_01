@@ -27,7 +27,9 @@ data:
   dist_centre_details_stl type /gda/sdm_s_mard_01,
   weina                   type eina,
   wmgeine                 type mgeine,
-  customer             type wrpl-kunnr.
+  customer             type wrpl-kunnr,
+  details_original_material type rmmg1,
+  details_dc_material       type rmmw2.
 
 field-symbols:
   <marc>        like  line of gt_marc_sdm,
@@ -36,10 +38,6 @@ field-symbols:
   <tsteuertab>  like line of tsteuertab,
   <mamt>        like line of tmamt.
 
-
-data:
- details_original_material type rmmg1,
- details_dc_material       type rmmw2.
 
 import details_original_material = details_original_material from memory id 'DETAILS_ORIGINAL'.
 import details_dc_material       = details_dc_material       from memory id 'DETAILS_DC'.
@@ -50,10 +48,6 @@ distribution_channel = details_original_material-vtweg.
 store                = details_original_material-werks.
 store_location_st    = details_original_material-lgort.
 
-*get parameter id 'VKO' field sales_org.
-*get parameter id 'VTW' field distribution_channel.
-*get parameter id 'WRK' field store.
-
 
 *plant               = details_dc_material-werks.
 store_location_dc   = details_dc_material-lgort.
@@ -61,16 +55,7 @@ vendor              = details_dc_material-lifnr.
 distribution_centre = details_dc_material-werks.
 purchase_org        = details_dc_material-ekorg.
 
-*get parameter id 'VZW' field distribution_centre.
-*get parameter id 'LIF' field vendor.
-*get parameter id 'EKO' field purchase_org.
-*get parameter id 'WRK' field plant.
-
-
-*import store_location_dc = store_location_dc from memory id 'LGORT_DC'.
-*import store_location_st = store_location_st from memory id 'LGORT_ST'.
-
-if sy-uname = 'PAVITHRANSS'.
+if sy-uname = 'PAVITHRANSS' or sy-uname = 'KKEMRAJ'.
   return.
 endif.
 
@@ -249,6 +234,13 @@ insert dist_centre_details_stl into table gt_mard_sdm.
 
 *Change Document Structure for Material Master/Product Group
 move-corresponding wmpgd to gs_mpgd_sdm.
+
+if gs_mpgd_sdm-werks = distribution_centre.
+  gs_mpgd_sdm-vlfkz = dist_centre_details_stl-vlfkz.
+elseif gs_mpgd_sdm-werks = store.
+  gs_mpgd_sdm-vlfkz = store_details_stl-vlfkz.
+endif.
+
 gs_mpgd_sdm-sdm_tabkey = /gda/cl_sdm_data_model_main=>build_string_from_key( i_tabname  = 'MARA'
                                                                          i_contents = gs_mara_sdm ).
 append gs_mpgd_sdm to gt_mpgd_sdm.
@@ -265,6 +257,11 @@ append gs_eine_sdm to gt_eine_sdm.
 
 * Material Valuation
 move-corresponding wmbew to gs_mbew_sdm.
+if gs_mbew_sdm-bwkey = distribution_centre.
+  gs_mbew_sdm-vlfkz = dist_centre_details_stl-vlfkz.
+elseif gs_mbew_sdm-bwkey = store.
+  gs_mbew_sdm-vlfkz = store_details_stl-vlfkz.
+endif.
 gs_mbew_sdm-sdm_tabkey = /gda/cl_sdm_data_model_main=>build_string_from_key( i_tabname  = 'MBEW'
                                                                         i_contents = gs_mbew_sdm ).
 append gs_mbew_sdm to gt_mbew_sdm.
@@ -311,6 +308,7 @@ endif.
 
 * Forecast Parameters
 move-corresponding wmpop to gs_mpop_sdm.
+gs_mpop_sdm-vlfkz = dist_centre_details_stl-vlfkz.
 gs_mpop_sdm-sdm_tabkey = /gda/cl_sdm_data_model_main=>build_string_from_key( i_tabname  = 'MPOP'
                                                                          i_contents = gs_mpop_sdm ).
 append gs_mpop_sdm to gt_mpop_sdm.

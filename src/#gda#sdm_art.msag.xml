@@ -648,7 +648,7 @@
      <SPRSL>E</SPRSL>
      <ARBGB>/GDA/SDM_ART</ARBGB>
      <MSGNR>231</MSGNR>
-     <TEXT>SDM:(Acc) Valuation Class for Project Stock cannot be blank</TEXT>
+     <TEXT>SDM:(Acc) Valuation Class for Project Stock cannot be blank (&amp;1)</TEXT>
     </T100>
     <T100>
      <SPRSL>E</SPRSL>
@@ -690,7 +690,7 @@
      <SPRSL>E</SPRSL>
      <ARBGB>/GDA/SDM_ART</ARBGB>
      <MSGNR>238</MSGNR>
-     <TEXT>SDM:(Warehouse Data) Storage Bin must be PVB1-01</TEXT>
+     <TEXT>SDM:(Warehouse Data) Storage Bin must be 01-02-1</TEXT>
     </T100>
     <T100>
      <SPRSL>E</SPRSL>
@@ -720,13 +720,13 @@
      <SPRSL>E</SPRSL>
      <ARBGB>/GDA/SDM_ART</ARBGB>
      <MSGNR>243</MSGNR>
-     <TEXT>SDM:(Other DC Logistics) Max Storage period must be 5 days</TEXT>
+     <TEXT>SDM:(Other Logistics Data DC) Max Storage period must be 5 days</TEXT>
     </T100>
     <T100>
      <SPRSL>E</SPRSL>
      <ARBGB>/GDA/SDM_ART</ARBGB>
      <MSGNR>244</MSGNR>
-     <TEXT>SDM:(MRP) Sloc mrp indicator must be 1</TEXT>
+     <TEXT>SDM:(DC Logistics MRP) Sloc mrp indicator must be 1</TEXT>
     </T100>
     <T100>
      <SPRSL>E</SPRSL>
@@ -744,7 +744,7 @@
      <SPRSL>E</SPRSL>
      <ARBGB>/GDA/SDM_ART</ARBGB>
      <MSGNR>247</MSGNR>
-     <TEXT>SDM:(MRP) Planning material must be blank</TEXT>
+     <TEXT>SDM:(DC Logistics MRP) Planning material must be blank</TEXT>
     </T100>
     <T100>
      <SPRSL>E</SPRSL>
@@ -774,25 +774,25 @@
      <SPRSL>E</SPRSL>
      <ARBGB>/GDA/SDM_ART</ARBGB>
      <MSGNR>253</MSGNR>
-     <TEXT>SDM:(Store Logistics) MRP type must be ND</TEXT>
+     <TEXT>SDM Article (Store): MRP type must be ND</TEXT>
     </T100>
     <T100>
      <SPRSL>E</SPRSL>
      <ARBGB>/GDA/SDM_ART</ARBGB>
      <MSGNR>254</MSGNR>
-     <TEXT>SDM:(Store Logistics) Forecast model must be S</TEXT>
+     <TEXT>SDM Article (Store): Forecast model must be S</TEXT>
     </T100>
     <T100>
      <SPRSL>E</SPRSL>
      <ARBGB>/GDA/SDM_ART</ARBGB>
      <MSGNR>255</MSGNR>
-     <TEXT>SDM Article (Store Logistics): Rnding Profile must be 0090</TEXT>
+     <TEXT>SDM Article (Store): Rnding Profile must be 0090</TEXT>
     </T100>
     <T100>
      <SPRSL>E</SPRSL>
      <ARBGB>/GDA/SDM_ART</ARBGB>
      <MSGNR>256</MSGNR>
-     <TEXT>SDM Article (Store Logistics): Comm. code cannot be blank</TEXT>
+     <TEXT>SDM Article (Store): Comm. code cannot be blank</TEXT>
     </T100>
     <T100>
      <SPRSL>E</SPRSL>
@@ -805,6 +805,36 @@
      <ARBGB>/GDA/SDM_ART</ARBGB>
      <MSGNR>258</MSGNR>
      <TEXT>SDM Article (Store QM): Inspection interval must be 7 days</TEXT>
+    </T100>
+    <T100>
+     <SPRSL>E</SPRSL>
+     <ARBGB>/GDA/SDM_ART</ARBGB>
+     <MSGNR>259</MSGNR>
+     <TEXT>SDM:(DC Logistics Acc) Valuation Class for Project Stock cannot be blank</TEXT>
+    </T100>
+    <T100>
+     <SPRSL>E</SPRSL>
+     <ARBGB>/GDA/SDM_ART</ARBGB>
+     <MSGNR>260</MSGNR>
+     <TEXT>SDM:(Store Acc) Valuation Class for Project Stock cannot be blank</TEXT>
+    </T100>
+    <T100>
+     <SPRSL>E</SPRSL>
+     <ARBGB>/GDA/SDM_ART</ARBGB>
+     <MSGNR>261</MSGNR>
+     <TEXT>SDM:(Store MRP) Planning material must be blank</TEXT>
+    </T100>
+    <T100>
+     <SPRSL>E</SPRSL>
+     <ARBGB>/GDA/SDM_ART</ARBGB>
+     <MSGNR>262</MSGNR>
+     <TEXT>SDM:(Store MRP) Sloc mrp indicator must be 1</TEXT>
+    </T100>
+    <T100>
+     <SPRSL>E</SPRSL>
+     <ARBGB>/GDA/SDM_ART</ARBGB>
+     <MSGNR>263</MSGNR>
+     <TEXT>SDM:(Other Logistics Data Store) Max Storage period must be 5 days</TEXT>
     </T100>
     <T100>
      <SPRSL>E</SPRSL>

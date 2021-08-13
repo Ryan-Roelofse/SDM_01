@@ -240,6 +240,7 @@ private section.
   data MV_EINA_FIRST type C .
   data MV_EORD_FIRST type C .
   data MV_MVKE_FIRST type C .
+  data MT_PLANTS type WRF_T001W_TTY .
 
   methods DETERMINE_SELECTION .
   methods BUILD_MARA
@@ -966,14 +967,18 @@ CLASS /GDA/SDM_CL_ART_SELECTIONS IMPLEMENTATION.
     endtry.
 
 * Add Plant Category as it is not a MARC Field but is required for the BRF+ call
-    delete me->mt_field_list where table_line = 'VLFKZ'.
-    append 'VLFKZ' TO me->mt_field_list.
+    append 'VLFKZ' to me->mt_field_list.
 
     loop at me->mt_marc assigning <ls_marc>.
-      select single vlfkz
-              from t001w
-              into <ls_marc>-vlfkz
-             where werks = <ls_marc>-werks.
+*      select single vlfkz
+*              from t001w
+*              into <ls_marc>-vlfkz
+*             where werks = <ls_marc>-werks.
+
+      read table me->mt_plants assigning field-symbol(<plant>) with key werks = <ls_marc>-werks.
+      if <plant> is assigned.
+        <ls_marc>-vlfkz = <plant>-vlfkz.
+      endif.
 
       <ls_marc>-sdm_tabkey = /gda/cl_sdm_data_model_main=>build_string_from_key( i_tabname  = 'MARC'
                                                                            i_contents = <ls_marc> ).
@@ -981,7 +986,7 @@ CLASS /GDA/SDM_CL_ART_SELECTIONS IMPLEMENTATION.
   endmethod.
 
 
-  method BUILD_MARD.
+  method build_mard.
 
 
     data:
@@ -1018,15 +1023,14 @@ CLASS /GDA/SDM_CL_ART_SELECTIONS IMPLEMENTATION.
     endtry.
 
 * Add Plant Category as it is not a MARC Field but is required for the BRF+ call
-    delete me->mt_field_list where table_line = 'VLFKZ'.
-    append 'VLFKZ' TO me->mt_field_list.
+    append 'VLFKZ' to me->mt_field_list.
 
     loop at me->mt_mard assigning <ls_mard>.
 
-      select single vlfkz
-              from t001w
-              into <ls_mard>-vlfkz
-             where werks = <ls_mard>-werks.
+      read table me->mt_plants assigning field-symbol(<plant>) with key werks = <ls_mard>-werks.
+      if <plant> is assigned.
+        <ls_mard>-vlfkz = <plant>-vlfkz.
+      endif.
 
       <ls_mard>-sdm_tabkey = /gda/cl_sdm_data_model_main=>build_string_from_key( i_tabname  = 'MARD'
                                                                            i_contents = <ls_mard> ).
@@ -1195,6 +1199,8 @@ CLASS /GDA/SDM_CL_ART_SELECTIONS IMPLEMENTATION.
 
     me->build_field_selection( iv_struct_name = '/GDA/SDM_S_MBEW_01' ).
 
+* Remove Plant Category as it is not a MBEW Field but is required for the BRF+ call
+    delete me->mt_field_list where table_line = 'VLFKZ'.
     try.
 */ Select Data
         select (me->mt_field_list)
@@ -1213,8 +1219,16 @@ CLASS /GDA/SDM_CL_ART_SELECTIONS IMPLEMENTATION.
 *            mv_text = mv_message.
     endtry.
 
+* Add Plant Category as it is not a MBEW Field but is required for the BRF+ call
+    append 'VLFKZ' to me->mt_field_list.
 
     loop at me->mt_mbew assigning <ls_mbew>.
+
+      read table me->mt_plants assigning field-symbol(<plant>) with key werks = <ls_mbew>-bwkey.
+      if <plant> is assigned.
+        <ls_mbew>-vlfkz = <plant>-vlfkz.
+      endif.
+
       <ls_mbew>-sdm_tabkey = /gda/cl_sdm_data_model_main=>build_string_from_key( i_tabname  = 'MBEW'
                                                                            i_contents = <ls_mbew> ).
     endloop.
@@ -1539,6 +1553,9 @@ CLASS /GDA/SDM_CL_ART_SELECTIONS IMPLEMENTATION.
 
     me->build_field_selection( iv_struct_name = '/GDA/SDM_S_MPGD_01' ).
 
+* Remove Plant Category as it is not a MPGD Field but is required for the BRF+ call
+    delete me->mt_field_list where table_line = 'VLFKZ'.
+
     TRY.
 */ Select Data
         SELECT (me->mt_field_list)
@@ -1555,8 +1572,16 @@ CLASS /GDA/SDM_CL_ART_SELECTIONS IMPLEMENTATION.
 *            mv_text = mv_message.
     ENDTRY.
 
+* Add Plant Category as it is not a MPGD Field but is required for the BRF+ call
+    append 'VLFKZ' to me->mt_field_list.
 
     loop at me->mt_mpgd assigning <ls_mpgd>.
+
+      read table me->mt_plants assigning field-symbol(<plant>) with key werks = <ls_mpgd>-werks.
+      if <plant> is assigned.
+        <ls_mpgd>-vlfkz = <plant>-vlfkz.
+      endif.
+
       <ls_mpgd>-sdm_tabkey = /gda/cl_sdm_data_model_main=>build_string_from_key( i_tabname  = 'MARC'
                                                                            i_contents = <ls_mpgd> ).
     endloop.
@@ -1726,6 +1751,7 @@ CLASS /GDA/SDM_CL_ART_SELECTIONS IMPLEMENTATION.
     DATA:
       ls_mpop_sdm        TYPE /gda/sdm_s_mpop_01, "Forecasting
       ls_mpop            TYPE mpop,            "Forecasting
+      ls_mpop_v          TYPE mpop_v,
       ls_mfhm            TYPE mfhm,            "PRT
       ls_mfhm_sdm        TYPE /gda/sdm_s_mfhm_06, "PRT
 *      ls_smeinh          type smeinh,          "UoM
@@ -2127,31 +2153,41 @@ CLASS /GDA/SDM_CL_ART_SELECTIONS IMPLEMENTATION.
           IF <ls_mapr>-matnr <> mv_object.
             EXIT.
           ELSE.
+*Below FM commented due to while updating table MPOP_V in runtime and again picking up MPOP
+*records from below FM, it is picking up old value but not updated one.
 */ Read with FM
-            CALL FUNCTION 'MPOP_SINGLE_READ'
-              EXPORTING
-*               kzrfb      = SPACE    " Ind.: Refresh buffer entry for material no.
-                matnr      = <ls_mapr>-matnr
-*               maxtz      =     " Max. No. of Entries in Buffer
-                werks      = <ls_mapr>-werks
-              IMPORTING
-*               wmpop      =     " Work area for MPOP
-                o_mpop     = ls_mpop
-*        TABLES
-*               prowf_tab  =     " Table of forecast values (w/o key)
-              EXCEPTIONS
-                not_found  = 1
-                wrong_call = 2
-                OTHERS     = 3.
+*            CALL FUNCTION 'MPOP_SINGLE_READ'
+*              EXPORTING
+**               kzrfb      = SPACE    " Ind.: Refresh buffer entry for material no.
+*                matnr      = <ls_mapr>-matnr
+**               maxtz      =     " Max. No. of Entries in Buffer
+*                werks      = <ls_mapr>-werks
+*              IMPORTING
+**               wmpop      =     " Work area for MPOP
+*                o_mpop     = ls_mpop
+**        TABLES
+**               prowf_tab  =     " Table of forecast values (w/o key)
+*              EXCEPTIONS
+*                not_found  = 1
+*                wrong_call = 2
+*                OTHERS     = 3.
+
+            SELECT SINGLE * FROM mpop_v INTO ls_mpop_v WHERE matnr = <ls_mapr>-matnr
+                                                         AND werks = <ls_mapr>-werks.
             IF sy-subrc = 0.
-              MOVE-CORRESPONDING ls_mpop TO ls_mpop_sdm.
+              MOVE-CORRESPONDING ls_mpop_v TO ls_mpop_sdm.
 *              ls_mpop_sdm-sdm_tabkey = <ls_mapr>-sdm_tabkey.
+
+                read table me->mt_plants assigning field-symbol(<plant>) with key werks = ls_mpop_sdm-werks.
+                if <plant> is assigned.
+                  ls_mpop_sdm-vlfkz = <plant>-vlfkz.
+                endif.
               ls_mpop_sdm-sdm_tabkey = /gda/cl_sdm_data_model_main=>build_string_from_key( i_tabname  = 'MAPR' "'MARC'
                                                                            i_contents = ls_mpop_sdm ).
 
               INSERT ls_mpop_sdm INTO TABLE me->mt_mpop_spec.
               CLEAR:
-               ls_mpop,
+               ls_mpop_v,
                ls_mpop_sdm.
             ENDIF.
           ENDIF.
@@ -2654,7 +2690,7 @@ CLASS /GDA/SDM_CL_ART_SELECTIONS IMPLEMENTATION.
   ENDMETHOD.
 
 
-  method CONSTRUCTOR.
+  method constructor.
 
     super->constructor( iv_sprint = iv_sprint ).
 
@@ -2663,15 +2699,8 @@ CLASS /GDA/SDM_CL_ART_SELECTIONS IMPLEMENTATION.
     me->mv_main       = 'MV_OBJECT'. "'MV_SPEC_MATNR'.
     me->mv_base_field = 'MATNR'.
 
-*/ Create BRF Exception Object Utility Object
-*    IF mo_brf_exc_util IS NOT BOUND.
-*      CREATE OBJECT mo_brf_exc_util
-*        EXPORTING
-*          iv_object_type = gc_object_material
-*          iv_period      = sy-datum
-*          iv_del_sign    = 'EQ'. "Equal
-*    ENDIF.
-
+    select * from t001w
+            into table me->mt_plants.
 
   endmethod.
 
